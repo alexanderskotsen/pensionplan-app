@@ -150,6 +150,7 @@ if(typeof document!=='undefined'){(function(){
 const tg=window.Telegram&&Telegram.WebApp; if(tg){tg.ready();tg.expand();try{tg.setHeaderColor('#eef1f5');tg.setBackgroundColor('#eef1f5')}catch(e){}}
 const $=id=>document.getElementById(id);
 const S={tab:'p',view:'form',sex:'f',work:'emp',past:2,cpay:21,cgoal:1000000};
+try{if(new URLSearchParams(location.search).get('tab')==='child')S.tab='c'}catch(e){}
 function chips(id,key,num){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   [...$(id).children].forEach(x=>x.classList.toggle('on',x===b));const v=b.dataset.v;S[key]=num&&v!=='own'?Number(v):v;upd()})}
 chips('sex','sex');chips('work','work');chips('past','past',true);chips('cgoal','cgoal',true);
@@ -226,8 +227,8 @@ function upd(){
   if(S.tab==='c')renderChild();
   const main=$('main'), sec=$('second');
   if(S.tab==='p'&&S.view==='form'){main.textContent='Порахувати';sec.hidden=true}
-  else if(S.tab==='p'){main.textContent='Отримати точний розрахунок';sec.hidden=false}
-  else{main.textContent='Точний розрахунок на консультації';sec.hidden=true}
+  else if(S.tab==='p'){main.textContent='Отримати точний розрахунок';sec.textContent='Надіслати розбір у Telegram';sec.hidden=false}
+  else{main.textContent='Точний розрахунок на консультації';sec.textContent='Надіслати розрахунок у Telegram';sec.hidden=!childGoal()}
 }
 function payload(action){
   const i=pensionInput(), d={a:action,p:{sex:i.sex,age:i.age,ret:i.ret,stazh:i.stazh,work:i.work,net:i.net,past:i.pastIdx,want:i.want,calc:S.view==='res'?1:0}};
