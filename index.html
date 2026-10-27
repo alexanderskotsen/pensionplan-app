@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Пенсійний план</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#eef1f5;--card:#fff;--fg:#151b26;--muted:#6b7483;--line:#e3e7ee;--accent:#2a6fdb;--accent-soft:#e9f1fd;--warn:#b25a00;--warn-soft:#fdf2e3;--good:#1d7a4a;--good-soft:#e6f5ec;--gold:#f0b35a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;font-size:15px}
+.wrap{max-width:520px;margin:0 auto;padding:12px 12px 120px;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;position:sticky;top:0;z-index:5}
+.tabs button{flex:1;border:0;background:none;padding:9px 0;font:600 14px inherit;font-family:inherit;color:#4f5868;border-radius:8px}
+.tabs button.on{background:#fff;color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.card{background:var(--card);border-radius:14px;padding:14px}
+.f{margin-bottom:16px}.f:last-child{margin-bottom:0}
+.lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lbl b{color:var(--fg);font-size:15px;white-space:nowrap}
+.hint{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;margin-top:2px}
+.seg{display:flex;gap:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.seg button,.chips button{font-family:inherit;font-size:14px;border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:18px;padding:8px 12px}
+.seg button{flex:1;border-radius:9px}
+.seg button.on,.chips button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.chips button:disabled{opacity:.35}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:28px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(to right,var(--accent) var(--p,50%),var(--line) var(--p,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--accent);margin-top:-10px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:4px;background:var(--accent)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid var(--accent)}
+input[type=number]{font:inherit;width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;margin-top:8px}
+.big{font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.15}.big small{font-size:15px;color:var(--muted);font-weight:500}
+.pill{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12px;font-weight:600;margin:6px 4px 0 0}
+.pill.ok{background:var(--good-soft);color:var(--good)}.pill.w{background:var(--warn-soft);color:var(--warn)}
+.bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden;display:flex;margin:12px 0 6px}
+.bar i{background:var(--accent)}.bar s{background:var(--gold);flex:1}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted)}
+.legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.legend .a:before{background:var(--accent)}.legend .b:before{background:var(--gold)}
+.gap{background:var(--accent-soft);border-radius:14px;padding:14px}
+.gap .k{font-size:13px;color:#34507a}.gap .v{font-size:26px;font-weight:700;color:var(--accent);margin-top:2px}
+dl{margin:10px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:13.5px}dt{color:var(--muted)}dd{margin:0;font-weight:600;text-align:right}
+.timeline{display:flex;min-height:30px;border-radius:8px;overflow:hidden;margin-top:10px;font-size:11.5px;font-weight:600;color:#fff}
+.timeline div{display:flex;align-items:center;justify-content:center;text-align:center;padding:4px}
+.mini{font-size:12px;color:var(--muted);line-height:1.45}
+.note{font-size:12.5px;color:var(--warn);background:var(--warn-soft);border-radius:12px;padding:10px 12px;line-height:1.45}
+.cta{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(14px + env(safe-area-inset-bottom))}
+.cta .in{max-width:520px;margin:0 auto}
+.btn{display:block;width:100%;border:0;background:var(--accent);color:#fff;font:600 16px inherit;font-family:inherit;padding:14px;border-radius:12px}
+.btn2{display:block;width:100%;border:0;background:none;color:var(--accent);font:600 14px inherit;font-family:inherit;padding:10px 0 0}
+.back{border:0;background:none;color:var(--accent);font:600 14px inherit;font-family:inherit;padding:2px 0;text-align:left}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs"><button id="tab-p" class="on">Моя пенсія</button><button id="tab-c">Для дитини</button></div>
+
+  <!-- ПЕНСІЯ: ФОРМА -->
+  <section id="p-form">
+    <div class="card">
+      <div class="f"><div class="lbl">Стать</div>
+        <div class="seg" id="sex"><button data-v="f" class="on">Жінка</button><button data-v="m">Чоловік</button></div></div>
+      <div class="f"><div class="lbl">Вік зараз <b id="age-v"></b></div><input type="range" id="age" min="18" max="65" value="35"></div>
+      <div class="f"><div class="lbl">Хочу на пенсію у <b id="ret-v"></b></div><input type="range" id="ret" min="40" max="70" value="60">
+        <div class="hint"><span>40</span><span>державна — з 60</span><span>70</span></div></div>
+      <div class="f"><div class="lbl">Офіційний стаж уже є <b id="stazh-v"></b></div><input type="range" id="stazh" min="0" max="45" value="12"></div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <div class="f"><div class="lbl">Як працюю зараз</div>
+        <div class="chips" id="work"><button data-v="emp" class="on">Офіційно за наймом</button><button data-v="fop">ФОП</button><button data-v="none">Неофіційно / не працюю</button></div></div>
+      <div class="f" id="net-f"><div class="lbl">На руки зараз <b id="net-v"></b></div><input type="range" id="net" min="5000" max="150000" step="1000" value="25000"></div>
+      <div class="f"><div class="lbl">Раніше в середньому на руки</div>
+        <div class="chips" id="past"><button data-v="0">до 10 тис.</button><button data-v="1">10–20</button><button data-v="2" class="on">20–30</button><button data-v="3">30–45</button><button data-v="4">45–65</button><button data-v="5">65+</button><button data-v="6">не знаю</button></div></div>
+      <div class="f"><div class="lbl">Хочу мати на пенсії <b id="want-v"></b></div><input type="range" id="want" min="5000" max="100000" step="1000" value="20000"></div>
+    </div>
+  </section>
+
+  <!-- ПЕНСІЯ: РЕЗУЛЬТАТ -->
+  <section id="p-res" hidden>
+    <button class="back" id="p-back">← Змінити дані</button>
+    <div id="p-out"></div>
+  </section>
+
+  <!-- ДИТИНА -->
+  <section id="c-form" hidden>
+    <div class="card">
+      <div class="f"><div class="lbl">Вік дитини <b id="cage-v"></b></div><input type="range" id="cage" min="0" max="17" value="4"></div>
+      <div class="f"><div class="lbl">Отримати гроші у</div><div class="chips" id="cpay"></div>
+        <div class="hint"><span>програма триває щонайменше 10 років</span></div></div>
+      <div class="f"><div class="lbl">Зібрати <b id="cgoal-v"></b></div>
+        <div class="chips" id="cgoal"><button data-v="200000">200 тис.</button><button data-v="500000">500 тис.</button><button data-v="1000000" class="on">1 млн</button><button data-v="own">своя сума</button></div>
+        <input type="number" id="cgoal-own" placeholder="Сума, грн" min="10000" step="10000" hidden></div>
+    </div>
+    <div id="c-out" style="margin-top:10px;display:flex;flex-direction:column;gap:10px"></div>
+  </section>
+</div>
+
+<div class="cta"><div class="in">
+  <button class="btn" id="main">Порахувати</button>
+  <button class="btn2" id="second" hidden>Надіслати розбір у Telegram</button>
+</div></div>
+
+<script>
+// ===== Формула: та сама, що в calc.py бота =====
+const ZP=17482.87, AVG_NOW=26269, PM=2595, MIN65=3758, MAX=25950, BASE_YEAR=2026, MIN_WAGE=8647;
+const NET_TO_GROSS=1/(1-0.18-0.05), CHILD_RETURN=0.07, RET=0.03, YEARS=20;
+const PAST=[8000,15000,25000,37500,55000,80000,null];
+const jround=x=>Math.floor(x+0.5);
+const money=n=>jround(n).toLocaleString('uk-UA').replace(/ /g,' ')+' грн';
+const mln=n=>n>=1e6?(Math.round(n/1e5)/10).toString().replace('.',',')+' млн грн':money(n);
+function req(y){const k=Math.min(Math.max(y-2026,0),2);return {r60:33+k,r63:23+k,r65:15}}
+function statePension(sex,age,sa,total,kz){
+  const year=BASE_YEAR+Math.max(0,jround(sa-age)), full=sex==='f'?30:35;
+  const ks=Math.floor(total*12)/1200, raw=ZP*kz*ks;
+  const over=Math.max(0,Math.floor(total-full)), extra=over*Math.min(raw*0.01,PM*0.01);
+  const minP=total>=full?(sa>=65?MIN65:PM):PM*total/full;
+  const p=Math.min(MAX,Math.max(raw+extra,minP)), rq=req(year);
+  const need=sa>=65?rq.r65:sa>=63?rq.r63:rq.r60;
+  return {p,ok:total>=need,need,rq,year};
+}
+const annuity=(m,n,r)=>(n<=0||m<=0)?0:(r>0?m*12*(1-Math.pow(1+r,-n))/r:m*12*n);
+function calculate(sex,age,ret,stazh,future,pastK,salary,want){
+  const total=stazh+future, futK=salary/AVG_NOW;
+  const kz=total>0?(stazh*pastK+future*futK)/total:0, early=ret<60;
+  let p,eligible,need,altAge=null,stateAge=null,bridge=0,gap,cap,year;
+  if(!early){
+    const s=statePension(sex,age,ret,total,kz); p=s.p;eligible=s.ok;need=s.need;year=s.year;
+    if(!eligible){p=0;altAge=total>=s.rq.r63?63:total>=s.rq.r65?65:null}
+    stateAge=eligible?ret:null; gap=Math.max(0,want-p); cap=annuity(gap,YEARS,RET);
+  }else{
+    p=0;eligible=false;need=null;
+    for(const sa of [60,63,65]){const s=statePension(sex,age,sa,total,kz);if(need===null)need=s.need;if(s.ok){stateAge=sa;p=s.p;eligible=true;need=s.need;break}}
+    year=BASE_YEAR+Math.max(0,jround(ret-age)); gap=Math.max(0,want-p);
+    if(stateAge){bridge=stateAge-ret;cap=annuity(want,bridge,RET)+annuity(gap,YEARS,RET)/Math.pow(1+RET,bridge)}
+    else{bridge=60-ret+YEARS;cap=annuity(want,bridge,RET)}
+  }
+  const months=Math.max(1,jround((ret-age)*12)), rm=Math.pow(1+RET,1/12)-1;
+  const pmt=ret>age?cap*rm/(Math.pow(1+rm,months)-1):null;
+  return {pension:jround(p),eligible,need,total,altAge,year,early,stateAge,bridge,gap:jround(gap),capital:jround(cap),pmt:pmt===null?null:jround(pmt),ratio:salary>0?jround(p/salary*100):null};
+}
+function childOptions(a){const e=Math.max(18,a+10);if(e>27)return[];return [...new Set([e,...[18,21,23,25,27].filter(x=>x>=e)])].sort((x,y)=>x-y)}
+function childCalc(a,pay,goal){const y=pay-a,m=y*12,rm=Math.pow(1+CHILD_RETURN,1/12)-1;return {years:y,pmt:jround(goal*rm/(Math.pow(1+rm,m)-1)),payYear:BASE_YEAR+y}}
+if(typeof module!=='undefined'){module.exports={calculate,childCalc,childOptions};}
+</script>
+<script>
+if(typeof document!=='undefined'){(function(){
+const tg=window.Telegram&&Telegram.WebApp; if(tg){tg.ready();tg.expand();try{tg.setHeaderColor('#eef1f5');tg.setBackgroundColor('#eef1f5')}catch(e){}}
+const $=id=>document.getElementById(id);
+const S={tab:'p',view:'form',sex:'f',work:'emp',past:2,cpay:21,cgoal:1000000};
+function chips(id,key,num){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
+  [...$(id).children].forEach(x=>x.classList.toggle('on',x===b));const v=b.dataset.v;S[key]=num&&v!=='own'?Number(v):v;upd()})}
+chips('sex','sex');chips('work','work');chips('past','past',true);chips('cgoal','cgoal',true);
+$('cpay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.cpay=Number(b.dataset.v);upd()});
+['age','ret','stazh','net','want','cage'].forEach(id=>$(id).addEventListener('input',upd));
+$('cgoal-own').addEventListener('input',upd);
+$('tab-p').onclick=()=>{S.tab='p';upd()};$('tab-c').onclick=()=>{S.tab='c';upd()};
+$('p-back').onclick=()=>{S.view='form';upd();scrollTo(0,0)};
+const v=id=>Number($(id).value);
+function fill(el){const p=(el.value-el.min)/(el.max-el.min)*100;el.style.setProperty('--p',p+'%')}
+function pensionInput(){
+  const age=v('age'), ret=Math.max(v('ret'),age+1);
+  const net=S.work==='emp'?v('net'):null;
+  const salary=S.work==='emp'?net*NET_TO_GROSS:S.work==='fop'?MIN_WAGE:0;
+  const future=S.work==='none'?0:Math.max(0,ret-age);
+  const pastNet=PAST[S.past], pastK=pastNet===null?0.8:pastNet*NET_TO_GROSS/AVG_NOW;
+  return {sex:S.sex,age,ret,stazh:v('stazh'),future,pastK,salary,want:v('want'),net,work:S.work,pastIdx:S.past};
+}
+function childGoal(){if(S.cgoal==='own'){const x=Number($('cgoal-own').value);return x>=10000?x:0}return S.cgoal}
+function renderPension(){
+  const i=pensionInput(), r=calculate(i.sex,i.age,i.ret,i.stazh,i.future,i.pastK,i.salary,i.want);
+  let h='';
+  if(r.early){
+    const tot=(r.stateAge?(r.stateAge-i.ret):0)+20, w1=r.stateAge?Math.round((r.stateAge-i.ret)/tot*100):100;
+    h+=`<div class="card"><div class="lbl">Хочу перестати працювати у <b>${i.ret}</b></div>`;
+    if(r.stateAge){
+      h+=`<div class="timeline"><div style="width:${w1}%;background:var(--gold)">${i.ret}–${r.stateAge}: тільки свої</div><div style="width:${100-w1}%;background:var(--accent)">з ${r.stateAge}: держава ${money(r.pension)} + свої</div></div>
+      <p class="mini" style="margin:10px 0 0">Державна пенсія — не раніше 60. З вашим стажем (${r.total} р.) її призначать з <b>${r.stateAge}</b>. <b>${r.bridge} років</b> доведеться жити на власні гроші.</p></div>`;
+    }else{
+      h+=`<p class="mini" style="margin:6px 0 0">⚠️ Якщо перестати працювати у ${i.ret}, стажу (${r.total} р.) не вистачить навіть на державну пенсію (потрібно від ${r.need} р.). Жити доведеться тільки на власні накопичення.</p></div>`;
+    }
+    h+=`<div class="gap"><div class="k">Відкладати з сьогодні до ${i.ret}</div><div class="v">≈ ${money(r.pmt)}/міс</div>
+      <dl><dt>потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd>${r.stateAge?`<dt>до ${r.stateAge} — щомісяця</dt><dd>${money(i.want)}</dd><dt>після ${r.stateAge} — доплата</dt><dd>${money(r.gap)}</dd>`:''}</dl></div>`;
+  }else{
+    const share=r.eligible?Math.min(100,Math.round(r.pension/i.want*100)):0;
+    h+=`<div class="card"><div class="lbl">Пенсія від держави у ${i.ret} років</div><div class="big">${money(r.pension)} <small>/міс</small></div>`;
+    h+=r.eligible?`<span class="pill ok">Право є: стаж ${r.total} р.</span>${r.ratio?`<span class="pill w">${r.ratio}% від зарплати</span>`:''}`
+      :`<span class="pill w">Права у ${i.ret} немає: потрібно ${r.need} р. стажу, буде ${r.total}</span>${r.altAge?`<span class="pill w">можна з ${r.altAge}</span>`:''}`;
+    h+=`<div class="bar"><i style="width:${share}%"></i><s></s></div><div class="legend"><span class="a">держава ${money(r.pension)}</span><span class="b">не вистачає ${money(r.gap)}</span></div></div>`;
+    h+=r.gap>0?`<div class="gap"><div class="k">Щоб мати ${money(i.want)}/міс, відкладати</div><div class="v">≈ ${money(r.pmt)}/міс</div>
+      <dl><dt>до пенсії лишилось</dt><dd>${i.ret-i.age} р.</dd><dt>потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></dl></div>`
+      :`<div class="gap"><div class="k">За розрахунком державна пенсія покриває бажаний дохід 👍</div></div>`;
+  }
+  if(i.work==='fop')h+=`<div class="card mini">Як ФОП з мінімальним ЄСВ ви отримаєте пенсію, близьку до мінімальної, навіть з великим доходом.</div>`;
+  if(i.work==='none')h+=`<div class="card mini">Неофіційна робота не додає ні стажу, ні пенсії: для ПФУ ці роки ніби не існують.</div>`;
+  h+=`<div class="note">⚠️ Це приблизний розрахунок. Точний розрахунок і підбір програми під ваш бюджет — на безкоштовній консультації.</div>
+      <div class="mini">Оцінка за формулою ПФУ в цінах 2026 року, не рішення Пенсійного фонду.</div>`;
+  $('p-out').innerHTML=h; $('p-out').style.cssText='display:flex;flex-direction:column;gap:10px;margin-top:8px';
+}
+function renderChild(){
+  const a=v('cage'), opts=childOptions(a);
+  if(!opts.includes(S.cpay))S.cpay=opts[0];
+  $('cpay').innerHTML=opts.map(x=>`<button data-v="${x}" class="${x===S.cpay?'on':''}">${x}</button>`).join('');
+  $('cgoal-own').hidden=S.cgoal!=='own';
+  const goal=childGoal(); $('cgoal-v').textContent=goal?money(goal):'';
+  if(!goal){$('c-out').innerHTML='<div class="mini">Вкажіть суму від 10 000 грн.</div>';return}
+  const r=childCalc(a,S.cpay,goal);
+  $('c-out').innerHTML=`<div class="gap"><div class="k">Щоб у ${r.payYear} році отримати ${money(goal)}</div><div class="v">≈ ${money(r.pmt)}/міс</div>
+    <dl><dt>програма</dt><dd>${r.years} років</dd><dt>виплата</dt><dd>у ${S.cpay} р. дитини</dd></dl></div>
+    <div class="card mini">🛡 Якщо з батьками щось станеться, страхова продовжить внески — дитина все одно отримає суму. Внески можна щороку індексувати від інфляції.</div>
+    <div class="note">⚠️ Приблизний розрахунок. Точну суму під вашу дитину, умови різних компаній та індексацію покажемо на безкоштовній консультації.</div>
+    <div class="mini">Дохідність не гарантується, точні умови залежать від програми і страхової компанії.</div>`;
+}
+function upd(){
+  const age=v('age'); $('ret').min=Math.max(40,age+1); if(v('ret')<=age)$('ret').value=age+1;
+  ['age','ret','stazh','net','want','cage'].forEach(id=>fill($(id)));
+  $('age-v').textContent=age; $('ret-v').textContent=v('ret'); $('stazh-v').textContent=v('stazh')+' р.';
+  $('net-v').textContent=money(v('net')); $('want-v').textContent=money(v('want'))+'/міс';
+  const ca=v('cage'); $('cage-v').textContent=ca+(ca===1?' рік':ca>=2&&ca<=4?' роки':' років');
+  $('net-f').hidden=S.work!=='emp';
+  $('tab-p').classList.toggle('on',S.tab==='p'); $('tab-c').classList.toggle('on',S.tab==='c');
+  $('p-form').hidden=!(S.tab==='p'&&S.view==='form'); $('p-res').hidden=!(S.tab==='p'&&S.view==='res'); $('c-form').hidden=S.tab!=='c';
+  if(S.tab==='p'&&S.view==='res')renderPension();
+  if(S.tab==='c')renderChild();
+  const main=$('main'), sec=$('second');
+  if(S.tab==='p'&&S.view==='form'){main.textContent='Порахувати';sec.hidden=true}
+  else if(S.tab==='p'){main.textContent='Отримати точний розрахунок';sec.hidden=false}
+  else{main.textContent='Точний розрахунок на консультації';sec.hidden=true}
+}
+function payload(action){
+  const i=pensionInput(), d={a:action,p:{sex:i.sex,age:i.age,ret:i.ret,stazh:i.stazh,work:i.work,net:i.net,past:i.pastIdx,want:i.want,calc:S.view==='res'?1:0}};
+  if(S.tab==='c'&&childGoal())d.c={age:v('cage'),pay:S.cpay,goal:childGoal()};
+  return JSON.stringify(d);
+}
+function send(action){
+  const data=payload(action);
+  if(tg&&tg.sendData&&tg.initData!==undefined){try{tg.sendData(data);return}catch(e){}}
+  alert('Відкрийте калькулятор через кнопку в Telegram-боті, щоб надіслати дані.\n\n'+data);
+}
+$('main').onclick=()=>{
+  if(S.tab==='p'&&S.view==='form'){S.view='res';upd();scrollTo(0,0);return}
+  send(S.tab==='c'?'child':'lead');
+};
+$('second').onclick=()=>send('bd');
+upd();
+})();}
+</script>
+</body>
+</html>
