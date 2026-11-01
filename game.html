@@ -9,7 +9,7 @@
 *{box-sizing:border-box}html,body{margin:0}
 
 .navtabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;margin:0 auto 10px;max-width:520px;gap:2px}
-.navtabs button{flex:1;border:0;background:none;padding:9px 0;font:600 13.5px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#4f5868;border-radius:8px;cursor:pointer}
+.navtabs button{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;background:none;padding:9px 0;font:600 12.5px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#4f5868;border-radius:8px;cursor:pointer}
 .navtabs button.on{background:#fff;color:#151b26;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 [hidden]{display:none!important}
 /* Layout: phone column — HUD (capital, age bar), play field canvas, overlays for start/end screens. Light, bright, money-themed. */
@@ -74,7 +74,7 @@ h2{font-size:1.25rem;margin:0}
 </style>
 </head>
 <body>
-<nav class="navtabs"><button type="button" class="" onclick="navGo('index.html')">Пенсія</button><button type="button" class="" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="" onclick="navGo('invest.html')">Інвестиції</button><button type="button" class="on" onclick="navGo('game.html')">Гра</button></nav>
+<nav class="navtabs"><button type="button" class="" onclick="navGo('index.html')">Пенсія</button><button type="button" class="" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="" onclick="navGo('invest.html')">Інвестиції</button><button type="button" class="on" onclick="navGo('game.html')">Гра</button><button type="button" class="" onclick="navGo('insure.html')">Захист</button></nav>
 <script>
 function navGo(page, tab){ const q = new URLSearchParams(location.search); q.delete('tab'); if (tab) q.set('tab', tab); const s = q.toString(); location.href = page + (s ? '?' + s : ''); }
 </script>
@@ -381,7 +381,7 @@ function showStart(){
     '<p class="lead">Вам 30. За хвилину пролетять 30 років до пенсії. Ловіть внески і страховки, оминайте пастки. Все зібране росте на 8% на рік.</p>' +
     '<div class="legend">' +
       '<div><span data-i="coin"></span><span><b>Внески</b><span>100, 500, 2000 грн</span></span></div>' +
-      '<div><span data-i="policy"></span><span><b>Страховки</b><span>поліс, медична, авто, житло. Діють до кінця гри</span></span></div>' +
+      '<div><span data-i="policy"></span><span><b>Захист</b><span>поліс, медична, авто, житло. Діють до кінця гри</span></span></div>' +
       '<div><span data-i="credit"></span><span><b>Пастки</b><span>кредит, конверт, шахраї, «хочу!» — оминайте</span></span></div>' +
       '<div><span data-i="boost"></span><span><b>Форс-мажори</b><span>від них не втекти. Рятує тільки страховка</span></span></div>' +
     '</div>' +
