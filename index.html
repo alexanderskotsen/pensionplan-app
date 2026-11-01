@@ -11,7 +11,7 @@
 html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;font-size:15px}
 .wrap{max-width:520px;margin:0 auto;padding:12px 12px 120px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;position:sticky;top:0;z-index:5}
-.tabs button{flex:1;border:0;background:none;padding:9px 0;font:600 14px inherit;font-family:inherit;color:#4f5868;border-radius:8px}
+.tabs button{flex:1;border:0;background:none;padding:9px 0;font:600 13.5px inherit;font-family:inherit;color:#4f5868;border-radius:8px}
 .tabs button.on{background:#fff;color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .card{background:var(--card);border-radius:14px;padding:14px}
 .f{margin-bottom:16px}.f:last-child{margin-bottom:0}
@@ -56,7 +56,7 @@ dl{margin:10px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 10px;font
 </head>
 <body>
 <div class="wrap">
-  <div class="tabs"><button id="tab-p" class="on">Моя пенсія</button><button id="tab-c">Для дитини</button></div>
+  <div class="tabs"><button id="tab-p" class="on">Пенсія</button><button id="tab-c">Дитині</button><button id="tab-i">Інвестиції</button><button id="tab-g">Гра</button></div>
 
   <!-- ПЕНСІЯ: ФОРМА -->
   <section id="p-form">
@@ -158,6 +158,8 @@ $('cpay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)
 ['age','ret','stazh','net','want','cage'].forEach(id=>$(id).addEventListener('input',upd));
 $('cgoal-own').addEventListener('input',upd);
 $('tab-p').onclick=()=>{S.tab='p';upd()};$('tab-c').onclick=()=>{S.tab='c';upd()};
+const navGo=p=>{const q=new URLSearchParams(location.search);q.delete('tab');const t=q.toString();location.href=p+(t?'?'+t:'')};
+$('tab-i').onclick=()=>navGo('invest.html');$('tab-g').onclick=()=>navGo('game.html');
 $('p-back').onclick=()=>{S.view='form';upd();scrollTo(0,0)};
 const v=id=>Number($(id).value);
 function fill(el){const p=(el.value-el.min)/(el.max-el.min)*100;el.style.setProperty('--p',p+'%')}

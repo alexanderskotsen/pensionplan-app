@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Інвестиційний калькулятор</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box}html,body{margin:0}
+
+.navtabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;margin:0 auto 10px;max-width:520px;gap:2px}
+.navtabs button{flex:1;border:0;background:none;padding:9px 0;font:600 13.5px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#4f5868;border-radius:8px;cursor:pointer}
+.navtabs button.on{background:#fff;color:#151b26;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+[hidden]{display:none!important}
+/* Layout: one column for phones (Mini App); inputs card, headline result, chart, comparison, details table. */
+:root{
+  --bg:#f5f7f9; --card:#ffffff; --fg:#14202b; --muted:#5b6b78; --line:#dde3e8; --soft:#eef2f5;
+  --accent:#1f5fbf; --accent-soft:#e7effb; --accent-ink:#ffffff;
+  --good:#1d7a4a; --good-soft:#e4f3ea; --bad:#b4372c; --bad-soft:#fbe9e7;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --base:#8a96a3;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --card:#19212a; --fg:#e7edf2; --muted:#98a6b3; --line:#2b3642; --soft:#202a35;
+  --accent:#5b9bef; --accent-soft:#1c2c42; --accent-ink:#0b1622;
+  --good:#5fca8a; --good-soft:#163325; --bad:#f08a80; --bad-soft:#3a1d1a;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --base:#7d8996; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --card:#19212a; --fg:#e7edf2; --muted:#98a6b3; --line:#2b3642; --soft:#202a35;
+  --accent:#5b9bef; --accent-soft:#1c2c42; --accent-ink:#0b1622;
+  --good:#5fca8a; --good-soft:#163325; --bad:#f08a80; --bad-soft:#3a1d1a;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --base:#7d8996; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
+.wrap{max-width:560px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:1.45rem;line-height:1.2;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.sub{margin:4px 0 0;color:var(--muted);max-width:60ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:14px;min-width:0}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--soft);border-radius:12px;padding:4px}
+.tabs button,.seg button,.chips button{font:inherit;border:0;cursor:pointer;color:var(--fg);background:transparent;border-radius:9px;padding:9px 8px;font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.seg{display:flex;gap:4px;background:var(--soft);border-radius:10px;padding:3px}
+.seg button{flex:1;padding:7px 6px;font-size:.92rem}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--accent);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1px solid var(--line);padding:6px 12px;font-size:.9rem;font-weight:500}
+.chips button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label,.lbl{display:grid;gap:5px;font-size:.86rem;font-weight:600;min-width:0}
+label small{font-weight:400;color:var(--muted);font-size:.78rem}
+input,select{font:inherit;font-weight:400;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box;font-variant-numeric:tabular-nums}
+.hero{display:grid;gap:4px}
+.hero .k{font-size:.85rem;color:var(--muted)}
+.big{font-size:2.2rem;font-weight:750;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:4px 10px;border-radius:99px;font-weight:650;font-size:.85rem;justify-self:start}
+.pill.good{background:var(--good-soft);color:var(--good)} .pill.bad{background:var(--bad-soft);color:var(--bad)}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kv div{background:var(--soft);border-radius:10px;padding:10px;min-width:0}
+.kv b{display:block;font-size:.95rem;font-variant-numeric:tabular-nums;overflow-wrap:normal}
+.kv span{font-size:.75rem;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.legend i.dash{background:repeating-linear-gradient(90deg,var(--base) 0 4px,transparent 4px 7px)!important}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible;touch-action:pan-y}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.8rem;box-shadow:0 4px 14px rgba(0,0,0,.12);min-width:150px;z-index:2}
+.tip b{display:block;margin-bottom:4px}
+.tip div{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.tip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.cmp{display:grid;gap:10px}
+.cmp .row{display:grid;gap:4px}
+.cmp .top{display:flex;justify-content:space-between;gap:10px;font-size:.9rem}
+.cmp .top b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.cmp .track{height:10px;background:var(--soft);border-radius:6px;overflow:hidden}
+.cmp .track i{display:block;height:100%;border-radius:6px}
+.note{font-size:.84rem;color:var(--muted);margin:0}
+.callout{background:var(--accent-soft);border-radius:12px;padding:12px 14px;font-size:.92rem}
+details summary{cursor:pointer;font-weight:600}
+.tbl{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:.84rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:600}
+.cta{display:block;text-align:center;text-decoration:none;background:var(--accent);color:var(--accent-ink);font-weight:650;border-radius:12px;padding:13px}
+.fine{font-size:.76rem;color:var(--muted);margin:0}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<nav class="navtabs"><button type="button" class="" onclick="navGo('index.html')">Пенсія</button><button type="button" class="" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="on" onclick="navGo('invest.html')">Інвестиції</button><button type="button" class="" onclick="navGo('game.html')">Гра</button></nav>
+<script>
+function navGo(page, tab){ const q = new URLSearchParams(location.search); q.delete('tab'); if (tab) q.set('tab', tab); const s = q.toString(); location.href = page + (s ? '?' + s : ''); }
+</script>
+
+<div class="wrap">
+  <header>
+    <h1>Скільки б у вас було, якби ви вкладали в S&amp;P 500</h1>
+    <p class="sub">Порахуйте на реальній історії індексу з 1997 року або подивіться прогноз на 10–30 років. У гривнях чи доларах.</p>
+  </header>
+
+  <div class="card">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tabHist" aria-selected="true">Якби вклав раніше</button>
+      <button type="button" role="tab" id="tabFc" aria-selected="false">Прогноз на майбутнє</button>
+    </div>
+    <div class="fields">
+      <div class="lbl">Валюта внесків
+        <div class="seg" id="cur"><button type="button" data-v="UAH" aria-pressed="true">Гривня</button><button type="button" data-v="USD" aria-pressed="false">Долар</button></div>
+      </div>
+      <div class="lbl">Як часто докладати
+        <div class="seg" id="freq"><button type="button" data-v="m" aria-pressed="true">Щомісяця</button><button type="button" data-v="y" aria-pressed="false">Щороку</button></div>
+      </div>
+      <label for="init">Стартова сума<small id="initHint">вкладаєте один раз на початку</small><input id="init" type="number" min="0" step="100" value="10000" inputmode="decimal"></label>
+      <label for="reg">Регулярний внесок<small id="regHint">кожного місяця</small><input id="reg" type="number" min="0" step="100" value="1000" inputmode="decimal"></label>
+      <label for="start" id="startWrap">З якого року<small>з січня цього року по сьогодні</small><select id="start"></select></label>
+      <div class="lbl hidden" id="yearsWrap">На скільки років
+        <div class="chips" id="years"><button type="button" data-v="10" aria-pressed="false">10</button><button type="button" data-v="15" aria-pressed="true">15</button><button type="button" data-v="20" aria-pressed="false">20</button><button type="button" data-v="30" aria-pressed="false">30</button></div>
+      </div>
+      <label for="dev" class="hidden" id="devWrap">Девальвація гривні, % на рік<small>з 2015 року в середньому близько 6%</small><input id="dev" type="number" min="0" max="30" step="0.5" value="5"></label>
+    </div>
+  </div>
+
+  <div class="card" aria-live="polite">
+    <div class="hero">
+      <span class="k" id="heroK">Сьогодні у вас було б</span>
+      <span class="big" id="heroV">—</span>
+      <span class="pill good" id="heroP">—</span>
+    </div>
+    <div class="kv" id="kv"></div>
+    <div class="legend" id="legend"></div>
+    <div class="chart" id="chart"></div>
+    <p class="note" id="chartNote"></p>
+  </div>
+
+  <div class="card" id="cmpCard">
+    <h2 style="font-size:1rem;margin:0" id="cmpTitle">Що було б з тими самими грошима</h2>
+    <div class="cmp" id="cmp"></div>
+    <div class="callout" id="insight"></div>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>Таблиця по роках</summary>
+      <div class="tbl"><table id="tbl"></table></div>
+    </details>
+  </div>
+
+  <button class="cta" id="cta" type="button" style="border:0;width:100%;font:inherit;font-weight:650;cursor:pointer">Обговорити план накопичень з консультантом</button>
+  <p class="fine" id="ctaNote" hidden>Відкрийте калькулятор через кнопку в Telegram-боті, щоб надіслати розрахунок консультанту.</p>
+
+  <p class="fine">S&amp;P 500 — індекс 500 найбільших компаній США. Розрахунок на річній дохідності індексу з реінвестованими дивідендами (1997–2025; 2026 рік — з 1 січня по 30 жовтня, +11,7%) та курсах НБУ на кінець кожного року (сьогодні — 45,53 грн/$ на 30.10.2026). Без податків, комісій та інфляції. Внески всередині року розподілені рівномірно. Минула дохідність не гарантує майбутньої: індекс може падати на десятки відсотків. Накопичувальне страхування життя — окремий продукт зі своїми умовами й дохідністю; цей калькулятор її не показує.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  // Річна дохідність S&P 500 з дивідендами, %. 2026 — YTD до 30.10.2026 (10 місяців).
+  const SP = {1996:22.5,1997:33.5,1998:28.7,1999:20.4,2000:-9.7,2001:-11.8,2002:-21.6,2003:28.2,2004:10.7,2005:4.8,
+    2006:15.8,2007:5.1,2008:-36.8,2009:26.4,2010:15.1,2011:1.9,2012:16.0,2013:32.3,2014:13.5,2015:1.2,2016:12.0,
+    2017:21.7,2018:-4.6,2019:31.2,2020:18.3,2021:28.7,2022:-18.2,2023:26.2,2024:24.9,2025:17.7,2026:11.7};
+  // Офіційний курс НБУ, грн за $1, на кінець року.
+  const FX = {1996:1.8889,1997:1.899,1998:3.427,1999:5.2163,2000:5.4345,2001:5.2985,2002:5.3324,2003:5.3315,2004:5.3054,
+    2005:5.05,2006:5.05,2007:5.05,2008:7.70,2009:7.985,2010:7.9617,2011:7.9898,2012:7.993,2013:7.993,2014:15.7686,
+    2015:24.0007,2016:27.1909,2017:28.0672,2018:27.6883,2019:23.6862,2020:28.2749,2021:27.2782,2022:36.5686,
+    2023:37.9824,2024:42.039,2025:42.3878};
+  const NOW_RATE = 45.5293, LAST_YEAR = 2026, LAST_MONTHS = 10;
+  const SCEN = [{ id:'s3', name:'Обережний, 5% на рік', r:0.05, col:'var(--s3)' },{ id:'s1', name:'Базовий, 8% на рік', r:0.08, col:'var(--s1)' },{ id:'s2', name:'Як у середньому в історії, 10% на рік', r:0.10, col:'var(--s2)' }];
+
+  const S = { mode:'hist', cur:'UAH', freq:'m', init:10000, reg:1000, start:2010, years:15, dev:5 };
+  const $ = id => document.getElementById(id);
+  const sym = () => S.cur === 'UAH' ? 'грн' : '$';
+  const fmt = (x, cur) => { const c = cur || S.cur; const v = Math.round(x).toLocaleString('uk-UA'); return c === 'UAH' ? v + ' грн' : '$' + v; };
+  const short = x => { const a = Math.abs(x); const s = S.cur === 'UAH' ? ' грн' : ' $';
+    if (a >= 1e6) return (x / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace('.', ',') + ' млн' + s;
+    if (a >= 1e3) return Math.round(x / 1e3) + ' тис' + s; return Math.round(x) + s; };
+  const kf = x => Math.abs(x) >= 1e6 ? (x / 1e6).toFixed(2).replace('.', ',') + ' млн ' + (S.cur === 'UAH' ? 'грн' : '$') : fmt(x);
+  const pct = x => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(1).replace('.', ',') + '%';
+  const num = id => { const v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+
+  // ---------- Історичний розрахунок ----------
+  function rateAt(y, m){ // курс на початок місяця m (0..11) року y
+    if (y === LAST_YEAR) return FX[y - 1] + (NOW_RATE - FX[y - 1]) * Math.min(m, LAST_MONTHS) / LAST_MONTHS;
+    return FX[y - 1] + (FX[y] - FX[y - 1]) * m / 12;
+  }
+  function rateEnd(y){ return y === LAST_YEAR ? NOW_RATE : FX[y]; }
+  function simHist(){
+    const uah = S.cur === 'UAH';
+    let val = 0, usdM = 0, uahM = 0, paid = 0;
+    const pts = [{ label:String(S.start), t:S.start, sp:0, usdM:0, uahM:0, paid:0 }];
+    for (let y = S.start; y <= LAST_YEAR; y++) {
+      const months = y === LAST_YEAR ? LAST_MONTHS : 12;
+      const g = Math.pow(1 + SP[y] / 100, 1 / months);
+      for (let m = 0; m < months; m++) {
+        let c = 0;
+        if (y === S.start && m === 0) c += S.init;
+        if (S.freq === 'm' || m === 0) c += S.reg;
+        if (c > 0) { const usd = uah ? c / rateAt(y, m) : c; val += usd; usdM += usd; paid += c; if (uah) uahM += c; }
+        val *= g;
+      }
+      const r = uah ? rateEnd(y) : 1;
+      pts.push({ label:y === LAST_YEAR ? 'жов ' + y : String(y), t:y + months / 12, sp:val * r, usdM:usdM * r, uahM:uah ? uahM : null, paid });
+    }
+    return pts;
+  }
+  function cagrHist(){ let p = 1, n = 0; for (let y = S.start; y <= LAST_YEAR; y++) { p *= 1 + SP[y] / 100; n += y === LAST_YEAR ? LAST_MONTHS / 12 : 1; } return (Math.pow(p, 1 / n) - 1) * 100; }
+
+  // ---------- Прогноз ----------
+  function simFc(){
+    const uah = S.cur === 'UAH', d = uah ? S.dev / 100 : 0;
+    const vals = SCEN.map(() => 0); let paid = 0;
+    const pts = [{ label:'зараз', t:0, paid:0, sc:vals.slice() }];
+    for (let yr = 0; yr < S.years; yr++) {
+      for (let m = 0; m < 12; m++) {
+        let c = 0; if (yr === 0 && m === 0) c += S.init; if (S.freq === 'm' || m === 0) c += S.reg;
+        const rate = uah ? NOW_RATE * Math.pow(1 + d, yr + m / 12) : 1;
+        paid += c;
+        SCEN.forEach((s, k) => { vals[k] = (vals[k] + c / rate) * Math.pow(1 + s.r, 1 / 12); });
+      }
+      const rEnd = uah ? NOW_RATE * Math.pow(1 + d, yr + 1) : 1;
+      pts.push({ label:'+' + (yr + 1) + ' р.', t:yr + 1, paid, sc:vals.map(v => v * rEnd) });
+    }
+    return pts;
+  }
+  function rolling(n){
+    const ys = Object.keys(SP).map(Number).filter(y => y < LAST_YEAR), out = [];
+    for (let i = 0; i + n <= ys.length; i++) { let p = 1; for (let k = 0; k < n; k++) p *= 1 + SP[ys[i + k]] / 100; out.push({ from:ys[i], cagr:(Math.pow(p, 1 / n) - 1) * 100 }); }
+    return out;
+  }
+
+  // ---------- Графік (SVG) ----------
+  function niceTicks(max){ if (max <= 0) return [0]; const raw = max / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+    const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; const t = []; for (let v = 0; v <= max + step * 0.001; v += step) t.push(v); if (t[t.length - 1] < max) t.push(t[t.length - 1] + step); return t; }
+  function drawChart(pts, series){
+    const W = 420, H = 250, L = 58, R = 74, T = 12, B = 26;
+    const maxV = Math.max(1, ...pts.flatMap(p => series.map(s => s.get(p) || 0)));
+    const ticks = niceTicks(maxV), top = ticks[ticks.length - 1];
+    const t0 = pts[0].t, t1 = pts[pts.length - 1].t;
+    const X = t => L + (t - t0) / ((t1 - t0) || 1) * (W - L - R), Y = v => T + (1 - v / top) * (H - T - B);
+    let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Зростання вкладень по роках">';
+    ticks.forEach(v => { svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--line)" stroke-width="1"/>' +
+      '<text x="' + (L - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end" font-size="12" fill="var(--muted)">' + short(v) + '</text>'; });
+    const every = Math.max(1, Math.ceil(pts.length / 5));
+    pts.forEach((p, i) => { if (i % every === 0 || i === pts.length - 1) { if (i !== pts.length - 1 && pts.length - 1 - i < every / 2) return;
+      svg += '<text x="' + X(p.t) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="12" fill="var(--muted)">' + p.label + '</text>'; } });
+    // заливка під головною серією
+    const main = series[0];
+    svg += '<path d="M' + X(pts[0].t) + ' ' + Y(0) + pts.map(p => 'L' + X(p.t) + ' ' + Y(main.get(p))).join('') + 'L' + X(t1) + ' ' + Y(0) + 'Z" fill="' + main.col + '" fill-opacity="0.08"/>';
+    series.slice().reverse().forEach(s => {
+      const d = pts.map((p, i) => (i ? 'L' : 'M') + X(p.t).toFixed(1) + ' ' + Y(s.get(p)).toFixed(1)).join('');
+      svg += '<path d="' + d + '" fill="none" stroke="' + s.col + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"' + (s.dash ? ' stroke-dasharray="5 4"' : '') + '/>';
+    });
+    // підписи на кінцях ліній з розведенням
+    const ends = series.map(s => ({ s, y:Y(s.get(pts[pts.length - 1])) })).sort((a, b) => a.y - b.y);
+    for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 15) ends[i].y = ends[i - 1].y + 15;
+    ends.forEach(e => { const v = e.s.get(pts[pts.length - 1]);
+      svg += '<circle cx="' + X(t1) + '" cy="' + Y(v) + '" r="4" fill="' + e.s.col + '" stroke="var(--card)" stroke-width="2"/>' +
+        '<text x="' + (X(t1) + 9) + '" y="' + (e.y + 4) + '" font-size="12" font-weight="600" fill="var(--fg)">' + short(v) + '</text>'; });
+    svg += '<line id="xh" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>';
+    svg += '<rect id="hit" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B) + '" fill="transparent"/></svg><div class="tip" id="tip" hidden></div>';
+    const box = $('chart'); box.innerHTML = svg;
+    const svgEl = box.querySelector('svg'), xh = box.querySelector('#xh'), tip = box.querySelector('#tip');
+    function move(ev){
+      const r = svgEl.getBoundingClientRect(), sx = (ev.clientX - r.left) / r.width * W;
+      let best = 0, bd = 1e9; pts.forEach((p, i) => { const d = Math.abs(X(p.t) - sx); if (d < bd) { bd = d; best = i; } });
+      const p = pts[best]; xh.setAttribute('x1', X(p.t)); xh.setAttribute('x2', X(p.t)); xh.setAttribute('visibility', 'visible');
+      tip.innerHTML = '<b>' + p.label + '</b>' + series.map(s => '<div><span><i style="background:' + s.col + '"></i>' + s.short + '</span><span>' + fmt(s.get(p)) + '</span></div>').join('');
+      tip.hidden = false;
+      const px = X(p.t) / W * r.width, tw = tip.offsetWidth;
+      tip.style.left = Math.max(0, Math.min(r.width - tw, px + 12 > r.width - tw ? px - tw - 12 : px + 12)) + 'px'; tip.style.top = '8px';
+    }
+    const hide = () => { tip.hidden = true; xh.setAttribute('visibility', 'hidden'); };
+    svgEl.addEventListener('pointermove', move); svgEl.addEventListener('pointerdown', move); svgEl.addEventListener('pointerleave', hide);
+    $('legend').innerHTML = series.map(s => '<span><i' + (s.dash ? ' class="dash"' : '') + ' style="background:' + s.col + '"></i>' + s.name + '</span>').join('');
+  }
+
+  // ---------- Рендер ----------
+  function render(){
+    S.init = num('init'); S.reg = num('reg'); S.dev = parseFloat($('dev').value) || 0;
+    $('regHint').textContent = S.freq === 'm' ? 'кожного місяця' : 'раз на рік, у січні';
+    const hist = S.mode === 'hist';
+    $('startWrap').classList.toggle('hidden', !hist); $('yearsWrap').classList.toggle('hidden', hist);
+    $('devWrap').classList.toggle('hidden', hist || S.cur !== 'UAH');
+    hist ? renderHist() : renderFc();
+  }
+  function renderHist(){
+    const pts = simHist(), last = pts[pts.length - 1], uah = S.cur === 'UAH';
+    const profit = last.sp - last.paid, mult = last.paid ? last.sp / last.paid : 0;
+    $('heroK').textContent = 'Сьогодні у вас було б (з січня ' + S.start + ' по жовтень 2026)';
+    $('heroV').textContent = fmt(last.sp);
+    $('heroP').className = 'pill ' + (profit >= 0 ? 'good' : 'bad');
+    $('heroP').textContent = last.paid ? (profit >= 0 ? 'у ' + mult.toFixed(1).replace('.', ',') + ' раза більше, ніж внесли' : 'менше, ніж внесли') : 'введіть суму';
+    const worst = Object.keys(SP).map(Number).filter(y => y >= S.start).reduce((a, y) => SP[y] < SP[a] ? y : a, S.start);
+    $('kv').innerHTML = '<div><b>' + kf(last.paid) + '</b><span>ви внесли</span></div><div><b>' + (profit >= 0 ? '+' : '') + kf(profit) + '</b><span>дохід</span></div>' +
+      '<div><b>' + pct(cagrHist()) + '</b><span>на рік у $ в середньому</span></div>';
+    const series = [{ name:'S&P 500', short:'S&P 500', col:'var(--s1)', get:p => p.sp }];
+    if (uah) series.push({ name:'Купували долари і тримали', short:'Долари', col:'var(--s2)', get:p => p.usdM });
+    series.push({ name:uah ? 'Тримали гривні' : 'Тримали долари', short:'Внесено', col:'var(--base)', dash:true, get:p => uah ? p.uahM : p.paid });
+    drawChart(pts, series);
+    $('chartNote').textContent = 'Найгірший рік у цьому періоді — ' + worst + ': ' + pct(SP[worst]) + '. Хто не продав у паніці, згодом відігрався.';
+    // порівняння
+    const rows = [{ n:'S&P 500', v:last.sp, c:'var(--s1)' }];
+    if (uah) rows.push({ n:'Купували долари і тримали «під матрацом»', v:last.usdM, c:'var(--s2)' });
+    rows.push({ n:uah ? 'Тримали гривні «під матрацом»' : 'Тримали долари «під матрацом»', v:uah ? last.uahM : last.paid, c:'var(--base)' });
+    const mx = Math.max(...rows.map(r => r.v), 1);
+    $('cmpTitle').textContent = 'Що було б з тими самими грошима';
+    $('cmp').innerHTML = rows.map(r => '<div class="row"><div class="top"><span>' + r.n + '</span><b>' + fmt(r.v) + '</b></div><div class="track"><i style="width:' + (r.v / mx * 100) + '%;background:' + r.c + '"></i></div></div>').join('');
+    const usdNote = uah && last.uahM ? 'Гривня за цей час знецінилася з ' + rateAt(S.start, 0).toFixed(2).replace('.', ',') + ' до ' + NOW_RATE.toFixed(2).replace('.', ',') + ' грн за долар. ' : '';
+    $('insight').textContent = usdNote + 'Різниця між «тримати» і «вкладати» — це складний відсоток: дохід щороку нараховується і на попередній дохід.';
+    // таблиця
+    $('tbl').innerHTML = '<thead><tr><th>Рік</th><th>S&P 500</th><th>Внесено</th><th>Вартість</th>' + (uah ? '<th>Курс</th>' : '') + '</tr></thead><tbody>' +
+      pts.slice(1).map((p, i) => { const y = S.start + i; return '<tr><td>' + p.label + '</td><td>' + pct(SP[y]) + '</td><td>' + fmt(p.paid) + '</td><td>' + fmt(p.sp) + '</td>' + (uah ? '<td>' + rateEnd(y).toFixed(2).replace('.', ',') + '</td>' : '') + '</tr>'; }).join('') + '</tbody>';
+  }
+  function renderFc(){
+    const pts = simFc(), last = pts[pts.length - 1], uah = S.cur === 'UAH', base = last.sc[1];
+    $('heroK').textContent = 'Через ' + S.years + ' р. за базовим сценарієм (8% на рік у $)';
+    $('heroV').textContent = fmt(base);
+    $('heroP').className = 'pill good';
+    $('heroP').textContent = last.paid ? 'у ' + (base / last.paid).toFixed(1).replace('.', ',') + ' раза більше, ніж внесете' : 'введіть суму';
+    $('kv').innerHTML = '<div><b>' + kf(last.paid) + '</b><span>внесете</span></div><div><b>' + kf(last.sc[0]) + '</b><span>обережно, 5%</span></div><div><b>' + kf(last.sc[2]) + '</b><span>як в історії, 10%</span></div>';
+    const series = [SCEN[1], SCEN[2], SCEN[0]].map(s => { const k = SCEN.indexOf(s); return { name:s.name, short:s.name.split(',')[0], col:s.col, get:p => p.sc[k] }; });
+    series.push({ name:'Просто відкладати', short:'Внесено', col:'var(--base)', dash:true, get:p => p.paid });
+    drawChart(pts, series);
+    $('chartNote').textContent = uah ? 'Гривневі внески переводяться в долари за курсом, що зростає на ' + String(S.dev).replace('.', ',') + '% на рік; результат показано в гривнях за курсом того року.' : 'Суми в доларах без урахування інфляції.';
+    const roll = rolling(S.years);
+    $('cmpTitle').textContent = 'Як це було в історії';
+    if (roll.length) {
+      const min = roll.reduce((a, b) => b.cagr < a.cagr ? b : a), max = roll.reduce((a, b) => b.cagr > a.cagr ? b : a), pos = roll.filter(r => r.cagr > 0).length;
+      const rows = roll.slice().sort((a, b) => a.from - b.from);
+      const mx = Math.max(...rows.map(r => Math.abs(r.cagr)));
+      $('cmp').innerHTML = '<p class="note">Середня дохідність S&P 500 за кожні ' + S.years + ' р. поспіль, починаючи з 1996 року:</p>' +
+        rows.map(r => '<div class="row"><div class="top"><span>' + r.from + '–' + (r.from + S.years - 1) + '</span><b>' + pct(r.cagr) + ' на рік</b></div><div class="track"><i style="width:' + (Math.abs(r.cagr) / mx * 100) + '%;background:' + (r.cagr >= 0 ? 'var(--s1)' : 'var(--s2)') + '"></i></div></div>').join('');
+      $('insight').textContent = 'З ' + roll.length + ' періодів по ' + S.years + ' р. у плюсі були ' + pos + '. Найгірший: ' + min.from + '–' + (min.from + S.years - 1) + ' (' + pct(min.cagr) + ' на рік), найкращий: ' + max.from + '–' + (max.from + S.years - 1) + ' (' + pct(max.cagr) + ' на рік). Чим довший строк, тим менше важить невдалий старт.';
+    } else {
+      $('cmp').innerHTML = '<p class="note">Для ' + S.years + ' років поспіль даних з 1996 року ще замало.</p>';
+      $('insight').textContent = 'За довгими історичними даними (з 1928 року) S&P 500 у середньому приносив близько 10% на рік у доларах, але з роками сильних падінь.';
+    }
+    $('tbl').innerHTML = '<thead><tr><th>Рік</th><th>Внесено</th>' + SCEN.map(s => '<th>' + Math.round(s.r * 100) + '%</th>').join('') + '</tr></thead><tbody>' +
+      pts.slice(1).map(p => '<tr><td>' + p.label + '</td><td>' + fmt(p.paid) + '</td>' + p.sc.map(v => '<td>' + fmt(v) + '</td>').join('') + '</tr>').join('') + '</tbody>';
+  }
+
+  // ---------- Події ----------
+  const sel = $('start');
+  for (let y = 1997; y <= LAST_YEAR; y++) { const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === S.start) o.selected = true; sel.appendChild(o); }
+  function seg(id, key, cb){ $(id).querySelectorAll('button').forEach(b => b.onclick = () => {
+    $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    S[key] = key === 'years' ? +b.dataset.v : b.dataset.v; if (cb) cb(); render(); }); }
+  seg('cur', 'cur', () => {
+    const toUsd = S.cur === 'USD';
+    $('init').value = toUsd ? 300 : 10000; $('reg').value = toUsd ? 50 : 1000;
+  });
+  seg('freq', 'freq'); seg('years', 'years');
+  function tab(m){ S.mode = m; $('tabHist').setAttribute('aria-selected', String(m === 'hist')); $('tabFc').setAttribute('aria-selected', String(m === 'fc')); render(); }
+  $('tabHist').onclick = () => tab('hist'); $('tabFc').onclick = () => tab('fc');
+  sel.onchange = () => { S.start = +sel.value; render(); };
+  ['init','reg','dev'].forEach(id => $(id).addEventListener('input', render));
+  const tg = window.Telegram && window.Telegram.WebApp;
+  try { if (tg && tg.platform && tg.platform !== 'unknown') { tg.ready(); tg.expand(); } } catch (e) {}
+  $('cta').onclick = () => {
+    let res = 0, paid = 0;
+    if (S.mode === 'hist') { const p = simHist(), l = p[p.length - 1]; res = l.sp; paid = l.paid; }
+    else { const p = simFc(), l = p[p.length - 1]; res = l.sc[1]; paid = l.paid; }
+    const data = JSON.stringify({ a:'invest', i:{ mode:S.mode, cur:S.cur, init:S.init, reg:S.reg, freq:S.freq, start:S.start, years:S.years, res:Math.round(res), paid:Math.round(paid) } });
+    try { if (tg && tg.initData) { tg.sendData(data); return; } } catch (e) {}
+    $('ctaNote').hidden = false;
+  };
+  render();
+})();
+</script>
+
+</body>
+</html>
