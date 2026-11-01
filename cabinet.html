@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Кабінет · Пенсійний план</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#eef1f5;--card:#fff;--fg:#151b26;--muted:#6b7483;--line:#e3e7ee;--accent:#2a6fdb;--accent-soft:#e9f1fd;--warn:#b25a00;--warn-soft:#fdf2e3;--good:#1d7a4a;--good-soft:#e6f5ec;--bad:#b42318;--bad-soft:#fdecea;--gold:#f0b35a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;font-size:15px}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:560px;margin:0 auto;padding:10px 12px 40px;display:flex;flex-direction:column;gap:10px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 2px 0}
+.top h1{font-size:18px;margin:0;font-weight:700;letter-spacing:-.01em}
+.role{font-size:12px;font-weight:600;padding:3px 9px;border-radius:12px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.role.viewer{background:#eceef2;color:#4f5868}
+.tabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;position:sticky;top:0;z-index:5}
+.tabs button{flex:1;border:0;background:none;padding:9px 0;font-weight:600;font-size:13.5px;color:#4f5868;border-radius:8px}
+.tabs button.on{background:#fff;color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.card{background:var(--card);border-radius:14px;padding:14px}
+.card h3{margin:0 0 10px;font-size:14px;color:var(--muted);font-weight:600}
+.seg{display:flex;gap:6px}
+.seg button,.chips button{font-size:13.5px;border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:9px;padding:8px 10px;flex:1}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -12px;padding:0 12px}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:0 0 auto;border-radius:18px;padding:7px 12px}
+.seg button.on,.chips button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{background:var(--card);border-radius:12px;padding:10px 10px 9px}
+.kpi b{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.kpi span{font-size:11.5px;color:var(--muted)}
+.kpi.hl{background:var(--accent);color:#fff}.kpi.hl span{color:#dbe7fb}
+.alert{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:11px 14px;font-weight:600;font-size:14px;border:0;width:100%;text-align:left}
+.fun{display:flex;flex-direction:column;gap:7px}
+.fun .r{display:grid;grid-template-columns:118px 1fr 64px;align-items:center;gap:8px;font-size:13px}
+.fun .r i{display:block;height:10px;border-radius:5px;background:var(--accent);min-width:3px}
+.fun .r em{font-style:normal;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.fun .r em small{color:var(--muted);font-weight:500}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl td{padding:7px 0;border-top:1px solid var(--line)}
+.tbl tr:first-child td{border-top:0}
+.tbl td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.tbl td.n b{color:var(--fg)}
+.search{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.list{display:flex;flex-direction:column;gap:8px}
+.lead{background:var(--card);border-radius:12px;padding:11px 13px;border:0;text-align:left;width:100%;color:inherit;font-size:14px}
+.lead .h{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.lead .h b{font-size:15px}
+.lead .m{color:var(--muted);font-size:12.5px;margin-top:4px;line-height:1.4}
+.st{font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:10px;white-space:nowrap;background:#eceef2;color:#4f5868}
+.st.new{background:var(--warn-soft);color:var(--warn)}.st.contract{background:var(--good-soft);color:var(--good)}
+.st.contacted,.st.consult{background:var(--accent-soft);color:var(--accent)}.st.refused{background:var(--bad-soft);color:var(--bad)}
+.empty{color:var(--muted);text-align:center;padding:26px 10px;font-size:14px}
+.tree{display:flex;flex-direction:column}
+.node{display:flex;align-items:center;gap:8px;padding:10px 4px;border:0;background:none;width:100%;text-align:left;border-top:1px solid var(--line);color:inherit;font-size:14px}
+.node:first-child{border-top:0}
+.node .ind{flex:0 0 auto;color:#b6bdc8;font-size:12px}
+.dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;background:var(--good)}
+.dot.wait{background:var(--gold)}.dot.off{background:#c5cad3}
+.node .nm{flex:1;min-width:0}
+.node .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.node .nm small{color:var(--muted);font-size:12px}
+.lvl{font-size:11.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:8px;padding:2px 7px;white-space:nowrap}
+.btn{display:block;width:100%;border:0;background:var(--accent);color:#fff;font-weight:600;font-size:15px;padding:13px;border-radius:12px}
+.btn.sec{background:var(--accent-soft);color:var(--accent)}
+.btn.ghost{background:none;color:var(--accent);padding:10px}
+.btn.danger{background:var(--bad-soft);color:var(--bad)}
+.btn:disabled{opacity:.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mini{font-size:12.5px;color:var(--muted);line-height:1.45}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.legend span{display:flex;align-items:center;gap:5px}
+input.txt{width:100%;font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 12px;font-size:14px}
+dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:600;word-break:break-word}
+dd a{color:var(--accent);text-decoration:none}
+.sheet-bg{position:fixed;inset:0;background:rgba(15,20,30,.38);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:8px 12px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+.grab{width:38px;height:4px;border-radius:2px;background:#c8ced8;margin:2px auto 0}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:4px 2px 0}
+.sh h2{margin:0;font-size:19px;letter-spacing:-.01em}
+.sh .sub{font-size:13px;color:var(--muted);margin-top:3px}
+.x{border:0;background:#e2e7ee;width:30px;height:30px;border-radius:50%;font-size:16px;color:#4f5868;flex:0 0 auto}
+.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stgrid button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 6px;font-size:13.5px;color:var(--fg)}
+.stgrid button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.lv{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+.lv button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 0;font-size:13.5px;color:var(--fg)}
+.lv button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.lnk{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}
+.lnk:first-child{border-top:0}
+.lnk code{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;max-width:100%}
+.lnk button{border:0;background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:6px 10px;font-weight:600;font-size:12.5px;flex:0 0 auto}
+.invite{background:#fff;border:1px dashed var(--accent);border-radius:12px;padding:12px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#151b26;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:40;max-width:90%;text-align:center}
+.vrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.vrow:first-child{border-top:0}
+.vrow button{border:0;background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:6px 10px;font-weight:600;font-size:12.5px}
+.err{background:var(--card);border-radius:14px;padding:22px 16px;text-align:center;line-height:1.5}
+.load{color:var(--muted);text-align:center;padding:30px 0;font-size:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><h1 id="title">Кабінет</h1><span class="role" id="role" hidden></span></div>
+  <div class="tabs" id="tabs" hidden>
+    <button data-t="ov" class="on">Огляд</button><button data-t="ld">Заявки</button><button data-t="tm">Команда</button><button data-t="ac" hidden>Доступ</button>
+  </div>
+  <div id="view"><div class="load">Завантаження…</div></div>
+</div>
+<div id="sheet" class="sheet-bg" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const tg = window.Telegram && window.Telegram.WebApp;
+try { tg.ready(); tg.expand(); tg.setHeaderColor('#eef1f5'); tg.setBackgroundColor('#eef1f5'); } catch (e) {}
+const P = new URLSearchParams(location.search);
+const API = (P.get('api') || '').replace(/\/$/, '');
+const INIT = (tg && tg.initData) || '';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = n => (n ?? 0).toLocaleString('uk-UA');
+const money = n => n ? num(Math.round(n)) + ' грн' : '—';
+const dt = ts => { if (!ts) return '—'; const d = new Date(ts * 1000); return d.toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit'}) + ' ' + d.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'}); };
+const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+const haptic = t => { try { tg.HapticFeedback.impactOccurred(t || 'light'); } catch (e) {} };
+
+async function api(path, data) {
+  const r = await fetch(API + path, {
+    method: data ? 'POST' : 'GET',
+    headers: Object.assign({'X-Init-Data': INIT}, data ? {'Content-Type': 'application/json'} : {}),
+    body: data ? JSON.stringify(data) : undefined,
+  });
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  if (!r.ok) { const e = new Error(j.error || ('HTTP ' + r.status)); e.status = r.status; throw e; }
+  return j;
+}
+function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2200); }
+function confirmBox(text, cb) { if (tg && tg.showConfirm) { try { return tg.showConfirm(text, ok => ok && cb()); } catch (e) {} } cb(); }
+function openLink(url) { if (/^https:\/\/t\.me\//.test(url) && tg && tg.openTelegramLink) { try { return tg.openTelegramLink(url); } catch (e) {} } window.open(url, '_blank'); }
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast('Скопійовано'); }
+  catch (e) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); toast('Скопійовано'); } catch (e2) { toast('Не вдалося скопіювати'); } t.remove(); }
+}
+
+const S = { me: null, tab: 'ov', days: 30, scope: 'branch', lscope: 'me', status: 'new', q: '', team: null };
+const ROLE = { admin: 'Головний адмін', viewer: 'Перегляд', agent: 'Консультант' };
+
+/* ---------- старт ---------- */
+async function boot() {
+  if (!API) return fail('Кабінет відкрито без адреси сервера. Відкрийте його кнопкою «Кабінет» у боті.');
+  if (!INIT) return fail('Відкрийте кабінет у Telegram — кнопкою «Кабінет» у боті.');
+  try { S.me = await api('/api/me'); }
+  catch (e) {
+    if (e.status === 403) return fail('Кабінет доступний лише команді. Якщо вас мали додати — напишіть головному адміну.');
+    if (e.status === 401) return fail('Telegram не підтвердив вхід. Закрийте і відкрийте кабінет ще раз.');
+    return fail('Сервер не відповідає. Спробуйте за хвилину: бот міг щойно перезапускатися.');
+  }
+  const me = S.me;
+  $('#title').textContent = me.agent ? me.agent.name : 'Кабінет';
+  $('#role').textContent = ROLE[me.role] + (me.agent && me.agent.level ? ' · рів. ' + me.agent.level : '');
+  $('#role').className = 'role ' + me.role; $('#role').hidden = false;
+  $('#tabs').hidden = false;
+  if (me.role === 'admin') $('[data-t=ac]').hidden = false;
+  document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.t));
+  go('ov');
+}
+function fail(t) { $('#view').innerHTML = `<div class="err">${esc(t)}</div>`; }
+function go(t) {
+  S.tab = t;
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  ({ ov: renderOverview, ld: renderLeads, tm: renderTeam, ac: renderAccess })[t]();
+  window.scrollTo(0, 0);
+}
+function loading() { $('#view').innerHTML = '<div class="load">Завантаження…</div>'; }
+function errView(e) { $('#view').innerHTML = `<div class="err">Не вдалося завантажити: ${esc(e.message)}<br><br><button class="btn sec" onclick="go(S.tab)">Спробувати ще раз</button></div>`; }
+
+/* ---------- огляд ---------- */
+async function renderOverview() {
+  loading();
+  let d; try { d = await api(`/api/overview?days=${S.days}&scope=${S.scope}`); } catch (e) { return errView(e); }
+  const f = d.funnel, isAgent = S.me.role === 'agent';
+  const periods = [[1, 'Сьогодні'], [7, '7 днів'], [30, '30 днів'], [0, 'Усі']];
+  let h = '';
+  if (isAgent && S.me.agent.team) h += `<div class="seg">${[['me', 'Лише я'], ['branch', 'Я + команда']].map(([k, n]) => `<button class="${S.scope === k ? 'on' : ''}" onclick="S.scope='${k}';renderOverview()">${n}</button>`).join('')}</div>`;
+  h += `<div class="seg">${periods.map(([k, n]) => `<button class="${S.days === k ? 'on' : ''}" onclick="S.days=${k};renderOverview()">${n}</button>`).join('')}</div>`;
+  if (d.new_leads) h += `<button class="alert" onclick="S.status='new';go('ld')"><span>🆕 Нових заявок: ${d.new_leads}</span><span>Відкрити →</span></button>`;
+  h += `<div class="grid">
+    <div class="kpi"><b>${num(f.users)}</b><span>нових у боті</span></div>
+    <div class="kpi hl"><b>${num(f.leads)}</b><span>заявок</span></div>
+    <div class="kpi"><b>${num(f.contracts)}</b><span>договорів</span></div></div>`;
+  const steps = [['Прийшли в бот', f.users], ['Порахували', f.calc], ['Гарячі', f.hot], ['Заявки', f.leads], ['Договори', f.contracts]];
+  const mx = Math.max(1, ...steps.map(s => s[1]));
+  h += `<div class="card"><h3>Воронка</h3><div class="fun">${steps.map(([n, v]) => `<div class="r"><span>${n}</span><i style="width:${Math.max(1, v / mx * 100)}%"></i><em>${num(v)} <small>${f.users ? pct(v, f.users) : ''}</small></em></div>`).join('')}</div>
+    <div class="mini" style="margin-top:8px">Відсоток — від тих, хто прийшов у бот за період. «Гарячі» натиснули «Підібрати програму».</div></div>`;
+  if (d.sources.length) h += `<div class="card"><h3>Звідки приходять</h3><table class="tbl">${d.sources.map(s => `<tr><td>${esc(s.name)}</td><td class="n">${num(s.users)} → <b>${num(s.leads)}</b> заявок</td></tr>`).join('')}</table></div>`;
+  if (d.statuses.length) h += `<div class="card"><h3>Статуси заявок за період</h3><table class="tbl">${d.statuses.map(s => `<tr><td>${esc(s.name)}</td><td class="n"><b>${num(s.n)}</b></td></tr>`).join('')}</table></div>`;
+  if (d.kinds.length) h += `<div class="card"><h3>Що привело до заявки</h3><table class="tbl">${d.kinds.map(s => `<tr><td>${esc(s.name)}</td><td class="n"><b>${num(s.n)}</b></td></tr>`).join('')}</table></div>`;
+  if (d.top.length && (!isAgent || S.scope === 'branch')) h += `<div class="card"><h3>Хто дав найбільше заявок</h3><table class="tbl">${d.top.map(s => `<tr><td>${esc(s.name)}</td><td class="n"><b>${num(s.n)}</b></td></tr>`).join('')}</table></div>`;
+  if (S.me.role !== 'agent') h += `<button class="btn sec" onclick="sendExcel(this)">📥 Надіслати базу в Excel у чат</button>`;
+  if (isAgent) h += linksCard(S.me.agent.links, 'Ваші посилання для клієнтів');
+  $('#view').innerHTML = h;
+}
+async function sendExcel(b) { b.disabled = true; try { await api('/api/export', {}); toast('Файл надіслано в чат з ботом'); } catch (e) { toast('Помилка: ' + e.message); } b.disabled = false; }
+function linksCard(links, title) {
+  return `<div class="card"><h3>${title}</h3>${links.map(l => `<div class="lnk"><div style="min-width:0"><b>${esc(l.name)}</b><code>${esc(l.url)}</code></div><button onclick="copy('${esc(l.url)}')">Копіювати</button></div>`).join('')}
+  <div class="mini" style="margin-top:6px">Хто прийде за посиланням, закріпиться за цим консультантом. Мітка показує, з якої соцмережі людина.</div></div>`;
+}
+
+/* ---------- заявки ---------- */
+const LF = [['new', '🆕 Нові'], ['work', 'В роботі'], ['notnow', 'Не зараз'], ['contract', 'Договір'], ['refused', 'Відмова'], ['all', 'Усі']];
+let LEADS = [];
+async function renderLeads() {
+  let h = '';
+  if (S.me.role === 'agent' && S.me.agent.team) h += `<div class="seg">${[['me', 'Мої'], ['team', 'Команди']].map(([k, n]) => `<button class="${S.lscope === k ? 'on' : ''}" onclick="S.lscope='${k}';renderLeads()">${n}</button>`).join('')}</div>`;
+  h += `<div class="chips">${LF.map(([k, n]) => `<button class="${S.status === k ? 'on' : ''}" onclick="S.status='${k}';renderLeads()">${n}</button>`).join('')}</div>`;
+  h += `<input class="search" id="q" placeholder="Пошук: ім'я, телефон, #номер" value="${esc(S.q)}">`;
+  h += `<div class="list" id="ll"><div class="load">Завантаження…</div></div>`;
+  $('#view').innerHTML = h;
+  let tmr; $('#q').oninput = e => { clearTimeout(tmr); tmr = setTimeout(() => { S.q = e.target.value; loadLeads(); }, 300); };
+  loadLeads();
+}
+async function loadLeads() {
+  const scope = S.me.role === 'agent' ? S.lscope : 'all';
+  try { LEADS = (await api(`/api/leads?scope=${scope}&status=${S.status}&q=${encodeURIComponent(S.q)}`)).leads; }
+  catch (e) { $('#ll').innerHTML = `<div class="empty">Помилка: ${esc(e.message)}</div>`; return; }
+  if (!LEADS.length) { $('#ll').innerHTML = `<div class="empty">Тут поки порожньо.</div>`; return; }
+  const showAgent = S.me.role !== 'agent' || S.lscope === 'team';
+  $('#ll').innerHTML = LEADS.map((l, i) => `<button class="lead" onclick="leadSheet(${i})">
+    <div class="h"><b>${esc(l.name)}</b><span class="st ${l.status}">${esc(S.me.statuses[l.status])}</span></div>
+    <div class="m">#${l.id} · ${esc(l.kind)} · ${esc(l.source)}${showAgent ? ' · ' + esc(l.agent_name) : ''}<br>${esc(l.phone || '')} · ${dt(l.created)}</div></button>`).join('');
+}
+function leadSheet(i) {
+  const l = LEADS[i];
+  let h = `<div class="sh"><div><h2>${esc(l.name)}</h2><div class="sub">Заявка #${l.id} · ${dt(l.created)}</div></div><button class="x" onclick="closeSheet()">✕</button></div>`;
+  h += `<div class="card"><dl>
+    <dt>Статус</dt><dd><span class="st ${l.status}">${esc(S.me.statuses[l.status])}</span></dd>
+    <dt>Телефон</dt><dd>${l.phone ? `<a href="tel:${esc(l.phone)}">${esc(l.phone)}</a>` : '—'}</dd>
+    ${l.username ? `<dt>Telegram</dt><dd><a href="#" onclick="openLink('https://t.me/${esc(l.username)}');return false">@${esc(l.username)}</a></dd>` : ''}
+    ${l.time ? `<dt>Зручно</dt><dd>${esc(l.time)}${l.method ? ', ' + esc(l.method) : ''}</dd>` : ''}
+    <dt>Тип</dt><dd>${esc(l.kind)}</dd><dt>Джерело</dt><dd>${esc(l.source)}</dd><dt>Консультант</dt><dd>${esc(l.agent_name)}</dd>
+    ${l.segment ? `<dt>Сегмент</dt><dd>${esc(l.segment)}</dd>` : ''}</dl></div>`;
+  if (l.pension || l.salary || l.child || l.game || l.invest) {
+    h += `<div class="card"><h3>Що людина рахувала</h3><dl>
+      ${l.age ? `<dt>Вік</dt><dd>${l.age}${l.ret_age ? ' → пенсія у ' + l.ret_age : ''}</dd>` : ''}
+      ${l.salary ? `<dt>Зарплата</dt><dd>${money(l.salary)}</dd>` : ''}
+      ${l.pension ? `<dt>Прогноз пенсії</dt><dd>${money(l.pension)}/міс</dd>` : ''}
+      ${l.want ? `<dt>Хоче на пенсії</dt><dd>${money(l.want)}/міс</dd>` : ''}
+      ${l.gap ? `<dt>Не вистачає</dt><dd>${money(l.gap)}/міс</dd>` : ''}
+      ${l.pmt ? `<dt>Відкладати</dt><dd>${money(l.pmt)}/міс</dd>` : ''}
+      ${l.child ? `<dt>Дитина</dt><dd>${esc(l.child)}</dd>` : ''}
+      ${l.game ? `<dt>Гра</dt><dd>${esc(l.game)}</dd>` : ''}
+      ${l.invest ? `<dt>S&amp;P 500</dt><dd>${esc(l.invest)}</dd>` : ''}</dl></div>`;
+  }
+  if (l.can_edit) {
+    h += `<div class="card"><h3>Змінити статус</h3><div class="stgrid">${Object.entries(S.me.statuses).filter(([k]) => k !== 'new').map(([k, n]) => `<button class="${l.status === k ? 'on' : ''}" onclick="setStatus(${i},'${k}')">${esc(n)}</button>`).join('')}</div>
+      <div class="mini" style="margin-top:8px">«Не зараз» — людина повернеться в м'яку розсилку і нагадування прийде через 3 місяці.</div></div>`;
+  } else h += `<div class="mini" style="padding:0 4px">Статус змінює консультант, за яким ця заявка.</div>`;
+  openSheet(h);
+}
+async function setStatus(i, st) {
+  const l = LEADS[i];
+  try { await api('/api/lead_status', { id: l.id, status: st }); l.status = st; haptic(); toast('Статус: ' + S.me.statuses[st]); leadSheet(i); loadLeads(); }
+  catch (e) { toast('Помилка: ' + e.message); }
+}
+
+/* ---------- команда ---------- */
+async function renderTeam() {
+  loading();
+  let d; try { d = await api('/api/team'); } catch (e) { return errView(e); }
+  S.team = d;
+  const kids = {}; d.nodes.forEach(n => (kids[n.parent || ''] = kids[n.parent || ''] || []).push(n));
+  const rows = [];
+  (function walk(p, depth) { (kids[p] || []).forEach(n => { rows.push([n, depth]); walk(n.code, depth + 1); }); })('', 0);
+  const total = d.nodes.filter(n => !n.me).length;
+  let h = '';
+  if (S.me.role !== 'viewer') h += `<button class="btn" onclick="inviteSheet(${S.me.role === 'agent' ? `'${S.me.agent.code}'` : 'null'})">＋ Запросити в команду</button>`;
+  h += `<div class="card"><h3>${S.me.role === 'agent' ? 'Моя гілка' : 'Структура'} · ${total} ${total === 1 ? 'людина' : (total % 10 >= 2 && total % 10 <= 4 && (total % 100 < 10 || total % 100 >= 20)) ? 'людини' : 'людей'}</h3>`;
+  if (!rows.length || (rows.length === 1 && rows[0][0].me)) h += `<div class="empty">Команди ще немає. Натисніть «Запросити в команду», введіть ім'я — і перешліть людині посилання.</div>`;
+  h += `<div class="tree">${rows.map(([n, dep]) => `<button class="node" style="padding-left:${4 + dep * 18}px" onclick="agentSheet('${n.code}')">
+      ${dep ? '<span class="ind">└</span>' : ''}<span class="dot ${n.state}"></span>
+      <span class="nm"><b>${n.me ? 'Ви · ' : ''}${esc(n.name)}</b><small>${num(n.users)} людей · ${num(n.leads)} заявок · ${num(n.contracts)} договорів</small></span>
+      ${n.level ? `<span class="lvl">рів. ${n.level}</span>` : ''}</button>`).join('')}</div>`;
+  h += `<div class="legend"><span><i class="dot"></i>підключений</span><span><i class="dot wait"></i>ще не підключився</span><span><i class="dot off"></i>вимкнений</span></div>
+    <div class="mini" style="margin-top:6px">Цифри за 30 днів. Відступ показує, хто в чиїй команді.</div></div>`;
+  $('#view').innerHTML = h;
+}
+async function agentSheet(code, days) {
+  days = days ?? 30;
+  let a; try { a = await api('/api/agent?code=' + encodeURIComponent(code)); } catch (e) { return toast('Помилка: ' + e.message); }
+  CUR = a;
+  const s = a.stats[String(days)], st = { on: 'підключений', wait: 'ще не підключився', off: 'вимкнений' }[a.state];
+  let h = `<div class="sh"><div><h2>${esc(a.name)}</h2><div class="sub"><span class="dot ${a.state}" style="display:inline-block;margin-right:5px"></span>${st}${a.level ? ' · рівень ' + a.level : ''}${a.boss ? ' · керівник: ' + esc(a.boss) : ''}</div></div><button class="x" onclick="closeSheet()">✕</button></div>`;
+  h += `<div class="seg">${[[7, '7 днів'], [30, '30 днів'], [0, 'Усі']].map(([k, n]) => `<button class="${days === k ? 'on' : ''}" onclick="agentSheet('${code}',${k})">${n}</button>`).join('')}</div>`;
+  h += `<div class="grid"><div class="kpi"><b>${num(s.users)}</b><span>людей у боті</span></div><div class="kpi hl"><b>${num(s.leads)}</b><span>заявок</span></div><div class="kpi"><b>${num(s.contracts)}</b><span>договорів</span></div></div>`;
+  h += `<div class="card"><dl><dt>Порахували пенсію</dt><dd>${num(s.calc)}</dd><dt>Конверсія в заявку</dt><dd>${pct(s.leads, s.users)}</dd>
+    <dt>У команді</dt><dd>${a.team}</dd>${a.team ? `<dt>Команда: людей · заявок · договорів</dt><dd>${num(s.team.users)} · ${num(s.team.leads)} · ${num(s.team.contracts)}</dd>` : ''}</dl></div>`;
+  if (a.can_level) h += `<div class="card"><h3>Рівень Starlife</h3><div class="lv">${Array.from({length: 16}, (_, i) => i + 1).map(n => `<button class="${a.level === n ? 'on' : ''}" onclick="setLevel('${code}',${n},${days})">${n}</button>`).join('')}</div>
+      <button class="btn ghost" onclick="setLevel('${code}',0,${days})">Прибрати рівень</button></div>`;
+  if (a.can_invite) h += `<button class="btn sec" onclick="reinvite('${code}')">🔗 Нове запрошення (ще не підключився)</button>`;
+  if (a.can_add_under && S.me.role !== 'viewer') h += `<button class="btn sec" onclick="inviteSheet('${code}',true)">＋ Запросити людину в цю гілку</button>`;
+  h += linksCard(a.links, 'Посилання для клієнтів');
+  if (a.can_admin) h += `<div class="row2"><button class="btn sec" onclick="renameSheet('${code}')">✏️ Перейменувати</button>
+      <button class="btn ${a.state === 'off' ? 'sec' : 'danger'}" onclick="toggleAgent('${code}',${a.state === 'off'})">${a.state === 'off' ? '✅ Увімкнути' : '⛔ Вимкнути'}</button></div>`;
+  openSheet(h);
+}
+async function setLevel(code, lvl, days) { try { await api('/api/level', { code, level: lvl }); haptic(); agentSheet(code, days); renderTeam(); } catch (e) { toast('Помилка: ' + e.message); } }
+function toggleAgent(code, on) {
+  const go2 = async () => { try { await api('/api/agent_update', { code, active: on }); toast(on ? 'Увімкнено' : 'Вимкнено'); agentSheet(code); renderTeam(); } catch (e) { toast('Помилка: ' + e.message); } };
+  if (on) return go2();
+  confirmBox('Вимкнути консультанта? Нові люди за його посиланнями закріплюватимуться за вами, старі клієнти залишаться за ним.', go2);
+}
+let CUR = null;
+function renameSheet(code) {
+  const name = CUR ? CUR.name : '';
+  openSheet(`<div class="sh"><div><h2>Нове ім'я</h2></div><button class="x" onclick="agentSheet('${code}')">✕</button></div>
+    <input class="txt" id="nn" value="${esc(name)}" maxlength="60"><button class="btn" onclick="doRename('${code}')">Зберегти</button>`);
+}
+async function doRename(code) { try { await api('/api/agent_update', { code, name: $('#nn').value }); toast('Збережено'); agentSheet(code); renderTeam(); } catch (e) { toast(e.message); } }
+function inviteSheet(parent, fromCard) {
+  const parentName = fromCard && CUR ? CUR.name : null;
+  openSheet(`<div class="sh"><div><h2>Запросити в команду</h2><div class="sub">${parentName ? 'У команду: ' + esc(parentName) : S.me.role === 'admin' ? 'Напряму під вами' : 'У вашу команду'}</div></div><button class="x" onclick="closeSheet()">✕</button></div>
+    <input class="txt" id="iname" placeholder="Ім'я і прізвище" maxlength="60">
+    <button class="btn" id="ibtn" onclick="doInvite(${parent ? `'${parent}'` : 'null'})">Створити запрошення</button>
+    <div class="mini">Бот дасть одноразове посилання. Людина натисне його і «Почати», і стане консультантом у цій гілці. Ви отримаєте сповіщення.</div>`);
+  setTimeout(() => $('#iname') && $('#iname').focus(), 100);
+}
+async function doInvite(parent) {
+  const b = $('#ibtn'); b.disabled = true;
+  try { showInvite(await api('/api/invite', { name: $('#iname').value, parent })); if (S.tab === 'tm') renderTeam(); }
+  catch (e) { toast(e.message); b.disabled = false; }
+}
+async function reinvite(code) { try { showInvite(await api('/api/reinvite', { code })); } catch (e) { toast('Помилка: ' + e.message); } }
+let INV = null;
+function showInvite(r) {
+  INV = r;
+  openSheet(`<div class="sh"><div><h2>Запрошення готове ✅</h2><div class="sub">Надішліть його людині</div></div><button class="x" onclick="closeSheet()">✕</button></div>
+    <div class="invite">${esc(r.text)}</div>
+    <button class="btn" onclick="openLink(INV.share)">📤 Надіслати в Telegram</button>
+    <button class="btn sec" onclick="copy(INV.text)">Скопіювати текст</button>
+    <div class="mini">Посилання одноразове. Якщо людина його загубить — відкрийте її картку і натисніть «Нове запрошення».</div>`);
+}
+
+/* ---------- доступ (лише адмін) ---------- */
+async function renderAccess() {
+  loading();
+  let d; try { d = await api('/api/viewers'); } catch (e) { return errView(e); }
+  VIEWERS = d.viewers;
+  let h = `<div class="card"><h3>Перегляд для партнерів</h3><div class="mini" style="margin-bottom:8px">Бачать огляд, усі заявки, команду і можуть отримати Excel. Нічого не змінюють.</div>`;
+  h += d.viewers.length ? d.viewers.map(v => `<div class="vrow"><span>${esc(v.name)} <small style="color:var(--muted)">${v.env ? '(вписаний у Render)' : 'ID ' + v.id}</small></span>${v.env ? '' : `<button onclick="removeViewer(${v.id})">Забрати</button>`}</div>`).join('') : '<div class="empty" style="padding:12px">Поки нікого.</div>';
+  h += `</div><div class="card"><h3>Дати доступ</h3><input class="txt" id="vid" inputmode="numeric" placeholder="Telegram ID, напр. 123456789">
+    <button class="btn" style="margin-top:8px" onclick="addViewer(this)">Дати доступ</button>
+    <div class="mini" style="margin-top:8px">ID людина дізнається в @userinfobot. Або в боті: «👁 Доступ до перегляду» → перешліть її повідомлення. Людина має хоч раз натиснути «Почати» в боті.</div></div>`;
+  $('#view').innerHTML = h;
+}
+async function addViewer(b) {
+  b.disabled = true;
+  try { const r = await api('/api/viewer_add', { id: $('#vid').value }); toast(r.reached ? `✅ ${r.name}: доступ відкрито` : `✅ Додано. Хай ${r.name} натисне «Почати» в боті`); renderAccess(); }
+  catch (e) { toast(e.message); b.disabled = false; }
+}
+let VIEWERS = [];
+function removeViewer(id) {
+  const name = (VIEWERS.find(v => v.id === id) || {}).name || id; confirmBox(`Забрати доступ у ${name}?`, async () => { try { await api('/api/viewer_remove', { id }); toast('Доступ забрано'); renderAccess(); } catch (e) { toast(e.message); } }); }
+
+/* ---------- шторка ---------- */
+function openSheet(h) { const bg = $('#sheet'); bg.innerHTML = `<div class="sheet"><div class="grab"></div>${h}</div>`; bg.hidden = false; bg.onclick = e => { if (e.target === bg) closeSheet(); }; try { tg.BackButton.show(); } catch (e) {} }
+function closeSheet() { $('#sheet').hidden = true; $('#sheet').innerHTML = ''; try { tg.BackButton.hide(); } catch (e) {} }
+try { tg.BackButton.onClick(closeSheet); } catch (e) {}
+
+boot();
+</script>
+</body>
+</html>
