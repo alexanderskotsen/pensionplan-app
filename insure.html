@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Цивілка і медстраховка</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="bridge.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
 .navtabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;margin:0 auto 10px;max-width:520px;gap:2px}
@@ -252,8 +253,7 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
   try { if (tg && tg.platform && tg.platform !== 'unknown') { tg.ready(); tg.expand(); } } catch (e) {}
   function send(obj){
     const data = JSON.stringify(obj);
-    try { if (tg && tg.initData) { tg.sendData(data); return; } } catch (e) {}
-    $('ctaNote').hidden = false;
+    window.toBot(data, obj.a).then(ok => { if (!ok) $('ctaNote').hidden = false; });
   }
   $('aCta').onclick = () => { const a = autoPrice();
     send({ a:'auto', v:{ engine:S.engine, zone:S.zone, dtp:S.dtp, term:S.term, benefit:S.benefit ? 1 : 0, taxi:S.taxi ? 1 : 0, lo:a.lo, hi:a.hi } }); };

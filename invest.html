@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Інвестиційний калькулятор</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="bridge.js"></script>
 <style>
 *{box-sizing:border-box}html,body{margin:0}
 
@@ -362,8 +363,7 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     if (S.mode === 'hist') { const p = simHist(), l = p[p.length - 1]; res = l.sp; paid = l.paid; }
     else { const p = simFc(), l = p[p.length - 1]; res = l.sc[1]; paid = l.paid; }
     const data = JSON.stringify({ a:'invest', i:{ mode:S.mode, cur:S.cur, init:S.init, reg:S.reg, freq:S.freq, start:S.start, years:S.years, res:Math.round(res), paid:Math.round(paid) } });
-    try { if (tg && tg.initData) { tg.sendData(data); return; } } catch (e) {}
-    $('ctaNote').hidden = false;
+    window.toBot(data, 'invest').then(ok => { if (!ok) $('ctaNote').hidden = false; });
   };
   render();
 })();

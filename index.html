@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Твій фінансовий план</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="bridge.js"></script>
 <style>
 :root{--bg:#eef1f5;--card:#fff;--fg:#151b26;--muted:#6b7483;--line:#e3e7ee;--accent:#2a6fdb;--accent-soft:#e9f1fd;--warn:#b25a00;--warn-soft:#fdf2e3;--good:#1d7a4a;--good-soft:#e6f5ec;--gold:#f0b35a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -240,8 +241,7 @@ function payload(action){
 }
 function send(action){
   const data=payload(action);
-  if(tg&&tg.sendData&&tg.initData!==undefined){try{tg.sendData(data);return}catch(e){}}
-  alert('Відкрийте калькулятор через кнопку в Telegram-боті, щоб надіслати дані.\n\n'+data);
+  window.toBot(data,'').then(ok=>{if(!ok)alert('Відкрийте калькулятор через Telegram-бота, щоб надіслати дані.')});
 }
 $('main').onclick=()=>{
   if(S.tab==='p'&&S.view==='form'){S.view='res';upd();scrollTo(0,0);return}

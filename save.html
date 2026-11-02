@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Накопичити гроші</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="bridge.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
 [hidden]{display:none!important}
@@ -256,8 +257,7 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
   try { if (tg && tg.platform && tg.platform !== 'unknown') { tg.ready(); tg.expand(); } } catch (e) {}
   $('cta').onclick = () => {
     const data = JSON.stringify({ a:'save', v:{ mode:S.mode, cur:S.cur, freq:S.freq, pay:S._pay, goal:S.goal, term:S.term, age:S.age, sex:S.sex } });
-    try { if (tg && tg.initData) { tg.sendData(data); return; } } catch (e) {}
-    $('ctaNote').hidden = false;
+    window.toBot(data, 'save').then(ok => { if (!ok) $('ctaNote').hidden = false; });
   };
   sync(); render();
 })();

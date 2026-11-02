@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Капітал за 60 секунд</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="bridge.js"></script>
 <style>
 *{box-sizing:border-box}html,body{margin:0}
 
@@ -442,8 +443,7 @@ function finish(){
   $('real').onclick = () => {
     const data = JSON.stringify({ a:'game', g:{ cap:Math.round(G.cap), dep:Math.round(G.dep), ins:Object.keys(G.ins).filter(k => G.ins[k]),
       fmLost:Math.round(G.fmLost), fmSaved:Math.round(G.fmSaved), traps:G.hits.trap, policyAge:G.policyAge || 0 } });
-    try { if (tg && tg.initData) { tg.sendData(data); return; } } catch (e) {}
-    if (BOT_USERNAME) openLink('https://t.me/' + BOT_USERNAME + '?start=game');
+    window.toBot(data, 'game').then(ok => { if (!ok && BOT_USERNAME) openLink('https://t.me/' + BOT_USERNAME + '?start=game'); });
   };
   $('share').onclick = () => openLink('https://t.me/share/url?url=' + encodeURIComponent(BOT_USERNAME ? 'https://t.me/' + BOT_USERNAME + '?start=game' : location.href.split('?')[0]) + '&text=' + encodeURIComponent(text));
   if (!BOT_USERNAME && !(tg && tg.initData)) $('share').hidden = true;
