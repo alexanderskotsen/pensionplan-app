@@ -49,7 +49,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .res .k{font-size:.86rem;color:var(--muted)}
 .big{font-size:2rem;font-weight:750;letter-spacing:-.02em;line-height:1.1;color:var(--good);font-variant-numeric:tabular-nums}
 .big small{font-size:.95rem;color:var(--muted);font-weight:500}
-dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:.9rem}dt{color:var(--muted)}dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:.9rem}dt{color:var(--muted)}dt small{font-size:.74rem;opacity:.85}dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
 .pill{display:inline-block;padding:4px 10px;border-radius:99px;font-weight:650;font-size:.85rem;justify-self:start;background:var(--good-soft);color:var(--good)}
 .shield{background:var(--accent-soft);border-radius:14px;padding:14px 16px;display:grid;gap:4px}
 .shield .k{font-size:.86rem}.shield .v{font-size:1.45rem;font-weight:750;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -162,6 +162,8 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
   }
   const fmt = n => Math.round(n).toLocaleString('uk-UA').replace(/ |,/g, ' ');
   const money = n => S.cur === 'uah' ? fmt(n) + ' грн' : '$' + fmt(n);
+  // результати округлюємо (до 1 000 грн / $10), щоб не створювати враження точного розрахунку
+  const approx = n => money(S.cur === 'uah' ? Math.round(n / 1000) * 1000 : Math.round(n / 10) * 10);
   const short = n => S.cur === 'uah' ? (n < 1000 ? fmt(n) + ' грн' : n >= 1e6 ? (n/1e6).toFixed(1).replace('.0','') + ' млн' : fmt(n/1000) + ' тис') : '$' + fmt(n);
   const roundPay = (v, step) => Math.max(step, Math.round(v / step) * step);
 
@@ -223,18 +225,20 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
       $('resBig').innerHTML = `≈ ${money(pay).replace(' грн','')} <small>${usd ? '' : 'грн '}${per}</small>`;
     } else {
       $('resK').textContent = `Через ${$('termV').textContent} у вас буде`;
-      $('resBig').innerHTML = `≈ ${money(r.proj).replace(' грн','')} <small>${usd ? '' : 'грн'}</small>`;
+      $('resBig').innerHTML = `≈ ${approx(r.proj).replace(' грн','')} <small>${usd ? '' : 'грн'}</small>`;
     }
     let dl = `<dt>Внесете за ${S.term} р.</dt><dd>${money(r.paid)}</dd>`;
-    if (S.mode === 'goal') dl += `<dt>Орієнтовно накопичите</dt><dd>${money(r.proj)}</dd>`;
-    if (r.guar != null) dl += `<dt>Гарантовано (4%)</dt><dd>≈ ${money(r.guar)}</dd>`;
-    dl += `<dt>Орієнтовно (${usd ? '3' : '7'}%), понад внески</dt><dd>+ ${money(Math.max(0, r.proj - r.paid))}</dd>`;
+    if (r.guar != null) dl += `<dt>З гарантованими 4%<br><small>мінімум за договором</small></dt><dd>≈ ${approx(r.guar)}</dd>`;
+    dl += usd
+      ? `<dt>Орієнтовно під 3%<br><small>дохід не гарантований</small></dt><dd>≈ ${approx(r.proj)}</dd>`
+      : `<dt>Орієнтовно під 7%<br><small>4% гарантовані + ≈3% інвестдохід</small></dt><dd>≈ ${approx(r.proj)}</dd>`;
+    dl += `<dt>З них ваш дохід</dt><dd style="color:var(--good)">+ ${approx(Math.max(0, r.proj - r.paid))}</dd>`;
     $('resDl').innerHTML = dl;
     const pct = Math.round((r.proj / r.paid - 1) * 100);
     $('resPill').textContent = (pct >= 0 ? '+' : '') + pct + '% до внесеного';
     $('protV').textContent = money(r.paid);
     $('cmpT').textContent = `Те саме, але інакше · ${S.term} р. по ${money(pay)} ${per}`;
-    $('bPolicy').style.width = '100%'; $('bPolicy').textContent = `≈ ${money(r.proj)} + захист`;
+    $('bPolicy').style.width = '100%'; $('bPolicy').textContent = `≈ ${approx(r.proj)} + захист`;
     $('bHome').style.width = Math.max(75, Math.round(r.paid / r.proj * 100)) + '%';
     $('bHome').textContent = `${money(r.paid)}, з'їдає інфляція`;
     $('fine').textContent = usd
