@@ -71,10 +71,11 @@ h2{font-size:1.25rem;margin:0}
 .tip{font-size:.88rem;background:var(--accent-soft);border-radius:10px;padding:10px 12px;text-align:left}
 .fine{font-size:.72rem;color:var(--muted);margin:0}
 .count{position:absolute;inset:0;display:grid;place-items:center;font-size:5rem;font-weight:900;color:var(--accent);pointer-events:none;text-shadow:0 2px 0 var(--card)}
+.navtabs{overflow-x:auto;scrollbar-width:none}.navtabs::-webkit-scrollbar{display:none}.navtabs button{flex:0 0 auto;padding:9px 12px}
 </style>
 </head>
 <body>
-<nav class="navtabs"><button type="button" class="" onclick="navGo('index.html')">Пенсія</button><button type="button" class="" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="" onclick="navGo('invest.html')">Інвестиції</button><button type="button" class="on" onclick="navGo('game.html')">Гра</button><button type="button" class="" onclick="navGo('insure.html')">Захист</button></nav>
+<nav class="navtabs"><button type="button" onclick="navGo('save.html')">Накопичити</button><button type="button" class="" onclick="navGo('index.html')">Пенсія</button><button type="button" class="" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="" onclick="navGo('invest.html')">Інвестиції</button><button type="button" class="on" onclick="navGo('game.html')">Гра</button><button type="button" class="" onclick="navGo('insure.html')">Захист</button></nav>
 <script>
 function navGo(page, tab){ const q = new URLSearchParams(location.search); q.delete('tab'); if (tab) q.set('tab', tab); const s = q.toString(); location.href = page + (s ? '?' + s : ''); }
 </script>
@@ -458,5 +459,6 @@ requestAnimationFrame(frame);
 })();
 </script>
 
+<script>document.querySelectorAll('.navtabs .on,.tabs .on').forEach(b=>{try{b.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}})</script>
 </body>
 </html>

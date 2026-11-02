@@ -242,7 +242,7 @@ function leadSheet(i) {
     ${l.time ? `<dt>Зручно</dt><dd>${esc(l.time)}${l.method ? ', ' + esc(l.method) : ''}</dd>` : ''}
     <dt>Тип</dt><dd>${esc(l.kind)}</dd><dt>Джерело</dt><dd>${esc(l.source)}</dd><dt>Консультант</dt><dd>${esc(l.agent_name)}</dd>
     ${l.segment ? `<dt>Сегмент</dt><dd>${esc(l.segment)}</dd>` : ''}</dl></div>`;
-  if (l.pension || l.salary || l.child || l.game || l.invest || l.auto || l.med) {
+  if (l.pension || l.salary || l.child || l.game || l.invest || l.auto || l.med || l.save) {
     h += `<div class="card"><h3>Що людина рахувала</h3><dl>
       ${l.age ? `<dt>Вік</dt><dd>${l.age}${l.ret_age ? ' → пенсія у ' + l.ret_age : ''}</dd>` : ''}
       ${l.salary ? `<dt>Зарплата</dt><dd>${money(l.salary)}</dd>` : ''}
@@ -254,7 +254,8 @@ function leadSheet(i) {
       ${l.game ? `<dt>Гра</dt><dd>${esc(l.game)}</dd>` : ''}
       ${l.invest ? `<dt>S&amp;P 500</dt><dd>${esc(l.invest)}</dd>` : ''}
       ${l.auto ? `<dt>Цивілка</dt><dd>${esc(l.auto)}</dd>` : ''}
-      ${l.med ? `<dt>Медстраховка</dt><dd>${esc(l.med)}</dd>` : ''}</dl></div>`;
+      ${l.med ? `<dt>Медстраховка</dt><dd>${esc(l.med)}</dd>` : ''}
+      ${l.save ? `<dt>Накопичення</dt><dd>${esc(l.save)}</dd>` : ''}</dl></div>`;
   }
   if (l.can_edit) {
     h += `<div class="card"><h3>Змінити статус</h3><div class="stgrid">${Object.entries(S.me.statuses).filter(([k]) => k !== 'new').map(([k, n]) => `<button class="${l.status === k ? 'on' : ''}" onclick="setStatus(${i},'${k}')">${esc(n)}</button>`).join('')}</div>
