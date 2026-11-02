@@ -65,7 +65,7 @@ svg text{fill:var(--muted)}
 </style>
 </head>
 <body>
-<nav class="navtabs"><button type="button" class="on" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" onclick="navGo('invest.html')">Інвестиції</button><button type="button" onclick="navGo('game.html')">Гра</button><button type="button" onclick="navGo('insure.html')">Захист</button></nav>
+<nav class="navtabs"><button type="button" class="on" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" onclick="navGo('invest.html')">Інвестиції</button><button type="button" onclick="navGo('insure.html')">Захист</button><button type="button" onclick="navGo('game.html')">Гра</button></nav>
 <script>
 function navGo(page, tab){ const q = new URLSearchParams(location.search); q.delete('tab'); if (tab) q.set('tab', tab); const s = q.toString(); location.href = page + (s ? '?' + s : ''); }
 </script>
