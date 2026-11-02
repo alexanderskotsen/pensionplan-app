@@ -96,8 +96,8 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
 
   <div class="card">
     <div class="row"><span>Строк</span><b id="termV"></b></div>
-    <input type="range" id="term" min="10" max="30" step="1" value="15" aria-label="Строк">
-    <div class="hint"><span>10 років</span><span id="termMax">30 років</span></div>
+    <input type="range" id="term" min="10" max="50" step="1" value="15" aria-label="Строк">
+    <div class="hint"><span>10 років</span><span id="termMax">50 років</span></div>
   </div>
 
   <div class="grid2">
@@ -149,7 +149,7 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
   const S = { mode:'amount', cur:'uah', freq:'m', pay:2000, goal:500000, term:15, age:32, sex:'f' };
 
   const risk = (age, sex) => Math.min(0.15, (0.03 + Math.max(0, age - 30) * 0.003) * (sex === 'm' ? 1.15 : 1));
-  const maxTerm = age => Math.max(10, Math.min(30, 75 - age));
+  const maxTerm = age => Math.max(10, Math.min(50, 75 - age));
   function fv(pay, freq, years, rate){
     if (rate == null) return null;
     const n = freq === 'y' ? years : years * 12, i = freq === 'y' ? rate : rate / 12;
