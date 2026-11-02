@@ -5,8 +5,9 @@
 window.toBot = async function (data, start) {
   const tg = window.Telegram && window.Telegram.WebApp;
   const q = new URLSearchParams(location.search);
-  const api = (q.get('api') || '').replace(/\/$/, '');
-  const bot = q.get('bot');
+  // Якщо сторінку відкрили старою кнопкою без параметрів — беремо адреси за замовчуванням.
+  const api = (q.get('api') || 'https://pensionplan-bot.onrender.com').replace(/\/$/, '');
+  const bot = q.get('bot') || 'tviy_finplan_bot';
   if (tg && tg.initData) {
     if (api) {
       try {
