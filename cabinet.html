@@ -242,6 +242,7 @@ function leadSheet(i) {
     ${l.time ? `<dt>Зручно</dt><dd>${esc(l.time)}${l.method ? ', ' + esc(l.method) : ''}</dd>` : ''}
     <dt>Тип</dt><dd>${esc(l.kind)}</dd><dt>Джерело</dt><dd>${esc(l.source)}</dd><dt>Консультант</dt><dd>${esc(l.agent_name)}</dd>
     ${l.segment ? `<dt>Сегмент</dt><dd>${esc(l.segment)}</dd>` : ''}</dl></div>`;
+  if (l.anketa) h += `<div class="card"><h3>Фінансова анкета</h3><p style="margin:0;line-height:1.6">${esc(l.anketa).split(' · ').join('<br>')}</p></div>`;
   if (l.pension || l.salary || l.child || l.game || l.invest || l.auto || l.med || l.save) {
     h += `<div class="card"><h3>Що людина рахувала</h3><dl>
       ${l.age ? `<dt>Вік</dt><dd>${l.age}${l.ret_age ? ' → пенсія у ' + l.ret_age : ''}</dd>` : ''}
