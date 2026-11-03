@@ -256,6 +256,7 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
   $('tabAmount').onclick = () => { S.mode = 'amount'; render(); };
   $('tabGoal').onclick = () => { S.mode = 'goal'; render(); };
   if (new URLSearchParams(location.search).get('tab') === 'goal') S.mode = 'goal';
+  { const pa = +new URLSearchParams(location.search).get('pa'); if (pa >= 18 && pa <= 65) S.age = pa; }  // вік з анкети
 
   const tg = window.Telegram && window.Telegram.WebApp;
   try { if (tg && tg.platform && tg.platform !== 'unknown') { tg.ready(); tg.expand(); } } catch (e) {}

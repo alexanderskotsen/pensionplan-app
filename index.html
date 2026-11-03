@@ -153,8 +153,14 @@ const tg=window.Telegram&&Telegram.WebApp; if(tg){tg.ready();tg.expand();try{tg.
 const $=id=>document.getElementById(id);
 const S={tab:'p',view:'form',sex:'f',work:'emp',past:2,cpay:21,cgoal:1000000};
 try{if(new URLSearchParams(location.search).get('tab')==='child')S.tab='c'}catch(e){}
+// відповіді фінансової анкети з бота (pa — вік, pn — на руки, pw — тип роботи); людина може змінити повзунки
+const PF=(()=>{try{const q=new URLSearchParams(location.search);return{pa:+q.get('pa')||0,pn:+q.get('pn')||0,pw:q.get('pw')||''}}catch(e){return{}}})();
+if(['emp','fop','none'].includes(PF.pw))S.work=PF.pw;
 function chips(id,key,num){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   [...$(id).children].forEach(x=>x.classList.toggle('on',x===b));const v=b.dataset.v;S[key]=num&&v!=='own'?Number(v):v;upd()})}
+if(PF.pa>=18&&PF.pa<=65)$('age').value=PF.pa;
+if(PF.pn>=5000)$('net').value=Math.min(150000,PF.pn);
+if(PF.pw)[...$('work').children].forEach(x=>x.classList.toggle('on',x.dataset.v===S.work));
 chips('sex','sex');chips('work','work');chips('past','past',true);chips('cgoal','cgoal',true);
 $('cpay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.cpay=Number(b.dataset.v);upd()});
 ['age','ret','stazh','net','want','cage'].forEach(id=>$(id).addEventListener('input',upd));
