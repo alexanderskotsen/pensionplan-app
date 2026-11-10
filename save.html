@@ -6,6 +6,7 @@
 <title>Накопичити гроші</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="bridge.js?v=3"></script>
+<script src="tariff.js?v=1"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
 [hidden]{display:none!important}
@@ -156,9 +157,14 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     return pay * (Math.pow(1 + i, n) - 1) / i * (1 + i);
   }
   function calc(pay){
+    if (S.cur === 'uah') {  // гривня — модель з tariff.js (відкалібрована на тарифах страховика)
+      const t = Tariff.adult(pay, S.freq, S.age, S.sex, S.term);
+      return { paid: t.paid, guar: t.guar, proj: t.base, opt: t.opt, cover: t.cover, at: t.at };
+    }
     const net = pay * (1 - risk(S.age, S.sex)), r = RATES[S.cur];
     const paid = pay * (S.freq === 'y' ? 1 : 12) * S.term;
-    return { paid, guar: fv(net, S.freq, S.term, r.guar), proj: fv(net, S.freq, S.term, r.proj) };
+    return { paid, guar: null, proj: fv(net, S.freq, S.term, r.proj), opt: null, cover: paid,
+             at: y => fv(net, S.freq, y, r.proj) };
   }
   const fmt = n => Math.round(n).toLocaleString('uk-UA').replace(/ |,/g, ' ');
   const money = n => S.cur === 'uah' ? fmt(n) + ' грн' : '$' + fmt(n);
@@ -190,7 +196,7 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     let h = '';
     for (let y = 1; y <= n; y++) {
       const paid = pay * (S.freq === 'y' ? 1 : 12) * y;
-      const tot = fv(pay * (1 - risk(S.age, S.sex)), S.freq, y, RATES[S.cur].proj);
+      const tot = r.at(y);
       const hp = Math.min(paid, tot) / top * H, hg = Math.max(0, tot - paid) / top * H;
       const x = (y - 1) * bw + bw * 0.15, w = bw * 0.7;
       h += `<rect x="${x}" y="${H - hp}" width="${w}" height="${hp}" rx="2" fill="var(--accent)"/>`;
@@ -217,7 +223,8 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     const per = S.freq === 'y' ? 'на рік' : 'на місяць';
     if (S.mode === 'goal') {
       const step = LIM[S.cur][S.freq][2];
-      pay = roundPay(S.goal / calc(1).proj, step);
+      const unit = S.freq === 'y' ? 10000 : 1000;  // модель майже лінійна: рахуємо на «одиницю» внеску
+      pay = roundPay(S.goal / calc(unit).proj * unit, step);
     }
     const r = calc(pay), usd = S.cur === 'usd';
     if (S.mode === 'goal') {
@@ -228,22 +235,23 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
       $('resBig').innerHTML = `≈ ${approx(r.proj).replace(' грн','')} <small>${usd ? '' : 'грн'}</small>`;
     }
     let dl = `<dt>Внесете за ${S.term} р.</dt><dd>${money(r.paid)}</dd>`;
-    if (r.guar != null) dl += `<dt>З гарантованими 4%<br><small>мінімум за договором</small></dt><dd>≈ ${approx(r.guar)}</dd>`;
+    if (r.guar != null) dl += `<dt>Гарантовано<br><small>мінімум за договором</small></dt><dd>≈ ${approx(r.guar)}</dd>`;
     dl += usd
       ? `<dt>Орієнтовно під 3%<br><small>дохід не гарантований</small></dt><dd>≈ ${approx(r.proj)}</dd>`
-      : `<dt>Орієнтовно під 7%<br><small>4% гарантовані + ≈3% інвестдохід</small></dt><dd>≈ ${approx(r.proj)}</dd>`;
+      : `<dt>Базовий прогноз<br><small>з бонусом від інвестицій</small></dt><dd>≈ ${approx(r.proj)}</dd>`
+        + `<dt>Якщо роки будуть вдалими<br><small>оптимістичний прогноз</small></dt><dd>≈ ${approx(r.opt)}</dd>`;
     dl += `<dt>З них ваш дохід</dt><dd style="color:var(--good)">+ ${approx(Math.max(0, r.proj - r.paid))}</dd>`;
     $('resDl').innerHTML = dl;
     const pct = Math.round((r.proj / r.paid - 1) * 100);
     $('resPill').textContent = (pct >= 0 ? '+' : '') + pct + '% до внесеного';
-    $('protV').textContent = money(r.paid);
+    $('protV').textContent = approx(r.cover);
     $('cmpT').textContent = `Те саме, але інакше · ${S.term} р. по ${money(pay)} ${per}`;
     $('bPolicy').style.width = '100%'; $('bPolicy').textContent = `≈ ${approx(r.proj)} + захист`;
     $('bHome').style.width = Math.max(75, Math.round(r.paid / r.proj * 100)) + '%';
     $('bHome').textContent = `${money(r.paid)}, з'їдає інфляція`;
     $('fine').textContent = usd
       ? 'Розрахунок орієнтовний. У доларових програмах дохідність не гарантована й залежить від інвестиційного доходу страхової. Частина внеску йде на страховий захист. Точні цифри покаже консультант безкоштовно.'
-      : 'Розрахунок орієнтовний: гарантована ставка 4%, орієнтовна 7% на рік. Частина внеску йде на страховий захист. Точні цифри залежать від страхової й програми — їх покаже консультант безкоштовно.';
+      : 'Розрахунок орієнтовний, за тарифами класичних накопичувальних програм. Гарантована сума — мінімум за договором; бонус від інвестицій нараховується щороку, але не гарантований. Частина внеску йде на страховий захист. Точні цифри покаже консультант безкоштовно.';
     chart(pay);
     S._pay = pay; S._r = r;
   }

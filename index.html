@@ -6,6 +6,7 @@
 <title>Твій фінансовий план</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="bridge.js?v=3"></script>
+<script src="tariff.js?v=1"></script>
 <style>
 :root{--bg:#eef1f5;--card:#fff;--fg:#151b26;--muted:#6b7483;--line:#e3e7ee;--accent:#2a6fdb;--accent-soft:#e9f1fd;--warn:#b25a00;--warn-soft:#fdf2e3;--good:#1d7a4a;--good-soft:#e6f5ec;--gold:#f0b35a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -144,7 +145,12 @@ function calculate(sex,age,ret,stazh,future,pastK,salary,want){
   return {pension:jround(p),eligible,need,total,altAge,year,early,stateAge,bridge,gap:jround(gap),capital:jround(cap),pmt:pmt===null?null:jround(pmt),ratio:salary>0?jround(p/salary*100):null};
 }
 function childOptions(a){const e=Math.max(18,a+10);if(e>27)return[];return [...new Set([e,...[18,21,23,25,27].filter(x=>x>=e)])].sort((x,y)=>x-y)}
-function childCalc(a,pay,goal){const y=pay-a,m=y*12,rm=Math.pow(1+CHILD_RETURN,1/12)-1;return {years:y,pmt:jround(goal*rm/(Math.pow(1+rm,m)-1)),payYear:BASE_YEAR+y}}
+// Дитяча програма: внесок, щоб базовий прогноз = goal; модель — tariff.js (та сама в tariff.py бота)
+const TF=typeof Tariff!=='undefined'?Tariff:(typeof require!=='undefined'?require('./tariff.js'):null);
+function childCalc(a,pay,goal){const y=pay-a;
+  if(!TF){const m=y*12,rm=Math.pow(1+CHILD_RETURN,1/12)-1;return {years:y,pmt:jround(goal*rm/(Math.pow(1+rm,m)-1)),payYear:BASE_YEAR+y}}
+  const u=TF.child(1000,'m',y),pmt=jround(goal/u.base*1000),r=TF.child(pmt,'m',y);
+  return {years:y,pmt,payYear:BASE_YEAR+y,guar:jround(r.guar),opt:jround(r.opt),paid:jround(r.paid)}}
 if(typeof module!=='undefined'){module.exports={calculate,childCalc,childOptions};}
 </script>
 <script>
@@ -219,10 +225,10 @@ function renderChild(){
   if(!goal){$('c-out').innerHTML='<div class="mini">Вкажіть суму від 10 000 грн.</div>';return}
   const r=childCalc(a,S.cpay,goal);
   $('c-out').innerHTML=`<div class="gap"><div class="k">Щоб у ${r.payYear} році отримати ${money(goal)}</div><div class="v">≈ ${money(r.pmt)}/міс</div>
-    <dl><dt>програма</dt><dd>${r.years} років</dd><dt>виплата</dt><dd>у ${S.cpay} р. дитини</dd></dl></div>
-    <div class="card mini">🛡 Якщо з батьками щось станеться, страхова продовжить внески — дитина все одно отримає суму. Внески можна щороку індексувати від інфляції.</div>
+    <dl><dt>програма</dt><dd>${r.years} років</dd><dt>виплата</dt><dd>у ${S.cpay} р. дитини</dd>${r.guar?`<dt>внесете</dt><dd>${money(r.paid)}</dd><dt>гарантовано</dt><dd>≈ ${money(Math.round(r.guar/1000)*1000)}</dd><dt>якщо роки вдалі</dt><dd>≈ ${money(Math.round(r.opt/1000)*1000)}</dd>`:''}</dl></div>
+    <div class="card mini">🛡 Можна додати опцію: якщо з батьками щось станеться, страхова продовжить внески — дитина все одно отримає суму. Внески можна щороку індексувати від інфляції.</div>
     <div class="note">⚠️ Приблизний розрахунок. Точну суму під вашу дитину, умови різних компаній та індексацію покажемо на безкоштовній консультації.</div>
-    <div class="mini">Дохідність не гарантується, точні умови залежать від програми і страхової компанії.</div>`;
+    <div class="mini">Бонус від інвестицій не гарантований, точні умови залежать від програми і страхової компанії.</div>`;
 }
 function upd(){
   const age=v('age'); $('ret').min=Math.max(40,age+1); if(v('ret')<=age)$('ret').value=age+1;
