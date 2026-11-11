@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Твій фінансовий план</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="bridge.js?v=3"></script>
+<script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=1"></script>
 <style>
 :root{--bg:#eef1f5;--card:#fff;--fg:#151b26;--muted:#6b7483;--line:#e3e7ee;--accent:#2a6fdb;--accent-soft:#e9f1fd;--warn:#b25a00;--warn-soft:#fdf2e3;--good:#1d7a4a;--good-soft:#e6f5ec;--gold:#f0b35a}
@@ -238,6 +238,7 @@ function upd(){
   const ca=v('cage'); $('cage-v').textContent=ca+(ca===1?' рік':ca>=2&&ca<=4?' роки':' років');
   $('net-f').hidden=S.work!=='emp';
   $('tab-p').classList.toggle('on',S.tab==='p'); $('tab-c').classList.toggle('on',S.tab==='c');
+  if (window.trackOpen) trackOpen(S.tab==='c'?'child':'pension');
   $('p-form').hidden=!(S.tab==='p'&&S.view==='form'); $('p-res').hidden=!(S.tab==='p'&&S.view==='res'); $('c-form').hidden=S.tab!=='c';
   if(S.tab==='p'&&S.view==='res')renderPension();
   if(S.tab==='c')renderChild();

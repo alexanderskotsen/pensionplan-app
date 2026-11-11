@@ -22,3 +22,28 @@ window.toBot = async function (data, start) {
   if (inTg) { try { tg.openTelegramLink(u); return true; } catch (e) {} }
   location.href = u; return true;
 };
+
+// Аналітика: хто відкрив який калькулятор (подія open_<calc> у боті). Людина нічого не помічає.
+// initData є не завжди (кнопка внизу чату його не дає) — тоді беремо підписаний tu/ts з посилання.
+(function () {
+  const seen = {};
+  const PAGES = { 'save.html': 'save', 'invest.html': 'invest', 'game.html': 'game' };
+  window.trackOpen = function (c) {
+    if (!c || seen[c]) return;
+    seen[c] = 1;
+    try {
+      const tg = window.Telegram && window.Telegram.WebApp;
+      const q = new URLSearchParams(location.search);
+      const api = (q.get('api') || 'https://pensionplan-bot.onrender.com').replace(/\/$/, '');
+      const init = tg && tg.initData;
+      if (!init && !q.get('tu')) return;
+      const headers = { 'Content-Type': 'text/plain' };
+      if (init) headers['X-Init-Data'] = init;
+      fetch(api + '/api/track', { method: 'POST', headers, keepalive: true,
+        body: JSON.stringify({ c, tu: q.get('tu') || '', ts: q.get('ts') || '' }) }).catch(() => {});
+    } catch (e) {}
+  };
+  const page = location.pathname.split('/').pop() || 'index.html';
+  const auto = PAGES[page];
+  if (auto) window.addEventListener('load', () => window.trackOpen(auto));
+})();

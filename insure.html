@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Цивілка і медстраховка</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="bridge.js?v=3"></script>
+<script src="bridge.js?v=4"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
 .navtabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;margin:0 auto 10px;max-width:520px;gap:2px}
@@ -222,6 +222,7 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     $('tabAuto').setAttribute('aria-selected', String(S.tab === 'auto'));
     $('tabMed').setAttribute('aria-selected', String(S.tab === 'med'));
     $('auto').hidden = S.tab !== 'auto'; $('med').hidden = S.tab !== 'med';
+    if (window.trackOpen) trackOpen(S.tab);
     const a = autoPrice();
     $('aK').textContent = 'Поліс на ' + S.term + ' місяців коштуватиме орієнтовно';
     $('aV').textContent = 'від ' + fmt(a.lo);
