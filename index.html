@@ -103,7 +103,7 @@ dl{margin:10px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 10px;font
 
 <div class="cta"><div class="in">
   <button class="btn" id="main">Порахувати</button>
-  <button class="btn2" id="second" hidden>Надіслати розбір у Telegram</button>
+  <button class="btn2" id="second" hidden>Надіслати розрахунок у чат</button>
 </div></div>
 
 <script>
@@ -244,8 +244,8 @@ function upd(){
   if(S.tab==='c')renderChild();
   const main=$('main'), sec=$('second');
   if(S.tab==='p'&&S.view==='form'){main.textContent='Порахувати';sec.hidden=true}
-  else if(S.tab==='p'){main.textContent='Отримати точний розрахунок';sec.textContent='Надіслати розбір у Telegram';sec.hidden=false}
-  else{main.textContent='Точний розрахунок на консультації';sec.textContent='Надіслати розрахунок у Telegram';sec.hidden=!childGoal()}
+  else if(S.tab==='p'){main.textContent='📞 Записатися на консультацію';sec.textContent='Надіслати розрахунок у чат';sec.hidden=false}
+  else{main.textContent='📞 Записатися на консультацію';sec.textContent='Надіслати розрахунок у чат';sec.hidden=!childGoal()}
 }
 function payload(action){
   const i=pensionInput(), d={a:action,p:{sex:i.sex,age:i.age,ret:i.ret,stazh:i.stazh,work:i.work,net:i.net,past:i.pastIdx,want:i.want,calc:S.view==='res'?1:0}};

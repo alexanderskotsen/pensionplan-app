@@ -66,6 +66,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .callout.warn{background:var(--bad-soft)}
 .note{font-size:.84rem;color:var(--muted);margin:0}
 .cta{display:block;width:100%;text-align:center;border:0;cursor:pointer;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:650;border-radius:12px;padding:13px}
+.cta2{display:block;width:100%;text-align:center;cursor:pointer;background:transparent;color:var(--accent);font:inherit;font-weight:600;font-size:.92rem;border:1px solid var(--line);border-radius:12px;padding:11px}
 .fine{font-size:.76rem;color:var(--muted);margin:0}
 .navtabs{overflow-x:auto;scrollbar-width:none}.navtabs::-webkit-scrollbar{display:none}.navtabs button{flex:0 0 auto;padding:9px 12px}
 </style>
@@ -126,7 +127,8 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
       <div class="callout">Цивілка захищає інших від вас. Щоб захистити себе, додають розширений ліміт (ДЦВ), КАСКО і страхування життя та здоров'я водія. Консультант покаже, що з цього варте ваших грошей.</div>
     </div>
 
-    <button class="cta" id="aCta" type="button">Підібрати найвигіднішу цивілку</button>
+    <button class="cta" id="aCta" type="button">📞 Записатися на консультацію</button>
+    <button class="cta2" id="aCta2" type="button">Надіслати розрахунок у чат</button>
   </section>
 
   <!-- ================= МЕДСТРАХОВКА ================= -->
@@ -179,7 +181,8 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
       <div class="callout warn">Більшість медстраховок не покривають онкологію, інсульт, інфаркт і хронічні хвороби. Саме вони коштують сотні тисяч. Їх закриває поліс страхування життя з покриттям критичних хвороб — він ще й накопичує гроші.</div>
     </div>
 
-    <button class="cta" id="mCta" type="button">Підібрати медстраховку</button>
+    <button class="cta" id="mCta" type="button">📞 Записатися на консультацію</button>
+    <button class="cta2" id="mCta2" type="button">Надіслати розрахунок у чат</button>
   </section>
 
   <p class="fine" id="ctaNote" hidden>Відкрийте калькулятор через кнопку в Telegram-боті, щоб надіслати розрахунок консультанту.</p>
@@ -256,10 +259,13 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     const data = JSON.stringify(obj);
     window.toBot(data, obj.a).then(ok => { if (!ok) $('ctaNote').hidden = false; });
   }
-  $('aCta').onclick = () => { const a = autoPrice();
-    send({ a:'auto', v:{ engine:S.engine, zone:S.zone, dtp:S.dtp, term:S.term, benefit:S.benefit ? 1 : 0, taxi:S.taxi ? 1 : 0, lo:a.lo, hi:a.hi } }); };
-  $('mCta').onclick = () => { const m = medPrice();
-    send({ a:'med', v:{ plan:S.plan, adults:S.adults, age:S.age, kids:S.kids, zone:S.mzone, dent:S.dent ? 1 : 0, check:S.check ? 1 : 0, lo:m.lo, hi:m.hi } }); };
+  // w:1 — «Записатися на консультацію» (бот одразу питає номер); w:0 — лише надіслати розрахунок у чат
+  const sendAuto = w => { const a = autoPrice();
+    send({ a:'auto', w, v:{ engine:S.engine, zone:S.zone, dtp:S.dtp, term:S.term, benefit:S.benefit ? 1 : 0, taxi:S.taxi ? 1 : 0, lo:a.lo, hi:a.hi } }); };
+  const sendMed = w => { const m = medPrice();
+    send({ a:'med', w, v:{ plan:S.plan, adults:S.adults, age:S.age, kids:S.kids, zone:S.mzone, dent:S.dent ? 1 : 0, check:S.check ? 1 : 0, lo:m.lo, hi:m.hi } }); };
+  $('aCta').onclick = () => sendAuto(1); $('aCta2').onclick = () => sendAuto(0);
+  $('mCta').onclick = () => sendMed(1); $('mCta2').onclick = () => sendMed(0);
   render();
 })();
 </script>

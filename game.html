@@ -48,7 +48,8 @@ body{font-family:var(--font);font-size:15px;line-height:1.4;
 .stage{position:relative;width:100%;aspect-ratio:2/3;max-height:calc(100vh - 220px);max-height:calc(100dvh - 220px);margin:0 auto;border-radius:16px;overflow:hidden;
   border:1px solid var(--line);background:var(--card);touch-action:none}
 canvas{display:block;width:100%;height:100%;touch-action:none}
-.over{position:absolute;inset:0;display:grid;place-items:center;padding:18px;background:color-mix(in srgb,var(--card) 92%,transparent);overflow-y:auto}
+.over{position:absolute;inset:0;display:grid;place-items:center;padding:18px;background:var(--card);overflow-y:auto}
+.btn.link{border-color:transparent;background:none;color:var(--accent);font-weight:600;font-size:.92rem;padding:6px 16px}
 .over .in{display:grid;gap:12px;justify-items:center;text-align:center;max-width:340px;width:100%}
 h1{font-size:1.7rem;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance}
 h2{font-size:1.25rem;margin:0}
@@ -377,8 +378,16 @@ function dayInfo(){
 }
 function showStart(){
   over.hidden = false;
-  const I = dayInfo(), nextStreak = I.D.last === I.today ? I.streakNow : I.streakNow + 1;
-  const bonus = I.D.last === I.today ? 0 : STREAK_BONUS[Math.min(7, nextStreak) - 1];
+  // Щоденний бонус: 1-й день серії — без бонусу, з 2-го дня поспіль бонус росте. «Вже взято» пишемо лише тому,
+  // хто сьогодні справді грав; новій людині — що бонус буде завтра.
+  const I = dayInfo(), played = I.D.last === I.today, nextStreak = played ? I.streakNow : I.streakNow + 1;
+  const bonus = played ? 0 : STREAK_BONUS[Math.min(7, nextStreak) - 1];
+  const tomorrow = STREAK_BONUS[Math.min(7, nextStreak + 1) - 1].toLocaleString('uk-UA');
+  const dayB = bonus ? nextStreak + ' дн. поспіль' : played && nextStreak > 1 ? nextStreak + ' дн. поспіль' : 'Щоденний бонус';
+  const dayS = bonus ? 'бонус на старті +' + bonus.toLocaleString('uk-UA') + ' грн'
+    : played && nextStreak > 1 ? 'бонус на сьогодні вже взято, завтра +' + tomorrow + ' грн'
+    : played ? 'зайдіть завтра: +' + tomorrow + ' грн на старті'
+    : 'грайте щодня: завтра +' + tomorrow + ' грн на старті';
   over.innerHTML = '<div class="in"><h1>Капітал за 60 секунд</h1>' +
     '<p class="lead">Вам 30. За хвилину пролетять 30 років до пенсії. Ловіть внески і страховки, оминайте пастки. Все зібране росте на 8% на рік.</p>' +
     '<div class="legend">' +
@@ -387,7 +396,7 @@ function showStart(){
       '<div><span data-i="credit"></span><span><b>Пастки</b><span>кредит, конверт, шахраї, «хочу!» — оминайте</span></span></div>' +
       '<div><span data-i="boost"></span><span><b>Форс-мажори</b><span>від них не втекти. Рятує тільки страховка</span></span></div>' +
     '</div>' +
-    '<div class="split"><div><b>' + Math.max(1, nextStreak) + ' ' + (nextStreak === 1 ? 'день' : 'дн.') + ' поспіль</b><span>' + (bonus ? 'бонус на старті +' + bonus.toLocaleString('uk-UA') + ' грн' : 'бонус на сьогодні вже взято') + '</span></div>' +
+    '<div class="split"><div><b>' + dayB + '</b><span>' + dayS + '</span></div>' +
       '<div><b>' + (I.chalDone ? 'Виконано ✓' : 'Челендж дня') + '</b><span>' + I.chal.t + '</span></div></div>' +
     '<p class="lead" style="font-size:.85rem">Водіть пальцем по полю. Поліс краще впіймати першим: він захищає від найдорожчого.</p>' +
     '<button class="btn main" id="go" type="button">Почати</button></div>';
@@ -436,15 +445,19 @@ function finish(){
     '<span class="grade ' + grade[0] + '">' + grade[1] + (isBest ? ' · новий рекорд!' : '') + '</span>' +
     '<div class="split"><div><b>' + short(G.dep) + '</b><span>ви внесли</span></div><div><b>+' + short(growth) + '</b><span>дав складний відсоток</span></div></div>' + chalLine +
     '<div class="tip">' + tips.join('<br><br>') + '</div>' +
-    '<button class="btn main" id="real" type="button">Перевірити мій реальний захист</button>' +
+    '<button class="btn main" id="real" type="button">📞 Записатися на консультацію</button>' +
+    '<button class="btn link" id="tochat" type="button">Надіслати результат у чат</button>' +
     '<button class="btn" id="share" type="button">Кинути виклик друзям</button>' +
     '<button class="btn" id="again" type="button">Зіграти ще раз</button>' +
     '<p class="fine">Гра умовна: 8% на рік — ілюстрація, а не обіцянка дохідності. Умови реальних страховок залежать від програми.</p></div>';
-  $('real').onclick = () => {
-    const data = JSON.stringify({ a:'game', g:{ cap:Math.round(G.cap), dep:Math.round(G.dep), ins:Object.keys(G.ins).filter(k => G.ins[k]),
+  // w:1 — «Записатися на консультацію» (бот одразу питає номер); w:0 — лише надіслати результат у чат
+  const sendRes = w => {
+    const data = JSON.stringify({ a:'game', w, g:{ cap:Math.round(G.cap), dep:Math.round(G.dep), ins:Object.keys(G.ins).filter(k => G.ins[k]),
       fmLost:Math.round(G.fmLost), fmSaved:Math.round(G.fmSaved), traps:G.hits.trap, policyAge:G.policyAge || 0 } });
     window.toBot(data, 'game').then(ok => { if (!ok && BOT_USERNAME) openLink('https://t.me/' + BOT_USERNAME + '?start=game'); });
   };
+  $('real').onclick = () => sendRes(1);
+  $('tochat').onclick = () => sendRes(0);
   $('share').onclick = () => openLink('https://t.me/share/url?url=' + encodeURIComponent(BOT_USERNAME ? 'https://t.me/' + BOT_USERNAME + '?start=game' : location.href.split('?')[0]) + '&text=' + encodeURIComponent(text));
   if (!BOT_USERNAME && !(tg && tg.initData)) $('share').hidden = true;
   $('again').onclick = countdown;
@@ -452,8 +465,7 @@ function finish(){
 
 // ---------- Старт ----------
 $('best').textContent = money(G.best); setSnd(); resize();
-// демо-кадр під стартовим екраном
-G.items = [{ type:'coin', x:80, y:160, vy:0, wob:0 }, { type:'bill', x:250, y:110, vy:0, wob:1 }, { type:'credit', x:180, y:260, vy:0, wob:2 }, { type:'policy', x:290, y:330, vy:0, wob:3 }];
+// стартовий екран непрозорий: демо-предмети під ним прибрано, щоб нічого не просвічувало крізь підкладку
 showStart();
 requestAnimationFrame(frame);
 })();
