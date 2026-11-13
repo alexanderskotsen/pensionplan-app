@@ -7,10 +7,10 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=3">
+<link rel="stylesheet" href="ui.css?v=4">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=1"></script>
-<script src="ui.js?v=3"></script>
+<script src="ui.js?v=4"></script>
 </head>
 <body data-view="form">
 <nav class="nav"><div class="nav-in"><button type="button" id="tab-n">Накопичити</button><button type="button" id="tab-p" class="on">Пенсія</button><button type="button" id="tab-c">Дитині</button><button type="button" id="tab-s">Захист</button><button type="button" id="tab-g">Гра</button></div></nav>
@@ -21,7 +21,7 @@
     <header class="ph">
       <i data-brand></i>
       <h1>Яка буде моя пенсія</h1>
-      <p>Сім коротких відповідей — побачите державну пенсію і скільки відкладати, щоб жити на бажану суму.</p>
+      <p>Сім коротких відповідей, і побачите державну пенсію і скільки відкладати, щоб жити на бажану суму.</p>
     </header>
     <div class="card">
       <div class="rowc"><span class="l">Стать</span>
@@ -31,7 +31,7 @@
         <span class="numbox"><input class="num" id="age-n" data-for="age" type="text" inputmode="numeric" autocomplete="off" aria-label="Вік, можна ввести"><span class="u">р.</span></span></div>
         <input type="range" id="age" min="18" max="65" value="35" aria-label="Вік зараз"></div>
       <hr class="sep">
-      <div class="fld"><div class="fld-h"><label for="ret-n">Хочу на пенсію у<small>державна — з 60</small></label>
+      <div class="fld"><div class="fld-h"><label for="ret-n">Хочу на пенсію у<small>державна з 60</small></label>
         <span class="numbox"><input class="num" id="ret-n" data-for="ret" type="text" inputmode="numeric" autocomplete="off" aria-label="Вік виходу на пенсію, можна ввести"><span class="u">р.</span></span></div>
         <input type="range" id="ret" min="40" max="70" value="60" aria-label="Вік виходу на пенсію"></div>
       <hr class="sep">
@@ -62,7 +62,7 @@
     <header class="ph">
       <i data-brand></i>
       <h1>Капітал дитині на старт</h1>
-      <p>Оберіть вік дитини й суму — побачите, скільки відкладати щомісяця.</p>
+      <p>Оберіть вік дитини й суму, і побачите, скільки відкладати щомісяця.</p>
     </header>
     <div class="card">
       <div class="fld"><div class="fld-h"><label for="cage-n">Вік дитини<small>0–17 років</small></label>
@@ -147,13 +147,17 @@ const $=id=>document.getElementById(id);
 // view — екран пенсії (форма/результат), cview — екран дитячої програми; у дані для бота йде лише view (поле calc)
 const S={tab:'p',view:'form',cview:'form',sex:'f',work:'emp',past:2,cpay:21,cgoal:1000000};
 try{if(new URLSearchParams(location.search).get('tab')==='child')S.tab='c'}catch(e){}
-// відповіді фінансової анкети з бота (pa — вік, pn — на руки, pw — тип роботи); людина може змінити повзунки
-const PF=(()=>{try{const q=new URLSearchParams(location.search);return{pa:+q.get('pa')||0,pn:+q.get('pn')||0,pw:q.get('pw')||''}}catch(e){return{}}})();
+// відповіді фінансової анкети з бота (pa — вік, pn — на руки, pw — тип роботи, pr — вік пенсії, pwant — бажана пенсія,
+// ca — вік дитини); людина може змінити повзунки
+const PF=(()=>{try{const q=new URLSearchParams(location.search);return{pa:+q.get('pa')||0,pn:+q.get('pn')||0,pw:q.get('pw')||'',pr:+q.get('pr')||0,pwant:+q.get('pwant')||0,ca:q.get('ca')===null||q.get('ca')===''?-1:+q.get('ca')}}catch(e){return{}}})();
 if(['emp','fop','none'].includes(PF.pw))S.work=PF.pw;
 function chips(id,key,num){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   [...$(id).children].forEach(x=>x.classList.toggle('on',x===b));const v=b.dataset.v;S[key]=num&&v!=='own'?Number(v):v;upd()})}
 if(PF.pa>=18&&PF.pa<=65)$('age').value=PF.pa;
 if(PF.pn>=5000)$('net').value=Math.min(150000,PF.pn);
+if(PF.pr>=40&&PF.pr<=70&&PF.pr>+$('age').value)$('ret').value=PF.pr;
+if(PF.pwant>=5000&&PF.pwant<=100000)$('want').value=PF.pwant;
+if(Number.isInteger(PF.ca)&&PF.ca>=0&&PF.ca<=17)$('cage').value=PF.ca;
 if(PF.pw)[...$('work').children].forEach(x=>x.classList.toggle('on',x.dataset.v===S.work));
 chips('sex','sex');chips('work','work');chips('past','past',true);chips('cgoal','cgoal',true);
 $('cpay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.cpay=Number(b.dataset.v);upd()});
@@ -180,9 +184,9 @@ function bridge(i,r){
   const amt=Math.min(20000,Math.max(500,Math.round(r.pmt/100)*100));
   const t=TF.adult(amt,'m',i.age,i.sex,n), k=x=>money(Math.round(x/1000)*1000);
   const notes=[];
-  if(r.pmt>20000)notes.push('Калькулятор рахує до 20 000 грн/міс — більшу суму підберемо на консультації.');
-  else if(r.pmt<500)notes.push('Найменший внесок у програмі — 500 грн/міс.');
-  if(n>left)notes.push('Найкоротший строк програми — 10 років.');
+  if(r.pmt>20000)notes.push('Калькулятор рахує до 20 000 грн/міс, більшу суму підберемо на консультації.');
+  else if(r.pmt<500)notes.push('Найменший внесок у програмі: 500 грн/міс.');
+  if(n>left)notes.push('Найкоротший строк програми: 10 років.');
   if(n<left)notes.push('Програма триває щонайдовше до 75 років, тому строк '+n+' р.');
   if(t.base<t.paid)notes.push('На короткому строку і в старшому віці значна частина внеску йде на страховий захист, тому прогноз може бути меншим за внесене.');
   // 4 759 → 4 800: внесок у програмі кратний 100 грн, тому показуємо обидві суми й пояснюємо округлення
@@ -190,8 +194,8 @@ function bridge(i,r){
   return `<div class="card bridge" id="bridge"><div class="card-h"><h2>Якщо відкладати цю суму в програмі накопичення</h2>
     <p class="note">${money(amt)}/міс${rounded} · ${n} ${yw(n)} · накопичувальне страхування життя</p></div>
     <dl class="rows"><div><dt>Гарантовано<small>мінімум за договором</small></dt><dd>≈ ${k(t.guar)}</dd></div><div><dt>Базовий прогноз<small>бонус від інвестицій не гарантований</small></dt><dd class="${t.base<t.paid?'am':'gd'}">≈ ${k(t.base)}</dd></div></dl>
-    <p class="note">Самі внесете ${money(t.paid)}. Захист життя весь строк — ≈ ${k(t.cover)}.${notes.length?' '+notes.join(' '):''}</p>
-    <p class="note">Суми програми — у майбутніх гривнях, без поправки на інфляцію, тому напряму з потрібним капіталом (у сьогоднішніх цінах) їх не порівнюйте. Як закрити різницю, покаже консультант.</p>
+    <p class="note">Самі внесете ${money(t.paid)}. Захист життя весь строк: ≈ ${k(t.cover)}.${notes.length?' '+notes.join(' '):''}</p>
+    <p class="note">Суми програми вказано в майбутніх гривнях, без поправки на інфляцію, тому напряму з потрібним капіталом (у сьогоднішніх цінах) їх не порівнюйте. Як закрити різницю, покаже консультант.</p>
     <button type="button" class="btn ghost" data-amt="${amt}" data-yrs="${n}" data-age="${i.age}" data-sx="${i.sex}">Порахувати детально${UI.icon('chev',18)}</button></div>`;
 }
 const v=id=>Number($(id).value);
@@ -216,13 +220,13 @@ function renderPension(){
       <p class="hero-v"><span class="pre">≈</span><span id="p-big">${num(r.pmt)}</span><small>грн на місяць</small></p>`;
     if(r.stateAge){
       const tot=(r.stateAge-i.ret)+20, w1=Math.round((r.stateAge-i.ret)/tot*100);
-      h+=`<p class="hero-s">Державна пенсія — не раніше 60. З вашим стажем (${r.total} р.) її призначать з <b>${r.stateAge}</b>. <b class="am">${r.bridge} ${yw(r.bridge)}</b> доведеться жити на власні гроші.</p>
+      h+=`<p class="hero-s">Державна пенсія не раніше 60. З вашим стажем (${r.total} р.) її призначать з <b>${r.stateAge}</b>. <b class="am">${r.bridge} ${yw(r.bridge)}</b> доведеться жити на власні гроші.</p>
         <div class="tl"><div style="flex-grow:${w1}"><i class="own"></i><span><b>${i.ret}–${r.stateAge}</b><br>тільки свої</span></div><div style="flex-grow:${100-w1}"><i></i><span><b>з ${r.stateAge}</b><br>держава ${money(r.pension)} + свої</span></div></div></div>`;
     }else{
       h+=`<p class="hero-s">Якщо перестати працювати у ${i.ret}, <b class="am">стажу (${r.total} р.) поки не вистачає на державну пенсію</b> (потрібно від ${r.need} р.). Жити доведеться тільки на власні накопичення.</p></div>`;
     }
     h+=sumrow(`<b>${i.sex==='f'?'Жінка':'Чоловік'}, ${i.age} р.</b>, на пенсію у ${i.ret}`);
-    h+=`<div class="card"><dl class="rows"><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div>${r.stateAge?`<div><dt>До ${r.stateAge} — щомісяця</dt><dd>${money(i.want)}</dd></div><div><dt>Після ${r.stateAge} — доплата до пенсії</dt><dd>${money(r.gap)}</dd></div>`:''}</dl></div>`;
+    h+=`<div class="card"><dl class="rows"><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div>${r.stateAge?`<div><dt>До ${r.stateAge}: щомісяця</dt><dd>${money(i.want)}</dd></div><div><dt>Після ${r.stateAge}: доплата до пенсії</dt><dd>${money(r.gap)}</dd></div>`:''}</dl></div>`;
     h+=bridge(i,r);
   }else{
     const share=r.eligible?Math.min(100,Math.round(r.pension/i.want*100)):0;
@@ -264,7 +268,7 @@ function renderChild(){
     <div><dt>Базовий прогноз<small>з бонусом від інвестицій</small></dt><dd class="gd">≈ ${k(r.base)}</dd></div>
     <div><dt>Якщо роки вдалі<small>оптимістичний прогноз</small></dt><dd>≈ ${k(r.opt)}</dd></div>`:''}</dl>
     ${r.guar&&r.guar<r.paid?`<p class="warnnote">${UI.icon('info',18)}<span>Гарантована сума менша за внесене: частина внеску йде на страховий захист. Різницю має перекрити бонус від інвестицій, але він не гарантований.</span></p>`:''}</div>`;
-  h+=`<div class="card"><div class="info"><span class="ib">${UI.icon('shield',22)}</span><div><p>Можна додати опцію: якщо з батьками щось станеться, страхова продовжить внески — <b>дитина все одно отримає суму</b>.</p><p>Внески можна щороку індексувати від інфляції. Точні умови пояснить консультант</p></div></div></div>`;
+  h+=`<div class="card"><div class="info"><span class="ib">${UI.icon('shield',22)}</span><div><p>Можна додати опцію: якщо з батьками щось станеться, страхова продовжить внески, і <b>дитина все одно отримає суму</b>.</p><p>Внески можна щороку індексувати від інфляції. Точні умови пояснить консультант</p></div></div></div>`;
   h+=UI.steps('Підберемо внесок і строк під вашу дитину');
   h+=UI.fine('<b>Розрахунок орієнтовний.</b> Бонус від інвестицій не гарантований, точні умови залежать від програми і страхової компанії.');
   $('c-out').innerHTML=h;

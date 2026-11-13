@@ -7,9 +7,9 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=3">
+<link rel="stylesheet" href="ui.css?v=4">
 <script src="bridge.js?v=4"></script>
-<script src="ui.js?v=3"></script>
+<script src="ui.js?v=4"></script>
 <style>
 .plans{display:grid;gap:8px}
 .plans button{position:relative;text-align:left;border:1.5px solid var(--ctl);background:var(--card);color:var(--fg);border-radius:var(--r-sm);padding:10px 44px 10px 14px;min-height:60px;display:grid;gap:2px;font-weight:400}
@@ -40,7 +40,7 @@
     <header class="ph">
       <i data-brand></i>
       <h1>Скільки коштує автоцивілка</h1>
-      <p>Чотири відповіді — й орієнтовна ціна поліса на 2026 рік. Консультант порівняє пропозиції страхових.</p>
+      <p>Чотири відповіді, і орієнтовна ціна поліса на 2026 рік. Консультант порівняє пропозиції страхових.</p>
     </header>
     <div class="card">
       <div class="lbl">Двигун
@@ -57,7 +57,7 @@
       </div>
       <hr class="sep">
       <div class="toggles">
-      <label class="toggle"><span>Пільга 50%<small>УБД, особа з інвалідністю, пенсіонер — авто у власності, до 2,5 л</small></span><input type="checkbox" id="aBenefit"></label>
+      <label class="toggle"><span>Пільга 50%<small>УБД, особа з інвалідністю, пенсіонер; авто у власності, до 2,5 л</small></span><input type="checkbox" id="aBenefit"></label>
       <label class="toggle"><span>Таксі чи перевезення за гроші</span><input type="checkbox" id="aTaxi"></label>
       </div>
     </div>
@@ -68,7 +68,7 @@
     <header class="ph">
       <i data-brand></i>
       <h1>Скільки коштує медична страховка</h1>
-      <p>Оберіть програму і склад родини — побачите орієнтовну ціну на рік.</p>
+      <p>Оберіть програму і склад родини, і побачите орієнтовну ціну на рік.</p>
     </header>
     <div class="card">
       <div class="lbl">Програма
@@ -81,7 +81,7 @@
       <div class="lbl">Дорослих
         <div class="chips" id="mAdults"><button type="button" data-v="1" aria-pressed="true">1</button><button type="button" data-v="2" aria-pressed="false">2</button><button type="button" data-v="3" aria-pressed="false">3</button><button type="button" data-v="4" aria-pressed="false">4</button></div>
       </div>
-      <div class="lbl"><span>Вік дорослих<small>якщо кілька — середній</small></span>
+      <div class="lbl"><span>Вік дорослих<small>якщо кілька, середній</small></span>
         <div class="chips" id="mAge"><button type="button" data-v="a1" aria-pressed="true">до 40</button><button type="button" data-v="a2" aria-pressed="false">40–49</button><button type="button" data-v="a3" aria-pressed="false">50–59</button><button type="button" data-v="a4" aria-pressed="false">60+</button></div>
       </div>
       <div class="lbl">Дітей
@@ -133,7 +133,7 @@
         <h2>Чого цивілка не покриває</h2>
         <ul class="list">
           <li><span>Ремонт вашого авто</span><b class="am">не покриває</b></li>
-          <li><span>Ремонт чужого авто понад 250 тис. грн</span><b class="am wrapok">понад ліміт — власним коштом</b></li>
+          <li><span>Ремонт чужого авто понад 250 тис. грн</span><b class="am wrapok">понад ліміт: власним коштом</b></li>
           <li><span>Ваше лікування після ДТП</span><b class="am">не покриває</b></li>
           <li><span>Ваш дохід, поки ви на лікарняному</span><b class="am">не компенсує</b></li>
         </ul>
@@ -155,12 +155,12 @@
         <p class="note">Ціни приблизні, для приватних клінік великих міст.</p>
       </div>
       <div class="callout"><h2>Що медстраховка зазвичай не закриває</h2>
-        <p>Медстраховки зазвичай мають ліміти й винятки: онкологію, інсульт, інфаркт і хронічні хвороби часто не покривають або покривають частково. Для таких випадків є страхування життя з покриттям критичних хвороб — воно ще й накопичує гроші.</p>
+        <p>Медстраховки зазвичай мають ліміти й винятки: онкологію, інсульт, інфаркт і хронічні хвороби часто не покривають або покривають частково. Для таких випадків є страхування життя з покриттям критичних хвороб: воно ще й накопичує гроші.</p>
         <button type="button" class="btn ghost" onclick="navGo('save.html')"><span><i data-ic="shield" data-px="18"></i> Захист життя з накопиченням</span><i data-ic="chev" data-px="18"></i></button></div>
     </div>
 
     <div data-steps="Порівняємо пропозиції страхових і підберемо поліс під вас"></div>
-    <details class="how"><summary>Як ми рахуємо?</summary><p>Ціни орієнтовні, станом на листопад 2026 року. З 2025 року ціну автоцивілки визначає кожна страхова сама, тому вона різниться між компаніями до 25%; ліміти покриття для всіх однакові. Ціна медстраховки залежить від програми, віку, здоров'я й переліку клінік — остаточну називає страхова після анкети. Ціни лікування — приблизні для приватних клінік великих міст.</p></details>
+    <details class="how"><summary>Як ми рахуємо?</summary><p>Ціни орієнтовні, станом на листопад 2026 року. З 2025 року ціну автоцивілки визначає кожна страхова сама, тому вона різниться між компаніями до 25%; ліміти покриття для всіх однакові. Ціна медстраховки залежить від програми, віку, здоров'я й переліку клінік, остаточну називає страхова після анкети. Ціни лікування приблизні для приватних клінік великих міст.</p></details>
     <p data-fine><b>Ціни орієнтовні</b>, станом на листопад 2026 року. Точну назве консультант.</p>
     <p class="note" id="ctaNote" hidden>Відкрийте калькулятор через кнопку в Telegram-боті, щоб надіслати розрахунок консультанту.</p>
   </div>
@@ -221,23 +221,23 @@
     if (window.trackOpen) trackOpen(S.tab);
     const from = S._enter ? 0.7 : null;
     const a = autoPrice();
-    $('aK').textContent = 'Автоцивілка на ' + S.term + ' місяців — орієнтовна ціна';
+    $('aK').textContent = 'Автоцивілка на ' + S.term + ' місяців: орієнтовна ціна';
     UI.count($('aV'), a.lo, num, from && a.lo * from);
     $('aLo').textContent = fmt(a.lo);
     $('aP').textContent = 'до ' + fmt(a.hi);
     $('aBar').style.width = Math.round(a.lo / a.hi * 100) + '%';
     const notes = [];
-    if (S.benefit && !a.benefitOk) notes.push('Пільга діє для авто з двигуном до 2,5 л — для об’єму понад 2,0 л уточнимо на консультації.');
-    if (S.dtp !== '0') notes.push('Після ДТП з вашої вини страхові можуть підняти ціну — частина з них цього не робить.');
+    if (S.benefit && !a.benefitOk) notes.push('Пільга діє для авто з двигуном до 2,5 л; для об’єму понад 2,0 л уточнимо на консультації.');
+    if (S.dtp !== '0') notes.push('Після ДТП з вашої вини страхові можуть підняти ціну, але частина з них цього не робить.');
     if (S.term === '6') notes.push('Річний поліс вигідніший: два піврічні коштують на ~40% дорожче.');
     $('aNote').innerHTML = UI.icon('info', 18) + '<span>' + notes.join(' ') + '</span>';
     $('aNote').hidden = !notes.length;
     const m = medPrice();
-    $('mK').textContent = 'Медстраховка на рік для ' + (m.n === 1 ? 'однієї людини' : m.n + ' людей') + ' — орієнтовна ціна';
+    $('mK').textContent = 'Медстраховка на рік для ' + (m.n === 1 ? 'однієї людини' : m.n + ' людей') + ': орієнтовна ціна';
     UI.count($('mV'), m.lo, num, from && m.lo * from);
     $('mP').textContent = '≈ ' + fmt(m.lo / 12) + ' на місяць';
-    $('mNote').innerHTML = UI.icon('info', 18) + '<span>Верхня межа — до ' + fmt(m.hi) + ' за дорожчі клініки чи стан здоров’я.' +
-      (S.age === 'a4' ? ' Після 60 частина страхових не приймає нових клієнтів — підберемо тих, хто приймає.' : '') + '</span>';
+    $('mNote').innerHTML = UI.icon('info', 18) + '<span>Верхня межа: до ' + fmt(m.hi) + ' за дорожчі клініки чи стан здоров’я.' +
+      (S.age === 'a4' ? ' Після 60 частина страхових не приймає нових клієнтів, підберемо тих, хто приймає.' : '') + '</span>';
     $('dockK').textContent = S.tab === 'auto' ? 'Цивілка, ' + S.term + ' міс.' : 'Медстраховка, ' + (m.n > 1 ? m.n + ' людей' : 'рік');
     $('dockV').textContent = 'від ' + fmt(S.tab === 'auto' ? a.lo : m.lo);
     // рядок «що ви обрали»

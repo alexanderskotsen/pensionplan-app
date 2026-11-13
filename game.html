@@ -7,9 +7,9 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=3">
+<link rel="stylesheet" href="ui.css?v=4">
 <script src="bridge.js?v=4"></script>
-<script src="ui.js?v=3"></script>
+<script src="ui.js?v=4"></script>
 <style>
 /* Гра: шапка (капітал, вік) → ігрове поле 2:3 → екрани старту/фіналу на всю область під навігацією. Токени — з ui.css. */
 :root{--violet:#5b3fc4;--sky1:#FBEEE4;--sky2:#FAF6F2}
@@ -382,7 +382,7 @@ function showStart(){
     '<div class="legend">' +
       '<div><span data-i="coin"></span><span><b>Внески</b><span>100, 500, 2000 грн</span></span></div>' +
       '<div><span data-i="policy"></span><span><b>Захист</b><span>поліс, медична, авто, житло. Діють до кінця гри</span></span></div>' +
-      '<div><span data-i="credit"></span><span><b>Пастки</b><span>кредит, конверт, шахраї, «хочу!» — оминайте</span></span></div>' +
+      '<div><span data-i="credit"></span><span><b>Пастки</b><span>кредит, конверт, шахраї, «хочу!»: оминайте</span></span></div>' +
       '<div><span data-i="boost"></span><span><b>Форс-мажори</b><span>від них не втекти. Рятує тільки страховка</span></span></div>' +
     '</div>' +
     '<div class="split2"><div><b>' + dayB + '</b><span>' + dayS + '</span></div>' +
@@ -423,7 +423,7 @@ function finish(){
   if (!G.ins.policy) tips.push('Ви грали без поліса. А серйозна хвороба може статися з кожним: саме поліс страхування життя закриває найдорожчі ризики. Це фундамент.');
   else tips.push('Поліс з ' + G.policyAge + ' років захищав від найдорожчого і додавав +1% до росту капіталу.');
   if (G.hits.trap) tips.push('Пастки забрали ' + money(G.lost) + '. Кредити й «легкі гроші» в житті з’їдають накопичення так само.');
-  if (G.envYears) tips.push('Конверт: ' + G.envYears + ' р. без офіційного стажу — це мінус і до державної пенсії.');
+  if (G.envYears) tips.push('Конверт: ' + G.envYears + ' р. без офіційного стажу, а це мінус і до державної пенсії.');
   tips.push('Найбільше виросли внески, впіймані на початку: вони працювали найдовше.');
   const I = dayInfo(); let chalLine = '';
   if (!I.chalDone && I.chal.ok()) { I.D.chalDate = I.today; I.D.chalDone = true; save('c60_day', I.D); chalLine = '<span class="grade">Челендж дня виконано: ' + I.chal.t + '</span>'; }
@@ -438,7 +438,7 @@ function finish(){
     '<button class="btn sec" id="share" type="button">Виклик друзям</button></div>' +
     '<button class="linkbtn" id="tochat" type="button">' + UI.icon('plane', 18) + 'Надіслати результат у чат</button>' +
     '<div class="tip">' + tips.join('<br><br>') + '</div>' +
-    UI.fine('Гра умовна: 8% на рік — ілюстрація, а не обіцянка дохідності. Умови реальних страховок залежать від програми.') + '</div>';
+    UI.fine('Гра умовна: 8% на рік як ілюстрація, а не обіцянка дохідності. Умови реальних страховок залежать від програми.') + '</div>';
   UI.count($('gcap'), G.cap, short, G.cap * 0.7);
   // w:1 — «Записатися на консультацію» (бот одразу питає номер); w:0 — лише надіслати результат у чат
   const sendRes = w => {

@@ -7,10 +7,10 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=3">
+<link rel="stylesheet" href="ui.css?v=4">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=1"></script>
-<script src="ui.js?v=3"></script>
+<script src="ui.js?v=4"></script>
 <style>
 /* «Швидше чи легше?» — та сама ціль з іншим строком; рядок натискається */
 .alt{display:grid}
@@ -29,7 +29,7 @@
     <header class="ph">
       <i data-brand></i>
       <h1>Накопичити гроші</h1>
-      <p>Вкажіть внесок і строк — побачите, скільки збереться і на яку суму сім'я під захистом.</p>
+      <p>Вкажіть внесок і строк, і побачите, скільки збереться і на яку суму сім'я під захистом.</p>
     </header>
 
     <div class="seg" role="tablist">
@@ -82,12 +82,12 @@
       <p class="hero-x" id="resPill"></p>
       <svg class="chart" id="chart" role="img" aria-label="Графік: гарантована сума, базовий прогноз і оптимістичний прогноз"></svg>
     </div>
-    <p class="warnnote" id="resWarn" hidden><i data-ic="info" data-px="18"></i><span>На короткому строку і в старшому віці значна частина внеску йде на страховий захист, тому прогноз може бути меншим за внесене. Спробуйте довший строк — результат буде кращим.</span></p>
+    <p class="warnnote" id="resWarn" hidden><i data-ic="info" data-px="18"></i><span>На короткому строку і в старшому віці значна частина внеску йде на страховий захист, тому прогноз може бути меншим за внесене. Спробуйте довший строк, результат буде кращим.</span></p>
 
     <div class="sumrow"><span id="sumT"></span><button type="button" class="linkbtn" id="back"><i data-ic="edit" data-px="18"></i>Змінити</button></div>
 
     <div class="card" id="altBox" hidden>
-      <div class="card-h"><h2>Швидше чи легше?</h2><p class="note">Та сама ціль, інший строк — натисніть, щоб перерахувати</p></div>
+      <div class="card-h"><h2>Швидше чи легше?</h2><p class="note">Та сама ціль, інший строк. Натисніть, щоб перерахувати</p></div>
       <div class="alt" id="alt"></div>
     </div>
 
@@ -241,8 +241,8 @@
       $('resU').textContent = usd ? '' : 'грн';
     }
     $('resS').innerHTML = loss
-      ? `Самі внесете <b>${money(r.paid)}</b> — базовий прогноз на ≈ <b class="am">${approx(r.paid - r.proj)}</b> менший.`
-      : `Самі внесете <b>${money(r.paid)}</b>, ще ≈ <b class="gd">+${approx(r.proj - r.paid)}</b> ` + (usd ? 'за орієнтовної дохідності 3% на рік — вона не гарантована.' : 'за базовим прогнозом.');
+      ? `Самі внесете <b>${money(r.paid)}</b>, а базовий прогноз на ≈ <b class="am">${approx(r.paid - r.proj)}</b> менший.`
+      : `Самі внесете <b>${money(r.paid)}</b>, ще ≈ <b class="gd">+${approx(r.proj - r.paid)}</b> ` + (usd ? 'за орієнтовної дохідності 3% на рік, вона не гарантована.' : 'за базовим прогнозом.');
     const pct = Math.round((r.proj / r.paid - 1) * 100);
     $('resPill').className = 'hero-x ' + (loss ? 'wr' : 'ok');
     $('resPill').innerHTML = UI.icon(loss ? 'info' : 'up', 18) + '<span>' + (loss ? (pct < 0 ? '−' + (-pct) + '% до внесеного' : 'трохи менше, ніж внесете')
@@ -262,9 +262,9 @@
     $('dockV').textContent = goalMode ? `≈ ${money(pay)}` : `≈ ${approx(r.proj)}`;
     $('fine').textContent = usd
       ? 'Розрахунок орієнтовний. У доларових програмах дохідність не гарантована й залежить від інвестиційного доходу страхової. Частина внеску йде на страховий захист. Точні цифри покаже консультант.'
-      : 'Розрахунок орієнтовний, за тарифами класичних накопичувальних програм. Гарантована сума — мінімум за договором; бонус від інвестицій нараховується щороку, але не гарантований. Частина внеску йде на страховий захист. Точні цифри покаже консультант.';
+      : 'Розрахунок орієнтовний, за тарифами класичних накопичувальних програм. Гарантована сума: мінімум за договором; бонус від інвестицій нараховується щороку, але не гарантований. Частина внеску йде на страховий захист. Точні цифри покаже консультант.';
     $('fineT').textContent = usd ? 'Дохідність у доларових програмах не гарантована.'
-      : (goalMode ? 'Внесок округлено вгору, щоб прогноз був не меншим за ціль. ' : '') + 'Гарантована сума — мінімум за договором, бонус від інвестицій не гарантований.';
+      : (goalMode ? 'Внесок округлено вгору, щоб прогноз був не меншим за ціль. ' : '') + 'Гарантована сума: мінімум за договором, бонус від інвестицій не гарантований.';
     S._pay = pay; S._r = r;
     $('vForm').hidden = S.view !== 'form'; $('vRes').hidden = S.view !== 'res';
     if (S.view === 'res') chart(r);
@@ -295,9 +295,11 @@
   // передзаповнення з пенсійного калькулятора («Порахувати детально»): amt — грн на місяць, yrs — строк, sx — стать
   let fromBridge = false;
   { const q = new URLSearchParams(location.search), amt = +q.get('amt'), yrs = +q.get('yrs'), sx = q.get('sx'), l = LIM.uah.m;
-    if (amt > 0) { S.pay = Math.min(l[1], Math.max(l[0], Math.round(amt / l[2]) * l[2])); fromBridge = true; }
+    if (amt > 0) { S.pay = Math.min(l[1], Math.max(l[0], Math.round(amt / l[2]) * l[2])); fromBridge = q.get('af') !== '1'; }  // af=1 — сума з анкети: лишаємось на формі
     if (yrs >= 10 && yrs <= 50) S.term = Math.round(yrs);
-    if (sx === 'f' || sx === 'm') S.sex = sx; }
+    if (sx === 'f' || sx === 'm') S.sex = sx;
+    // позначку «з анкети» прибираємо з адреси, щоб navGo не потягнув її далі (інакше «Порахувати детально» з пенсії не відкрив би результат)
+    if (q.get('af')) { try { q.delete('af'); q.delete('amt'); history.replaceState(null, '', location.pathname + '?' + q.toString()); } catch (e) {} } }
 
   const tg = window.Telegram && window.Telegram.WebApp;
   try { if (tg && tg.platform && tg.platform !== 'unknown') { tg.ready(); tg.expand(); } } catch (e) {}
