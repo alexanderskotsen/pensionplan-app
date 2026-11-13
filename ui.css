@@ -144,7 +144,7 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 /* ---------- Герой результату (темна картка, одна головна цифра) ---------- */
 .hero{position:relative;overflow:hidden;background:var(--hero);color:var(--hero-fg);border-radius:24px;padding:20px;display:grid;gap:10px;min-width:0}
 .hero>*{position:relative;min-width:0}
-.hero>svg.deco{position:absolute;right:-70px;top:-70px;width:240px;height:240px;pointer-events:none}
+.hero>svg.deco{position:absolute;overflow:visible;right:-70px;top:-70px;width:240px;height:240px;pointer-events:none}
 .hero-k{font-size:15px;color:var(--hero-mut);line-height:1.35;margin:0;padding-right:40px;text-wrap:pretty}
 .hero-v{font-size:clamp(34px,11.2vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1.02;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px}
 .hero-v small{font-size:17px;font-weight:600;letter-spacing:0;color:var(--hero-mut)}

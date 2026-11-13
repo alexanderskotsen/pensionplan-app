@@ -7,13 +7,13 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=4">
+<link rel="stylesheet" href="ui.css?v=5">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=3"></script>
-<script src="ui.js?v=4"></script>
+<script src="ui.js?v=5"></script>
 </head>
 <body data-view="form">
-<nav class="nav"><div class="nav-in"><button type="button" id="tab-n">Накопичити</button><button type="button" id="tab-p" class="on">Пенсія</button><button type="button" id="tab-c">Дитині</button><button type="button" id="tab-s">Захист</button><button type="button" id="tab-g">Гра</button></div></nav>
+<nav class="nav"><div class="nav-in"><button type="button" id="tab-n">Накопичити</button><button type="button" id="tab-p" class="on">Пенсія</button><button type="button" id="tab-c">Дитині</button><button type="button" id="tab-s">Захист</button><!-- Гра схована 14.11.2026 --></div></nav>
 
 <div class="wrap">
   <!-- ПЕНСІЯ: ФОРМА -->
@@ -164,7 +164,7 @@ $('cpay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)
 ['age','ret','stazh','net','want','cage'].forEach(id=>$(id).addEventListener('input',upd));
 $('cgoal-own').addEventListener('input',upd);
 $('tab-p').onclick=()=>{S.tab='p';upd();scrollTo(0,0)};$('tab-c').onclick=()=>{S.tab='c';upd();scrollTo(0,0)};
-$('tab-n').onclick=()=>navGo('save.html');$('tab-g').onclick=()=>navGo('game.html');$('tab-s').onclick=()=>navGo('insure.html');
+$('tab-n').onclick=()=>navGo('save.html');$('tab-s').onclick=()=>navGo('insure.html');
 // форма ↔ результат (окремо для пенсії й дитячої програми)
 function show(v){const k=S.tab==='p'?'view':'cview';S[k]=v;S._enter=v==='res';upd();S._enter=false;scrollTo(0,0);if(v==='res')UI.enter($(S.tab==='p'?'p-out':'c-out'))}
 $('toResC').onclick=()=>show('res');
