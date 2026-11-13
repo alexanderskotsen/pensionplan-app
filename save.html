@@ -4,118 +4,111 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Накопичити гроші</title>
+<link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=1">
+<link rel="stylesheet" href="ui.css?v=3">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=1"></script>
-<script src="ui.js?v=1"></script>
+<script src="ui.js?v=3"></script>
 <style>
-.legend{display:flex;gap:14px;font-size:.78rem;color:var(--muted)}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-svg text{fill:var(--muted)}
-.shield{background:var(--accent-soft);border-radius:var(--r);padding:14px 16px;display:grid;gap:4px}
-.shield .k{color:var(--fg)}
-.shield .v{font-size:1.5rem;font-weight:750;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.shield .note{color:var(--fg);opacity:.85}
-/* порівняння: підпис над смугою, щоб текст не обрізався на вузьких екранах */
-.cmp{display:grid;gap:10px}
-.cmp .r{display:grid;gap:4px}
-.cmp .t{display:flex;justify-content:space-between;gap:10px;font-size:.86rem;flex-wrap:wrap}
-.cmp .t b{font-weight:650}
-.cmp .t span{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
-.cmp .tr{height:10px;border-radius:6px;background:var(--soft);overflow:hidden}
-.cmp .tr i{display:block;height:100%;border-radius:6px;background:var(--gray)}
-.cmp .tr i.g{background:var(--good)}
+/* «Швидше чи легше?» — та сама ціль з іншим строком; рядок натискається */
+.alt{display:grid}
+.alt button{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:6px 0;border:0;border-top:1px solid var(--line);background:none;font-size:15px;text-align:left}
+.alt button b{white-space:nowrap}
+.alt button[aria-pressed="true"]{font-weight:750}
+.alt button[aria-pressed="true"] span::after{content:" · зараз";font-weight:500;color:var(--muted)}
 </style>
 </head>
-<body>
+<body data-view="form">
 <nav class="nav"><div class="nav-in"><button type="button" class="on" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" onclick="navGo('insure.html')">Захист</button><button type="button" onclick="navGo('game.html')">Гра</button></div></nav>
 
 <div class="wrap">
-  <header class="ph">
-    <h1>Накопичити гроші</h1>
-    <p>Вкажіть внесок і строк — побачите, скільки збереться і на яку суму ви під захистом.</p>
-  </header>
+  <!-- ФОРМА -->
+  <section id="vForm" class="stack">
+    <header class="ph">
+      <i data-brand></i>
+      <h1>Накопичити гроші</h1>
+      <p>Вкажіть внесок і строк — побачите, скільки збереться і на яку суму сім'я під захистом.</p>
+    </header>
 
-  <div class="seg" role="tablist">
-    <button type="button" role="tab" id="tabAmount" aria-selected="true">Скільки накопичу</button>
-    <button type="button" role="tab" id="tabGoal" aria-selected="false">Хочу суму</button>
-  </div>
-
-  <div class="card" id="boxPay">
-    <div class="fld" id="payFld">
-      <div class="fld-h"><label for="payN" id="payLbl">Відкладаю щомісяця</label>
-        <span class="numbox" id="payBox"><input class="num" id="payN" data-for="pay" type="text" inputmode="numeric" autocomplete="off" aria-label="Сума внеску, можна ввести"><span class="u" id="payU">грн</span></span></div>
-      <input type="range" id="pay" aria-label="Сума внеску">
-      <div class="hint"><span id="payMin"></span><span id="payMax"></span></div>
+    <div class="seg" role="tablist">
+      <button type="button" role="tab" id="tabAmount" aria-selected="true">Скільки накопичу</button>
+      <button type="button" role="tab" id="tabGoal" aria-selected="false">Хочу суму</button>
     </div>
-    <div class="fld" id="boxGoal" hidden>
-      <div class="fld-h"><label for="goalN">Хочу накопичити</label>
-        <span class="numbox" id="goalBox"><input class="num" id="goalN" data-for="goal" type="text" inputmode="numeric" autocomplete="off" aria-label="Цільова сума, можна ввести"><span class="u" id="goalU">грн</span></span></div>
-      <input type="range" id="goal" aria-label="Цільова сума">
-      <div class="hint"><span id="goalMin"></span><span id="goalMax"></span></div>
+
+    <div class="card" id="boxPay">
+      <div class="fld" id="payFld">
+        <div class="fld-h"><label for="payN"><span id="payLbl">Відкладаю щомісяця</span><small id="payRng"></small></label>
+          <span class="numbox" id="payBox"><input class="num" id="payN" data-for="pay" type="text" inputmode="numeric" autocomplete="off" aria-label="Сума внеску, можна ввести"><span class="u" id="payU">грн</span></span></div>
+        <input type="range" id="pay" aria-label="Сума внеску">
+      </div>
+      <div class="fld" id="boxGoal" hidden>
+        <div class="fld-h"><label for="goalN">Хочу накопичити<small id="goalRng"></small></label>
+          <span class="numbox" id="goalBox"><input class="num" id="goalN" data-for="goal" type="text" inputmode="numeric" autocomplete="off" aria-label="Цільова сума, можна ввести"><span class="u" id="goalU">грн</span></span></div>
+        <input type="range" id="goal" aria-label="Цільова сума">
+      </div>
+      <div class="chips fill" id="cFreq" aria-label="Як вносити"><button type="button" data-v="m">щомісяця</button><button type="button" data-v="y">раз на рік</button></div>
+      <div class="chips fill" id="cCur" aria-label="Валюта"><button type="button" data-v="uah">₴ гривня</button><button type="button" data-v="usd">$ долар</button></div>
     </div>
-    <div class="chips fill" id="cFreq" aria-label="Як вносити"><button type="button" data-v="m">щомісяця</button><button type="button" data-v="y">раз на рік</button></div>
-    <div class="chips fill" id="cCur" aria-label="Валюта"><button type="button" data-v="uah">₴ гривня</button><button type="button" data-v="usd">$ долар</button></div>
-  </div>
 
-  <div class="card">
-    <div class="fld">
-      <div class="fld-h"><label for="termN">Строк</label>
-        <span class="numbox"><input class="num" id="termN" data-for="term" type="text" inputmode="numeric" autocomplete="off" aria-label="Строк у роках, можна ввести"><span class="u" id="termU">років</span></span></div>
-      <input type="range" id="term" min="10" max="50" step="1" value="15" aria-label="Строк">
-      <div class="hint"><span>10 років</span><span id="termMax">50 років</span></div>
+    <div class="card">
+      <div class="fld">
+        <div class="fld-h"><label for="termN">Строк<small id="termMax">10–50 років</small></label>
+          <span class="numbox"><input class="num" id="termN" data-for="term" type="text" inputmode="numeric" autocomplete="off" aria-label="Строк у роках, можна ввести"><span class="u" id="termU">років</span></span></div>
+        <input type="range" id="term" min="10" max="50" step="1" value="15" aria-label="Строк">
+      </div>
+      <hr class="sep">
+      <div class="fld">
+        <div class="fld-h"><label for="ageN">Мій вік<small>18–65 років</small></label>
+          <span class="numbox"><input class="num" id="ageN" data-for="age" type="text" inputmode="numeric" autocomplete="off" aria-label="Вік, можна ввести"><span class="u">р.</span></span></div>
+        <input type="range" id="age" min="18" max="65" step="1" value="32" aria-label="Вік">
+      </div>
+      <hr class="sep">
+      <div class="rowc"><span class="l">Стать</span>
+        <div class="chips" id="cSex"><button type="button" data-v="f">Жінка</button><button type="button" data-v="m">Чоловік</button></div></div>
     </div>
-    <div class="fld">
-      <div class="fld-h"><label for="ageN">Мій вік</label>
-        <span class="numbox"><input class="num" id="ageN" data-for="age" type="text" inputmode="numeric" autocomplete="off" aria-label="Вік, можна ввести"><span class="u">р.</span></span></div>
-      <input type="range" id="age" min="18" max="65" step="1" value="32" aria-label="Вік">
+
+    <p data-fine><b>Розрахунок орієнтовний.</b> Точні цифри покаже консультант.</p>
+  </section>
+
+  <!-- РЕЗУЛЬТАТ -->
+  <section id="vRes" class="stack" hidden aria-live="polite">
+    <div class="hero" id="hero">
+      <i data-deco></i><i data-mk="15"></i>
+      <p class="hero-k" id="resK"></p>
+      <p class="hero-v"><span class="pre">≈</span><span id="resBig"></span><small id="resU"></small></p>
+      <p class="hero-s" id="resS"></p>
+      <p class="hero-x" id="resPill"></p>
+      <svg class="chart" id="chart" role="img" aria-label="Графік: гарантована сума, базовий прогноз і оптимістичний прогноз"></svg>
     </div>
-    <div class="rowc"><span class="l">Стать</span>
-      <div class="chips" id="cSex"><button type="button" data-v="f">Жінка</button><button type="button" data-v="m">Чоловік</button></div></div>
-  </div>
+    <p class="warnnote" id="resWarn" hidden><i data-ic="info" data-px="18"></i><span>На короткому строку і в старшому віці значна частина внеску йде на страховий захист, тому прогноз може бути меншим за внесене. Спробуйте довший строк — результат буде кращим.</span></p>
 
-  <div class="card res" aria-live="polite">
-    <div class="k" id="resK"></div>
-    <div class="big good" id="resBig"></div>
-    <span class="pill" id="resPill"></span>
-    <dl id="resDl"></dl>
-    <p class="warnnote" id="resWarn" hidden>На короткому строку і в старшому віці значна частина внеску йде на страховий захист, тому прогноз може бути меншим за внесене. Спробуйте довший строк — результат буде кращим.</p>
-  </div>
+    <div class="sumrow"><span id="sumT"></span><button type="button" class="linkbtn" id="back"><i data-ic="edit" data-px="18"></i>Змінити</button></div>
 
-  <div class="card">
-    <h2>Як ростуть гроші</h2>
-    <svg id="chart" viewBox="0 0 320 140" width="100%" height="140" role="img" aria-label="Графік накопичення"></svg>
-    <div class="legend"><span><i style="background:var(--accent)"></i>внески</span><span><i style="background:var(--gold)"></i>дохід</span></div>
-  </div>
-
-  <div class="shield">
-    <div class="k">🛡 Весь цей час ви під захистом</div>
-    <div class="v" id="protV"></div>
-    <p class="note">Якщо з вами щось станеться, сім'я отримає цю суму, навіть якщо ви встигли внести лише кілька платежів. Депозит і «конверт удома» так не вміють.</p>
-  </div>
-
-  <div class="card">
-    <h2>Те саме, але інакше</h2>
-    <p class="mini" id="cmpT"></p>
-    <div class="cmp">
-      <div class="r"><div class="t"><b>Поліс</b><span id="cmpPolicy"></span></div><div class="tr"><i class="g" id="bPolicy"></i></div></div>
-      <div class="r"><div class="t"><b>Депозит</b><span>дохід є, захисту немає</span></div><div class="tr"><i style="width:88%"></i></div></div>
-      <div class="r"><div class="t"><b>Удома</b><span id="cmpHome"></span></div><div class="tr"><i id="bHome"></i></div></div>
+    <div class="card" id="altBox" hidden>
+      <div class="card-h"><h2>Швидше чи легше?</h2><p class="note">Та сама ціль, інший строк — натисніть, щоб перерахувати</p></div>
+      <div class="alt" id="alt"></div>
     </div>
-  </div>
 
-  <p class="fine">Розрахунок орієнтовний. Точні цифри покаже консультант безкоштовно.</p>
-  <details class="how"><summary>Як ми рахуємо?</summary><p id="fine"></p></details>
-  <p class="fine" id="ctaNote" hidden>Відкрийте цю сторінку через Telegram-бота, щоб надіслати розрахунок.</p>
+    <div class="card"><div class="info"><span class="ib"><i data-ic="shield" data-px="22"></i></span>
+      <div><p>Якщо з вами щось станеться, сім'я отримає <b id="protV"></b>. Це накопичувальне страхування життя.</p><p>Точні умови пояснить консультант.</p></div></div></div>
+
+    <div data-steps="Підберемо внесок і строк під вас"></div>
+
+    <details class="how"><summary>Як ми рахуємо?</summary><p id="fine"></p></details>
+    <p data-fine><b>Розрахунок орієнтовний.</b> <span id="fineT"></span></p>
+    <p class="note" id="ctaNote" hidden>Відкрийте цю сторінку через Telegram-бота, щоб надіслати розрахунок.</p>
+  </section>
 </div>
 
 <div class="dock"><div class="dock-in">
   <div class="dock-top">
-    <div class="dock-sum"><span id="dockK"></span><b id="dockV"></b></div>
-    <button type="button" class="dock-link" id="cta2"><span class="lg">Надіслати розрахунок у чат</span><span class="sm">Надіслати в чат</span></button>
+    <button type="button" class="dock-sum" id="dockSum"><span id="dockK"></span><b id="dockV"></b></button>
+    <button type="button" class="dock-go" id="toRes" data-tores><span class="lg">Показати розрахунок</span><span class="sm">Розрахунок</span><i data-ic="chev" data-px="18"></i></button>
   </div>
-  <button type="button" class="btn" id="cta">📞 Записатися на консультацію</button>
+  <button type="button" class="btn cta" id="cta" data-cta></button>
+  <button type="button" class="dock-link" id="cta2"><i data-ic="plane" data-px="18"></i>Надіслати розрахунок у чат</button>
 </div></div>
 
 <script>
@@ -126,7 +119,7 @@ svg text{fill:var(--muted)}
   const LIM = { uah:{ m:[500,20000,100], y:[6000,240000,1000], goal:[50000,10000000,50000] },
                 usd:{ m:[20,1000,10], y:[240,12000,60], goal:[2000,500000,1000] } };
   const DEF = { uah:{ m:2000, y:24000, goal:500000 }, usd:{ m:100, y:1200, goal:30000 } };
-  const S = { mode:'amount', cur:'uah', freq:'m', pay:2000, goal:500000, term:15, age:32, sex:'f' };
+  const S = { mode:'amount', cur:'uah', freq:'m', pay:2000, goal:500000, term:15, age:32, sex:'f', view:'form' };
 
   const risk = (age, sex) => Math.min(0.15, (0.03 + Math.max(0, age - 30) * 0.003) * (sex === 'm' ? 1.15 : 1));
   const maxTerm = age => Math.max(10, Math.min(50, 75 - age));
@@ -138,20 +131,30 @@ svg text{fill:var(--muted)}
   function calc(pay){
     if (S.cur === 'uah') {  // гривня — модель з tariff.js (відкалібрована на тарифах страховика)
       const t = Tariff.adult(pay, S.freq, S.age, S.sex, S.term);
-      return { paid: t.paid, guar: t.guar, proj: t.base, opt: t.opt, cover: t.cover, at: t.at };
+      return { paid: t.paid, guar: t.guar, proj: t.base, opt: t.opt, cover: t.cover, at: t.at, t };
     }
     const net = pay * (1 - risk(S.age, S.sex)), r = RATES[S.cur];
     const paid = pay * (S.freq === 'y' ? 1 : 12) * S.term;
     return { paid, guar: null, proj: fv(net, S.freq, S.term, r.proj), opt: null, cover: paid,
              at: y => fv(net, S.freq, y, r.proj) };
   }
-  const fmt = n => Math.round(n).toLocaleString('uk-UA').replace(/ |,/g, ' ');
+  const fmt = n => Math.round(n).toLocaleString('uk-UA').replace(/ |,/g, ' ');
   const money = n => S.cur === 'uah' ? fmt(n) + ' грн' : '$' + fmt(n);
   // результати округлюємо (до 1 000 грн / $10), щоб не створювати враження точного розрахунку
-  const approx = n => money(S.cur === 'uah' ? Math.round(n / 1000) * 1000 : Math.round(n / 10) * 10);
+  const rnd = n => S.cur === 'uah' ? Math.round(n / 1000) * 1000 : Math.round(n / 10) * 10;
+  const approx = n => money(rnd(n));
+  const bare = n => S.cur === 'uah' ? fmt(n) : '$' + fmt(n);   // без «грн» — для графіка й головної цифри
   const short = n => S.cur === 'uah' ? (n < 1000 ? fmt(n) + ' грн' : n >= 1e6 ? (n/1e6).toFixed(1).replace('.0','') + ' млн' : fmt(n/1000) + ' тис') : '$' + fmt(n);
   // внесок під ціль округлюємо ВГОРУ до кроку, щоб прогноз не був меншим за ціль (так само в calc.py save_goal)
   const roundPay = (v, step) => Math.max(step, Math.ceil(v / step - 1e-9) * step);
+  const yw = n => n % 10 >= 2 && n % 10 <= 4 && (n < 12 || n > 14) ? 'роки' : n % 10 === 1 && n !== 11 ? 'рік' : 'років';
+  function goalPay(){
+    const step = LIM[S.cur][S.freq][2];
+    const unit = S.freq === 'y' ? 10000 : 1000;  // модель майже лінійна: рахуємо на «одиницю» внеску
+    let pay = roundPay(S.goal / calc(unit).proj * unit, step);
+    for (let k = 0; k < 20 && calc(pay).proj < S.goal; k++) pay += step;
+    return pay;
+  }
 
   function setRange(el, lo, hi, step, val){ el.min = lo; el.max = hi; el.step = step; el.value = val; paint(el); }
   function paint(el){ el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%'); }
@@ -167,86 +170,113 @@ svg text{fill:var(--muted)}
     const l = LIM[S.cur];
     setRange($('pay'), l[S.freq][0], l[S.freq][1], l[S.freq][2], S.pay);
     setRange($('goal'), l.goal[0], l.goal[1], l.goal[2], S.goal);
-    $('payMin').textContent = short(l[S.freq][0]); $('payMax').textContent = short(l[S.freq][1]);
-    $('goalMin').textContent = short(l.goal[0]); $('goalMax').textContent = short(l.goal[1]);
+    $('payRng').textContent = short(l[S.freq][0]) + ' – ' + short(l[S.freq][1]);
+    $('goalRng').textContent = short(l.goal[0]) + ' – ' + short(l.goal[1]);
   }
-  function chart(pay){
-    const svg = $('chart'), NS = 'http://www.w3.org/2000/svg', n = S.term, W = 320, H = 118;
-    const r = calc(pay), top = Math.max(r.proj, r.paid) || 1, bw = W / n;
-    let h = '';
-    for (let y = 1; y <= n; y++) {
-      const paid = pay * (S.freq === 'y' ? 1 : 12) * y;
-      const tot = r.at(y);
-      const hp = Math.min(paid, tot) / top * H, hg = Math.max(0, tot - paid) / top * H;
-      const x = (y - 1) * bw + bw * 0.15, w = bw * 0.7;
-      h += `<rect x="${x}" y="${H - hp}" width="${w}" height="${hp}" rx="2" fill="var(--accent)"/>`;
-      if (hg > 0) h += `<rect x="${x}" y="${H - hp - hg}" width="${w}" height="${hg}" rx="2" fill="var(--gold)"/>`;
-    }
-    h += `<text x="0" y="136" font-size="10">1 рік</text><text x="${W}" y="136" font-size="10" text-anchor="end">${n}-й рік</text>`;
+  // Графік трьох сценаріїв: внески (площа), гарантовано, базовий прогноз (виділено, з числом біля точки), якщо роки вдалі.
+  // Малюємо у справжніх пікселях, щоб підписи не дрібнішали на вузьких екранах.
+  function chart(r){
+    const svg = $('chart'), w = Math.floor(svg.getBoundingClientRect().width);
+    if (!w) return;
+    const n = S.term, LW = 124, pw = w - LW, H = 190, y0 = H - 24, top0 = 14;
+    const perY = r.paid / n;
+    const top = Math.max(r.proj, r.paid, r.opt || 0, r.guar || 0) || 1;
+    const X = y => y / n * pw, Y = v => y0 - v / top * (y0 - top0);
+    const line = f => { let d = ''; for (let y = 0; y <= n; y++) d += (y ? 'L' : 'M') + X(y).toFixed(1) + ' ' + Y(f(y)).toFixed(1); return d; };
+    const T = window.Tariff, t = r.t;
+    let h = `<path d="M0 ${y0}L${pw} ${Y(r.paid).toFixed(1)}V${y0}Z" fill="#fff" opacity=".1"/><path d="M0 ${y0}H${pw}" stroke="#fff" stroke-opacity=".22"/>`;
+    const labs = [{ v: r.paid, n: bare(r.paid), l: 'ваші внески', c: 'paid' }];
+    if (t && r.opt != null) { h += `<path class="fade" d="${line(y => t.annual * T.sdd(y, t.rOpt))}" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"/>`;
+      labs.push({ v: r.opt, n: bare(rnd(r.opt)), l: 'якщо роки вдалі', c: 'opt' }); }
+    if (t && r.guar != null) { const g = T.irr(t.annual, n, t.guar);
+      h += `<path class="fade" d="${line(y => t.annual * T.sdd(y, g))}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="2"/>`;
+      labs.push({ v: r.guar, n: bare(rnd(r.guar)), l: 'гарантовано', c: 'guar' }); }
+    h += `<path class="base" pathLength="1" d="${line(y => r.at(y))}" fill="none" stroke="var(--hero-good)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+    labs.push({ v: r.proj, n: '≈ ' + bare(rnd(r.proj)), l: S.cur === 'usd' ? 'орієнтовно, 3%' : 'базовий прогноз', c: 'base' });
+    // підписи праворуч: за висотою точок, без накладань
+    labs.forEach(o => { o.y = Y(o.v); o.ty = o.y; }); labs.sort((a, b) => a.y - b.y);
+    const GAP = 38, lo = 16, hi = y0 - 14;
+    for (let i = 1; i < labs.length; i++) if (labs[i].ty < labs[i - 1].ty + GAP) labs[i].ty = labs[i - 1].ty + GAP;
+    const over = labs[labs.length - 1].ty - hi; if (over > 0) labs.forEach(o => o.ty -= over);
+    if (labs[0].ty < lo) { labs[0].ty = lo; for (let i = 1; i < labs.length; i++) labs[i].ty = Math.max(labs[i].ty, labs[i - 1].ty + GAP - 4); }
+    let g = '';
+    labs.forEach(o => {
+      const b = o.c === 'base', x = pw + 12;
+      if (Math.abs(o.ty - o.y) > 6) g += `<path d="M${pw + 2} ${o.y.toFixed(1)}L${x - 3} ${o.ty.toFixed(1)}" stroke="#fff" stroke-opacity=".35"/>`;
+      g += b ? `<circle cx="${pw}" cy="${o.y.toFixed(1)}" r="6" fill="var(--hero-good)" stroke="var(--hero)" stroke-width="2"/>`
+             : `<circle cx="${pw}" cy="${o.y.toFixed(1)}" r="4" fill="${o.c === 'paid' ? 'var(--hero)' : '#fff'}" stroke="#fff" stroke-width="1.5"/>`;
+      g += `<text class="${b ? 'nb' : 'n'}" x="${x}" y="${(o.ty + 2).toFixed(1)}">${o.n}</text><text class="${b ? 'lb' : ''}" x="${x}" y="${(o.ty + 17).toFixed(1)}">${o.l}</text>`;
+    });
+    h += `<g class="fade">${g}</g>`;
+    h += `<text x="0" y="${H - 4}">сьогодні</text><text x="${pw}" y="${H - 4}" text-anchor="end">${new Date().getFullYear() + n} рік</text>`;
+    svg.setAttribute('viewBox', `0 0 ${w} ${H}`); svg.setAttribute('height', H);
     svg.innerHTML = h;
   }
   function render(){
     const mt = maxTerm(S.age); if (S.term > mt) S.term = mt;
-    $('term').max = mt; $('term').value = S.term; paint($('term')); $('termMax').textContent = mt + ' років';
+    $('term').max = mt; $('term').value = S.term; paint($('term')); $('termMax').textContent = '10–' + mt + ' років';
     $('age').value = S.age; paint($('age'));
     $('tabAmount').setAttribute('aria-selected', S.mode === 'amount'); $('tabGoal').setAttribute('aria-selected', S.mode === 'goal');
     $('boxGoal').hidden = S.mode !== 'goal';
     $('payFld').hidden = S.mode === 'goal';
     [['cCur','cur'],['cFreq','freq'],['cSex','sex']].forEach(([id,k]) => $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === String(S[k]))));
     $('payLbl').textContent = S.freq === 'y' ? 'Відкладаю раз на рік' : 'Відкладаю щомісяця';
-    const yw = S.term % 10 >= 2 && S.term % 10 <= 4 && (S.term < 12 || S.term > 14) ? 'роки' : 'років';
-    const termTxt = S.term + ' ' + yw;
-    $('termU').textContent = yw;
+    const termTxt = S.term + ' ' + yw(S.term);
+    $('termU').textContent = yw(S.term);
     ['payU','goalU'].forEach(id => { $(id).textContent = S.cur === 'uah' ? 'грн' : '$'; $(id).parentElement.classList.toggle('pre', S.cur !== 'uah'); });
 
-    let pay = S.pay;
-    const per = S.freq === 'y' ? 'на рік' : 'на місяць';
-    if (S.mode === 'goal') {
-      const step = LIM[S.cur][S.freq][2];
-      const unit = S.freq === 'y' ? 10000 : 1000;  // модель майже лінійна: рахуємо на «одиницю» внеску
-      pay = roundPay(S.goal / calc(unit).proj * unit, step);
-      for (let k = 0; k < 20 && calc(pay).proj < S.goal; k++) pay += step;
-    }
+    const per = S.freq === 'y' ? 'на рік' : 'на місяць', goalMode = S.mode === 'goal';
+    const pay = goalMode ? goalPay() : S.pay;
     const r = calc(pay), usd = S.cur === 'usd';
     const loss = r.proj < r.paid;  // прогноз менший за внесене (короткий строк у старшому віці)
-    $('resBig').classList.toggle('good', !loss);
-    if (S.mode === 'goal') {
+    // --- герой: одна головна цифра + речення, де прогноз названо прогнозом ---
+    const from = S._enter ? 0.7 : null;
+    if (goalMode) {
       $('resK').textContent = `Щоб мати ${money(S.goal)} через ${termTxt}, відкладайте`;
-      $('resBig').innerHTML = `≈ ${money(pay).replace(' грн','')} <small>${usd ? '' : 'грн '}${per}</small>`;
+      UI.count($('resBig'), pay, bare, from && pay * from);
+      $('resU').textContent = (usd ? '' : 'грн ') + per;
     } else {
-      $('resK').textContent = `Через ${termTxt} у вас буде`;
-      $('resBig').innerHTML = `≈ ${approx(r.proj).replace(' грн','')} <small>${usd ? '' : 'грн'}</small>`;
+      $('resK').textContent = `Через ${termTxt} можете мати`;
+      UI.count($('resBig'), rnd(r.proj), n => bare(rnd(n)), from && rnd(r.proj) * from);
+      $('resU').textContent = usd ? '' : 'грн';
     }
-    let dl = `<dt>Внесете за ${S.term} р.</dt><dd>${money(r.paid)}</dd>`;
-    if (r.guar != null) dl += `<dt>Гарантовано<br><small>мінімум за договором</small></dt><dd>≈ ${approx(r.guar)}</dd>`;
-    dl += usd
-      ? `<dt>Орієнтовно під 3%<br><small>дохід не гарантований</small></dt><dd>≈ ${approx(r.proj)}</dd>`
-      : `<dt>Базовий прогноз<br><small>з бонусом від інвестицій</small></dt><dd>≈ ${approx(r.proj)}</dd>`
-        + `<dt>Якщо роки будуть вдалими<br><small>оптимістичний прогноз</small></dt><dd>≈ ${approx(r.opt)}</dd>`;
-    dl += loss
-      ? `<dt>Різниця з внесеним</dt><dd style="color:var(--warn)">− ${approx(r.paid - r.proj)}</dd>`
-      : `<dt>З них ваш дохід</dt><dd style="color:var(--good)">+ ${approx(r.proj - r.paid)}</dd>`;
-    $('resDl').innerHTML = dl;
+    $('resS').innerHTML = loss
+      ? `Самі внесете <b>${money(r.paid)}</b> — базовий прогноз на ≈ <b class="am">${approx(r.paid - r.proj)}</b> менший.`
+      : `Самі внесете <b>${money(r.paid)}</b>, ще ≈ <b class="gd">+${approx(r.proj - r.paid)}</b> ` + (usd ? 'за орієнтовної дохідності 3% на рік — вона не гарантована.' : 'за базовим прогнозом.');
     const pct = Math.round((r.proj / r.paid - 1) * 100);
-    $('resPill').classList.toggle('warn', loss);
-    $('resPill').textContent = loss ? (pct < 0 ? '−' + (-pct) + '% до внесеного' : 'трохи менше, ніж внесете')
-                                    : '+' + pct + '% до внесеного';
+    $('resPill').className = 'hero-x ' + (loss ? 'wr' : 'ok');
+    $('resPill').innerHTML = UI.icon(loss ? 'info' : 'up', 18) + '<span>' + (loss ? (pct < 0 ? '−' + (-pct) + '% до внесеного' : 'трохи менше, ніж внесете')
+                                    : '+' + pct + '% до внесеного') + '</span>';
     $('resWarn').hidden = !loss;
-    $('protV').textContent = approx(r.cover);
-    $('cmpT').textContent = `${S.term} р. по ${money(pay)} ${per} — куди покласти`;
-    // смуги пропорційні сумам: довша та, де грошей більше
-    const top = Math.max(r.proj, r.paid) || 1, bar = n => Math.max(8, Math.round(n / top * 100)) + '%';
-    $('bPolicy').style.width = bar(r.proj); $('cmpPolicy').textContent = `≈ ${approx(r.proj)} + захист`;
-    $('bHome').style.width = bar(r.paid);
-    $('cmpHome').textContent = `${money(r.paid)}, з'їдає інфляція`;
-    $('dockK').textContent = S.mode === 'goal' ? `Відкладати ${per}` : `Через ${termTxt}`;
-    $('dockV').textContent = S.mode === 'goal' ? `≈ ${money(pay)}` : `≈ ${approx(r.proj)}`;
+    $('sumT').innerHTML = (goalMode ? `<b>Ціль ${money(S.goal)}</b>` : `<b>${money(pay)} ${per}</b>`) + `, ${termTxt}`;
+    $('protV').textContent = '≈ ' + approx(r.cover);
+    // --- «Швидше чи легше?»: та сама ціль за інший строк ---
+    $('altBox').hidden = !goalMode;
+    if (goalMode) {
+      const cur = S.term, ts = [...new Set([cur - 5, cur, cur + 5].map(x => Math.min(mt, Math.max(10, x))))];
+      $('alt').innerHTML = ts.length < 2 ? '' : ts.map(t => { S.term = t; const p = goalPay();
+        return `<button type="button" data-t="${t}" aria-pressed="${t === cur}"><span>За ${t} ${yw(t)}</span><b>≈ ${money(p)} ${S.freq === 'y' ? '/рік' : '/міс'}</b></button>`; }).join('');
+      S.term = cur; $('altBox').hidden = ts.length < 2;
+    }
+    $('dockK').textContent = goalMode ? `Внесок ${per}` : `Через ${termTxt}`;
+    $('dockV').textContent = goalMode ? `≈ ${money(pay)}` : `≈ ${approx(r.proj)}`;
     $('fine').textContent = usd
-      ? 'Розрахунок орієнтовний. У доларових програмах дохідність не гарантована й залежить від інвестиційного доходу страхової. Частина внеску йде на страховий захист. Точні цифри покаже консультант безкоштовно.'
-      : 'Розрахунок орієнтовний, за тарифами класичних накопичувальних програм. Гарантована сума — мінімум за договором; бонус від інвестицій нараховується щороку, але не гарантований. Частина внеску йде на страховий захист. Точні цифри покаже консультант безкоштовно.';
-    chart(pay);
+      ? 'Розрахунок орієнтовний. У доларових програмах дохідність не гарантована й залежить від інвестиційного доходу страхової. Частина внеску йде на страховий захист. Точні цифри покаже консультант.'
+      : 'Розрахунок орієнтовний, за тарифами класичних накопичувальних програм. Гарантована сума — мінімум за договором; бонус від інвестицій нараховується щороку, але не гарантований. Частина внеску йде на страховий захист. Точні цифри покаже консультант.';
+    $('fineT').textContent = usd ? 'Дохідність у доларових програмах не гарантована.'
+      : (goalMode ? 'Внесок округлено вгору, щоб прогноз був не меншим за ціль. ' : '') + 'Гарантована сума — мінімум за договором, бонус від інвестицій не гарантований.';
     S._pay = pay; S._r = r;
+    $('vForm').hidden = S.view !== 'form'; $('vRes').hidden = S.view !== 'res';
+    if (S.view === 'res') chart(r);
     if (window.UI) UI.syncNums();
+  }
+  function show(v){
+    S.view = v; S._enter = v === 'res';
+    UI.setView(v, () => show('form'));
+    render(); S._enter = false; scrollTo(0, 0);
+    // промальовка графіка — лише при вході на результат; клас знімаємо, щоб перемальовування (resize, зміна строку) не анімувалось знову
+    if (v === 'res') { UI.enter($('vRes')); const c = $('chart'); c.classList.remove('draw'); clearTimeout(c._t);
+      if (!UI.still()) { void c.getBoundingClientRect(); c.classList.add('draw'); c._t = setTimeout(() => c.classList.remove('draw'), 1300); } }
   }
 
   chips('cCur','cur'); chips('cFreq','freq'); chips('cSex','sex');
@@ -256,11 +286,16 @@ svg text{fill:var(--muted)}
   $('age').oninput = e => { S.age = +e.target.value; render(); };
   $('tabAmount').onclick = () => { S.mode = 'amount'; render(); };
   $('tabGoal').onclick = () => { S.mode = 'goal'; render(); };
+  $('toRes').onclick = $('dockSum').onclick = () => show('res');
+  $('back').onclick = () => show('form');
+  $('alt').onclick = e => { const b = e.target.closest('button[data-t]'); if (b) { S.term = +b.dataset.t; render(); } };
+  window.addEventListener('resize', () => { if (S.view === 'res') { $('chart').classList.remove('draw'); chart(S._r); } });
   if (new URLSearchParams(location.search).get('tab') === 'goal') S.mode = 'goal';
   { const pa = +new URLSearchParams(location.search).get('pa'); if (pa >= 18 && pa <= 65) S.age = pa; }  // вік з анкети
   // передзаповнення з пенсійного калькулятора («Порахувати детально»): amt — грн на місяць, yrs — строк, sx — стать
+  let fromBridge = false;
   { const q = new URLSearchParams(location.search), amt = +q.get('amt'), yrs = +q.get('yrs'), sx = q.get('sx'), l = LIM.uah.m;
-    if (amt > 0) S.pay = Math.min(l[1], Math.max(l[0], Math.round(amt / l[2]) * l[2]));
+    if (amt > 0) { S.pay = Math.min(l[1], Math.max(l[0], Math.round(amt / l[2]) * l[2])); fromBridge = true; }
     if (yrs >= 10 && yrs <= 50) S.term = Math.round(yrs);
     if (sx === 'f' || sx === 'm') S.sex = sx; }
 
@@ -274,6 +309,8 @@ svg text{fill:var(--muted)}
   $('cta').onclick = () => sendCalc(1);
   $('cta2').onclick = () => sendCalc(0);
   sync(); render();
+  // з пенсійного калькулятора людина приходить по деталі — показуємо одразу результат
+  if (fromBridge) (document.readyState === 'loading' ? fn => document.addEventListener('DOMContentLoaded', fn) : fn => fn())(() => show('res'));
 })();
 </script>
 </body>

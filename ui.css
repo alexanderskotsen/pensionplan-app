@@ -1,181 +1,293 @@
 /* Спільний стиль Mini App «Твій фінансовий план»: save / index / insure / game.
+   Бренд: шрифт Onest, теплий фон, корал — ЛИШЕ для запису на консультацію (кнопка .btn.cta) і дрібних акцентів
+   (шеврон-«дах» під активною вкладкою, лінія базового прогнозу, знак). Нестача — бурштин, дохід — зелений.
    Токени → база → навігація → картки, поля, чипи, повзунки → результат → нижня панель дії.
-   Темна тема: системна (prefers-color-scheme) або з Telegram (ui.js ставить data-theme). */
+   Темна тема нейтральна: системна (prefers-color-scheme) або з Telegram (ui.js ставить data-theme і кольори з themeParams). */
+@font-face{font-family:Onest;src:url(fonts/onest-cyrillic-wght-normal.woff2) format("woff2");font-weight:100 900;font-display:swap;
+  unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Onest;src:url(fonts/onest-latin-wght-normal.woff2) format("woff2");font-weight:100 900;font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+2248,U+20B4,U+FEFF,U+FFFD}
 :root{
-  --bg:#f3f5f8; --card:#ffffff; --fg:#111a24; --muted:#566473; --line:#dde3ea; --soft:#eceff3;
-  --accent:#1b5fc4; --accent-soft:#e8f0fc; --accent-ink:#ffffff;
-  --good:#17754a; --good-soft:#e2f3e9; --good-ink:#ffffff;
-  --warn:#845000; --warn-soft:#fbf0d9;
-  --bad:#ad3429; --bad-soft:#fbe9e7;
-  --gold:#e3a13c; --gold-ink:#3a2700; --gray:#8a94a3;
-  --shadow:0 1px 2px rgba(16,24,40,.06);
-  --r:16px; --r-sm:12px; --gut:16px; --tap:44px;
-  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --bg:#FAF6F2; --card:#ffffff; --fg:#1B1620; --muted:#6A6470; --line:#E9E1DA; --soft:#F1EBE5;
+  --ctl:#8D8692;                      /* межі контролів: ≥3:1 до картки */
+  --ink:#1B1620; --ink-on:#ffffff;    /* вибраний чип, заповнення повзунка, нейтральна кнопка */
+  --cta:#D63A2C; --cta-on:#ffffff; --brand:#E84037;
+  --good:#17794B; --good-soft:#E2F4EA;
+  --warn:#8A5200; --warn-soft:#FFF1D0;
+  --hero:#241B26; --hero-fg:#ffffff; --hero-mut:#D3CCD8; --hero-line:rgba(255,255,255,.16);
+  --hero-good:#7FE0AE; --hero-warn:#FFCB70; --hero-brand:#FF6B57;
+  --shadow:0 1px 2px rgba(27,22,32,.05);
+  --r:20px; --r-sm:14px; --gut:16px; --tap:44px;
+  --font:Onest,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f141a; --card:#182029; --fg:#e8eef4; --muted:#9ba9b7; --line:#2b3643; --soft:#212b36;
-  --accent:#6aa5f3; --accent-soft:#1b2c44; --accent-ink:#08172a;
-  --good:#62cc8d; --good-soft:#15301f; --good-ink:#062314;
-  --warn:#e8bb6c; --warn-soft:#3a2d14;
-  --bad:#f08a80; --bad-soft:#3a1d1a;
-  --gold:#e0a24e; --gold-ink:#2b1c00; --gray:#6b7787;
+  --bg:#141416; --card:#1F1F23; --fg:#F2F0F4; --muted:#ABA7B0; --line:#303036; --soft:#2A2A2F;
+  --ctl:#7C7882; --ink:#F2F0F4; --ink-on:#141416;
+  --cta:#D63A2C; --brand:#FF6B57;
+  --good:#6FD3A0; --good-soft:#15301F; --warn:#F2C377; --warn-soft:#3A2D14;
+  --hero:#2A2830; --hero-line:rgba(255,255,255,.14);
   --shadow:none; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0f141a; --card:#182029; --fg:#e8eef4; --muted:#9ba9b7; --line:#2b3643; --soft:#212b36;
-  --accent:#6aa5f3; --accent-soft:#1b2c44; --accent-ink:#08172a;
-  --good:#62cc8d; --good-soft:#15301f; --good-ink:#062314;
-  --warn:#e8bb6c; --warn-soft:#3a2d14;
-  --bad:#f08a80; --bad-soft:#3a1d1a;
-  --gold:#e0a24e; --gold-ink:#2b1c00; --gray:#6b7787;
+  --bg:#141416; --card:#1F1F23; --fg:#F2F0F4; --muted:#ABA7B0; --line:#303036; --soft:#2A2A2F;
+  --ctl:#7C7882; --ink:#F2F0F4; --ink-on:#141416;
+  --cta:#D63A2C; --brand:#FF6B57;
+  --good:#6FD3A0; --good-soft:#15301F; --warn:#F2C377; --warn-soft:#3A2D14;
+  --hero:#2A2830; --hero-line:rgba(255,255,255,.14);
   --shadow:none; color-scheme:dark}
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45;
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.45;
   padding:0 max(var(--gut),env(safe-area-inset-right,0px)) 32px max(var(--gut),env(safe-area-inset-left,0px));
-  overflow-wrap:break-word}
+  overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
 button{font-family:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
-button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 .wrap{max-width:560px;margin:0 auto;display:grid;gap:12px;min-width:0}
 .wrap>*{min-width:0}
 .stack{display:grid;gap:12px;min-width:0}
+.stack>*{min-width:0}
+svg.ic{flex:none;display:inline-block;vertical-align:-.18em}
+svg.mk{flex:none;display:inline-block;color:var(--brand)}
 
 /* ---------- Навігація між калькуляторами ---------- */
 .nav{position:sticky;top:0;z-index:20;background:var(--bg);margin:0 calc(-1*var(--gut)) 12px;border-bottom:1px solid var(--line)}
 .nav-in{display:flex;max-width:592px;margin:0 auto;padding:0 8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nav-in::-webkit-scrollbar{display:none}
-.nav button{flex:1 0 auto;position:relative;min-height:48px;padding:0 10px;border:0;background:none;
+.nav button{flex:1 0 auto;position:relative;min-height:48px;min-width:48px;padding:0 10px 4px;border:0;background:none;
   font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap}
-.nav button.on{color:var(--fg)}
-.nav button.on::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}
-.nav::before,.nav::after{content:"";position:absolute;top:0;bottom:0;width:40px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:1}
-.nav::before{left:0;background:linear-gradient(to left,transparent,var(--bg) 70%)}
-.nav::after{right:0;background:linear-gradient(to right,transparent,var(--bg) 70%)}
+.nav button.on{color:var(--fg);font-weight:700}
+/* «дах» — єдиний гострий акцент системи: шеврон під активною вкладкою */
+.nav button.on::after{content:"";position:absolute;left:50%;bottom:3px;width:26px;height:9px;margin-left:-13px;
+  background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 10'%3E%3Cpath d='M2 9L14 2.2 26 9' fill='none' stroke='%23E84037' stroke-width='3' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E")}
+.nav::before,.nav::after{content:"";position:absolute;top:0;bottom:1px;width:44px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:1}
+.nav::before{left:0;background:linear-gradient(to left,transparent,var(--bg) 75%)}
+.nav::after{right:0;background:linear-gradient(to right,transparent,var(--bg) 75%)}
 .nav.more-l::before,.nav.more-r::after{opacity:1}
 
 /* ---------- Заголовок сторінки ---------- */
-.ph{display:grid;gap:4px;padding:2px 2px 0}
-.ph h1{font-size:1.3rem;line-height:1.2;margin:0;letter-spacing:-.015em;text-wrap:balance}
-.ph p{margin:0;color:var(--muted);font-size:.92rem;text-wrap:pretty}
-h2{font-size:1rem;margin:0;line-height:1.3}
+.ph{display:grid;gap:6px;padding:4px 2px 0}
+.brand{display:flex;align-items:center;gap:7px;margin:0 0 2px;font-size:14px;font-weight:650;color:var(--muted);letter-spacing:-.005em}
+.ph h1{font-size:24px;font-weight:750;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.ph p{margin:0;color:var(--muted);font-size:15px;text-wrap:pretty}
+h2{font-size:17px;font-weight:700;margin:0;line-height:1.25;letter-spacing:-.01em;text-wrap:balance}
 
 /* ---------- Картки ---------- */
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:12px;min-width:0;box-shadow:var(--shadow)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:14px;min-width:0;box-shadow:var(--shadow)}
 .card>*{min-width:0}
-.card.soft{background:var(--accent-soft);border-color:transparent;box-shadow:none}
-.mini{font-size:.8rem;color:var(--muted);line-height:1.45;margin:0}
-.note{font-size:.84rem;color:var(--muted);margin:0;line-height:1.45}
-.warnnote{font-size:.84rem;line-height:1.45;margin:0;padding:10px 12px;border-radius:var(--r-sm);background:var(--warn-soft);color:var(--warn)}
+.card.tint{background:var(--soft);border-color:transparent;box-shadow:none}
+.sep{border:0;border-top:1px solid var(--line);margin:0}
+.note,.mini{font-size:14px;color:var(--muted);margin:0;line-height:1.45}
+.warnnote{font-size:14px;line-height:1.45;margin:0;padding:10px 12px;border-radius:var(--r-sm);background:var(--warn-soft);color:var(--warn);display:flex;gap:8px}
+.warnnote svg{margin-top:2px}
+.am{color:var(--warn);font-weight:700}
+.gd{color:var(--good);font-weight:700}
 
 /* ---------- Перемикач режиму (2 вкладки в межах сторінки) ---------- */
-.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--soft);border-radius:14px;padding:4px}
-.seg button{white-space:nowrap;min-height:var(--tap);border:0;background:transparent;border-radius:10px;padding:4px 8px;font-size:.93rem;font-weight:600;color:var(--muted);line-height:1.15}
-.seg button.on,.seg button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--card);color:var(--fg);box-shadow:0 1px 2px rgba(16,24,40,.12)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:3px}
+.seg button{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;min-height:var(--tap);border:0;background:transparent;border-radius:12px;padding:4px 8px;font-size:15px;font-weight:600;color:var(--muted);line-height:1.15}
+.seg button.on,.seg button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--card);color:var(--fg);box-shadow:0 1px 2px rgba(27,22,32,.14),0 0 0 1px var(--line)}
 
 /* ---------- Поля ---------- */
-.fld{display:grid;gap:2px;min-width:0}
+.fld{display:grid;gap:4px;min-width:0}
 .fld-h{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:var(--tap)}
-.fld-h>label,.fld-h>.l,.lbl{font-size:.9rem;font-weight:600;color:var(--fg);min-width:0}
+.fld-h>label,.fld-h>.l,.lbl{font-size:15px;font-weight:600;color:var(--fg);min-width:0;line-height:1.25}
 .lbl{display:grid;gap:8px}
-.lbl small,.fld-h small{display:block;font-weight:400;color:var(--muted);font-size:.78rem}
-.hint{display:flex;justify-content:space-between;gap:8px;font-size:.74rem;color:var(--muted);margin-top:-4px}
+.lbl small,.fld-h small,.toggle small{display:block;font-weight:400;color:var(--muted);font-size:14px;line-height:1.3;margin-top:1px}
+.hint{display:flex;justify-content:space-between;gap:8px;font-size:14px;color:var(--muted);padding:0 52px;margin-top:-2px}
 /* значення поруч із повзунком: можна тапнути і ввести число */
-.numbox{display:inline-flex;align-items:center;gap:5px;flex:none;min-height:var(--tap);padding:0 12px;border:1px solid var(--line);border-radius:var(--r-sm);
-  background:var(--card);font-weight:700;font-variant-numeric:tabular-nums;cursor:text}
+.numbox{display:inline-flex;align-items:baseline;gap:5px;flex:none;min-height:var(--tap);padding:0 12px;border:1.5px solid var(--ctl);border-radius:var(--r-sm);
+  background:var(--card);font-weight:750;cursor:text;line-height:42px}
 .numbox.pre{flex-direction:row-reverse}
-.numbox input{border:0;background:none;outline:0;padding:0;margin:0;height:42px;min-width:2ch;max-width:11ch;text-align:right;
-  font:inherit;font-size:16px;color:var(--fg);font-variant-numeric:tabular-nums}
-.numbox .u{font-size:.82rem;font-weight:500;color:var(--muted);white-space:nowrap}
-.numbox:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.inp{font:inherit;font-size:16px;width:100%;min-height:var(--tap);padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);color:var(--fg)}
+.numbox input{border:0;background:none;outline:0;padding:0;margin:0;height:41px;min-width:2ch;max-width:11ch;text-align:right;
+  font:inherit;font-size:18px;letter-spacing:-.01em;color:var(--fg)}
+.numbox .u{font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap}
+.numbox:focus-within{border-color:var(--fg);box-shadow:0 0 0 3px var(--soft)}
+.inp{font:inherit;font-size:16px;width:100%;min-height:var(--tap);padding:8px 12px;border:1.5px solid var(--ctl);border-radius:var(--r-sm);background:var(--card);color:var(--fg)}
+
+/* ---------- Повзунок з кнопками −/+ (ui.js обгортає кожен range у .sl) ---------- */
+.sl{display:grid;grid-template-columns:var(--tap) minmax(0,1fr) var(--tap);gap:8px;align-items:center}
+.stp-b{width:var(--tap);height:var(--tap);padding:0;border:1.5px solid var(--ctl);border-radius:50%;background:var(--card);color:var(--fg);
+  display:grid;place-items:center;transition:transform .08s,background .12s}
+.stp-b:active{transform:scale(.93);background:var(--soft)}
+.stp-b:disabled{opacity:.38}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:var(--tap);background:transparent;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:linear-gradient(to right,var(--ink) var(--p,50%),var(--ctl) var(--p,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);margin-top:-11px;box-shadow:0 1px 4px rgba(0,0,0,.28)}
+input[type=range]::-moz-range-track{height:6px;border-radius:6px;background:var(--ctl)}
+input[type=range]::-moz-range-progress{height:6px;border-radius:6px;background:var(--ink)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.28)}
+:root[data-theme="dark"] input[type=range]::-webkit-slider-thumb{border-color:#141416}
+:root[data-theme="dark"] input[type=range]::-moz-range-thumb{border-color:#141416}
 
 /* ---------- Чипи ---------- */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chips button{min-height:var(--tap);min-width:var(--tap);padding:6px 14px;border:1px solid var(--line);background:var(--card);border-radius:var(--r-sm);
-  font-size:.92rem;font-weight:500;color:var(--fg);line-height:1.2}
-.chips button.on,.chips button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:650}
-.chips button:disabled{opacity:.35}
-.chips.fill button{flex:1 1 0}
+.chips button{min-height:var(--tap);min-width:var(--tap);padding:6px 14px;border:1.5px solid var(--ctl);background:var(--card);border-radius:var(--r-sm);
+  font-size:15px;font-weight:600;color:var(--fg);line-height:1.2;transition:background .12s,color .12s,border-color .12s}
+.chips button.on,.chips button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--ink-on)}
+.chips button:disabled{opacity:.38}
+.chips.fill button{flex:1 1 0;padding-left:8px;padding-right:8px}
 .rowc{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.rowc>.l{font-size:.9rem;font-weight:600}
-
-/* ---------- Повзунок ---------- */
-input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:var(--tap);background:transparent;margin:0;cursor:pointer}
-input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:linear-gradient(to right,var(--accent) var(--p,50%),var(--line) var(--p,50%))}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid var(--accent);margin-top:-12px;box-shadow:0 1px 4px rgba(0,0,0,.25)}
-input[type=range]::-moz-range-track{height:6px;border-radius:6px;background:var(--line)}
-input[type=range]::-moz-range-progress{height:6px;border-radius:6px;background:var(--accent)}
-input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.rowc>.l{font-size:15px;font-weight:600}
 
 /* ---------- Перемикач-рядок (весь рядок натискається) ---------- */
-.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:6px 0;font-size:.92rem;font-weight:600;cursor:pointer}
-.toggle small{display:block;color:var(--muted);font-size:.78rem;font-weight:400}
-.toggle input{-webkit-appearance:none;appearance:none;flex:none;width:52px;height:32px;border-radius:99px;background:var(--gray);position:relative;margin:0;cursor:pointer;transition:background .15s}
+.toggles{display:grid}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:8px 0;font-size:15px;font-weight:600;cursor:pointer;line-height:1.25}
+.toggle input{-webkit-appearance:none;appearance:none;flex:none;width:54px;height:32px;border-radius:99px;background:var(--ctl);position:relative;margin:0;cursor:pointer;transition:background .15s}
 .toggle input::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
-.toggle input:checked{background:var(--accent)}
-.toggle input:checked::after{transform:translateX(20px)}
+.toggle input:checked{background:var(--good)}
+:root[data-theme="dark"] .toggle input:checked{background:#2E9E68}
+.toggle input:checked::after{transform:translateX(22px)}
 .toggle+.toggle{border-top:1px solid var(--line)}
 
-/* ---------- Результат ---------- */
-.res{gap:8px}
-.k{font-size:.88rem;color:var(--muted)}
-.big{font-size:2.1rem;font-weight:750;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
-.big small{font-size:.95rem;color:var(--muted);font-weight:500;letter-spacing:0}
-.big.good{color:var(--good)}
-.pill{display:inline-block;padding:4px 10px;border-radius:99px;font-weight:650;font-size:.82rem;justify-self:start;background:var(--good-soft);color:var(--good)}
-.pill.warn,.pill.w{background:var(--warn-soft);color:var(--warn)}
-.pills{display:flex;flex-wrap:wrap;gap:6px}
-dl{margin:0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;font-size:.9rem}
-dt{color:var(--muted)}dt small{display:block;font-size:.74rem;opacity:.9}
-dd{margin:0;font-weight:650;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.gap{background:var(--accent-soft);border-radius:var(--r);padding:14px 16px;display:grid;gap:6px;min-width:0}
-.gap .k{color:var(--fg);opacity:.85}
-.gap .v{font-size:1.7rem;font-weight:750;color:var(--accent);letter-spacing:-.02em;line-height:1.15;font-variant-numeric:tabular-nums}
-.gap dl{margin-top:6px}
-.list{display:grid;gap:8px;margin:0;padding:0;list-style:none;font-size:.9rem}
-.list li{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:8px}
-.list li:last-child{border-bottom:0;padding-bottom:0}
-.list b{white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
-.callout{background:var(--accent-soft);border-radius:var(--r-sm);padding:12px 14px;font-size:.9rem}
-.callout.warn{background:var(--bad-soft)}
+/* ---------- Герой результату (темна картка, одна головна цифра) ---------- */
+.hero{position:relative;overflow:hidden;background:var(--hero);color:var(--hero-fg);border-radius:24px;padding:20px;display:grid;gap:10px;min-width:0}
+.hero>*{position:relative;min-width:0}
+.hero>svg.deco{position:absolute;right:-70px;top:-70px;width:240px;height:240px;pointer-events:none}
+.hero-k{font-size:15px;color:var(--hero-mut);line-height:1.35;margin:0;padding-right:40px;text-wrap:pretty}
+.hero-v{font-size:clamp(34px,11.2vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1.02;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px}
+.hero-v small{font-size:17px;font-weight:600;letter-spacing:0;color:var(--hero-mut)}
+.hero-v.gd{color:var(--hero-good)}
+.hero-v.gd small,.hero-v.gd .pre{color:var(--hero-good);opacity:.85}
+.hero-v .pre{font-size:22px;font-weight:600;letter-spacing:0;color:var(--hero-mut)}
+.hero-v.txt{font-size:26px;letter-spacing:-.02em;line-height:1.15}
+.hero-s{font-size:15px;line-height:1.45;margin:0;text-wrap:pretty}
+.hero-s .gd{color:var(--hero-good)}
+.hero-s .am,.hero .am{color:var(--hero-warn)}
+.hero-x{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--hero-mut);margin:0;line-height:1.4}
+.hero-x svg{margin-top:2px}
+.hero-x.ok svg{color:var(--hero-good)}
+.hero-x.wr svg{color:var(--hero-warn)}
+.hero .mk{position:absolute;right:16px;top:16px;color:#fff;opacity:.9}
+.hero hr{border:0;border-top:1px solid var(--hero-line);margin:4px 0}
+/* смуга «є / не вистачає» */
+.split{display:grid;gap:6px}
+.split-b{display:flex;height:12px;gap:3px}
+.split-b i{display:block;border-radius:6px;background:#fff;min-width:6px}
+.split-b s{flex:1;border-radius:6px;border:2px dashed var(--hero-warn);min-width:10px}
+.split-l{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--hero-mut);line-height:1.3}
+.split-l b{display:block;font-size:16px;color:#fff}
+.split-l span:last-child{text-align:right}
+.split-l span:last-child b{color:var(--hero-warn)}
+/* графік трьох сценаріїв */
+.chart{display:block;width:100%;overflow:visible}
+.chart text{font-family:var(--font);fill:var(--hero-mut);font-size:13px}
+.chart text.n{fill:#fff;font-size:16px;font-weight:750}
+.chart text.nb{fill:var(--hero-good);font-size:17px;font-weight:800}
+.chart text.lb{fill:var(--hero-good);font-weight:700}
+.chart .base{stroke-dasharray:1;stroke-dashoffset:0}
+.chart.draw .base{animation:draw .7s cubic-bezier(.3,.7,.3,1) both}
+.chart.draw .fade{animation:fade .5s .35s both}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.view-in>*{animation:rise .32s cubic-bezier(.2,.7,.3,1) both}
+.view-in>*:nth-child(2){animation-delay:.04s}.view-in>*:nth-child(3){animation-delay:.08s}.view-in>*:nth-child(n+4){animation-delay:.12s}
 
-/* ---------- «Як ми рахуємо?» ---------- */
+/* ---------- Блоки результату ---------- */
+.k{font-size:15px;color:var(--muted);margin:0;line-height:1.35}
+.big{font-size:32px;font-weight:800;letter-spacing:-.025em;line-height:1.1;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px}
+.big small{font-size:16px;color:var(--muted);font-weight:600;letter-spacing:0}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-weight:700;font-size:14px;justify-self:start;background:var(--good-soft);color:var(--good);line-height:1.25}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+dl.rows{margin:0;display:grid;font-size:15px}
+dl.rows>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+dl.rows>div:first-child{border-top:0;padding-top:0}
+dl.rows>div:last-child{padding-bottom:0}
+dl.rows dt{color:var(--fg);min-width:0}
+dl.rows dt small{display:block;font-size:14px;color:var(--muted)}
+dl.rows dd{margin:0;font-weight:700;text-align:right;white-space:nowrap}
+dl.rows dd.wrapok{white-space:normal}
+/* рядок «що ви обрали» + «Змінити» */
+.sumrow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:4px 6px 4px 16px;min-height:56px;font-size:15px;line-height:1.3;box-shadow:var(--shadow)}
+.sumrow>span{min-width:0}
+.linkbtn{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--fg);font-size:15px;font-weight:700;min-height:var(--tap);min-width:var(--tap);padding:0 10px;text-align:left;border-radius:12px;text-decoration:underline;text-decoration-color:var(--ctl);text-underline-offset:3px}
+.linkbtn:active{background:var(--soft)}
+/* іконка + текст (захист, примітки) */
+.info{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start}
+.info>.ib{width:40px;height:40px;border-radius:12px;background:var(--soft);display:grid;place-items:center;color:var(--fg)}
+.info p{margin:0;font-size:15px;line-height:1.4}
+.info p+p{margin-top:4px;color:var(--muted);font-size:14px}
+/* «Що буде після запису» */
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:15px;line-height:1.35;counter-reset:st}
+.steps li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;counter-increment:st}
+.steps li::before{content:counter(st);width:28px;height:28px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:14px;font-weight:750;margin-top:-3px}
+.trust{font-size:14px;color:var(--muted);margin:0;line-height:1.4;padding-top:12px;border-top:1px solid var(--line)}
+.list{display:grid;margin:0;padding:0;list-style:none;font-size:15px;line-height:1.3}
+.list li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:1px solid var(--line);padding:11px 0}
+.list li:first-child{border-top:0;padding-top:0}
+.list li:last-child{padding-bottom:0}
+.list b{white-space:nowrap;text-align:right}
+.list b.wrapok{white-space:normal;max-width:52%}
+.callout{background:var(--soft);border-radius:var(--r);padding:16px;display:grid;gap:10px;font-size:15px;line-height:1.45}
+.callout p{margin:0}
+
+/* ---------- «Як ми рахуємо?» і дрібний рядок бренду ---------- */
 details.how{border:1px solid var(--line);border-radius:var(--r);background:transparent}
-details.how summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:0 16px;font-size:.9rem;font-weight:600;color:var(--muted);cursor:pointer}
+details.how summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:0 16px;font-size:15px;font-weight:600;color:var(--fg);cursor:pointer}
 details.how summary::-webkit-details-marker{display:none}
 details.how summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin:-4px 4px 0 0;transition:transform .15s}
 details.how[open] summary::after{transform:rotate(-135deg);margin-top:4px}
-details.how p{margin:0;padding:0 16px 14px;font-size:.8rem;color:var(--muted);line-height:1.5}
-.fine{font-size:.78rem;color:var(--muted);margin:0;line-height:1.45;padding:0 2px}
+details.how p{margin:0;padding:0 16px 14px;font-size:14px;color:var(--muted);line-height:1.5}
+.fine{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--muted);margin:0;line-height:1.45;padding:0 2px}
+.fine svg.mk{margin-top:3px}
+.fine b{color:var(--fg);font-weight:700}
 
 /* ---------- Кнопки ---------- */
-.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:50px;padding:8px 14px;border:0;border-radius:14px;
-  background:var(--accent);color:var(--accent-ink);font-size:1rem;font-weight:700;line-height:1.2;text-align:center;text-decoration:none}
-.btn:active{filter:brightness(.94)}
-.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line);min-height:var(--tap);font-size:.93rem;font-weight:650}
-.btn.sec{background:var(--soft);color:var(--fg);min-height:var(--tap);font-size:.93rem;font-weight:650}
-.linkbtn{border:0;background:none;color:var(--accent);font-size:.9rem;font-weight:650;min-height:var(--tap);padding:0 4px;text-align:left}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;padding:8px 14px;border:0;border-radius:16px;
+  background:var(--ink);color:var(--ink-on);font-size:16px;font-weight:700;line-height:1.2;text-align:center;text-decoration:none;transition:transform .08s,filter .12s}
+.btn:active{transform:scale(.985);filter:brightness(.93)}
+/* Головна дія: запис на консультацію. Єдине місце із заливкою коралом. */
+.btn.cta{background:var(--cta);color:var(--cta-on);flex-direction:column;gap:1px;min-height:54px;padding:6px 12px}
+.btn.cta .l1{display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:750}
+.btn.cta .l2{font-size:14px;font-weight:600;line-height:1.2}
+.btn.sec{background:var(--soft);color:var(--fg);min-height:var(--tap);font-size:15px;border:1.5px solid var(--ctl)}
+.btn.ghost{background:var(--card);color:var(--fg);border:1.5px solid var(--ctl);min-height:48px;font-size:15px;justify-content:space-between;padding:8px 14px 8px 16px;text-align:left}
 
 /* ---------- Закріплена панель дії ---------- */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);
-  padding:6px max(var(--gut),env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(var(--gut),env(safe-area-inset-left,0px));
-  box-shadow:0 -4px 16px rgba(16,24,40,.06)}
-.dock-in{max-width:560px;margin:0 auto;display:grid;gap:4px}
-.dock-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:var(--tap)}
-.dock-sum{display:grid;min-width:0;line-height:1.2}
-.dock-sum span{font-size:.74rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dock-sum b{font-size:1.12rem;font-weight:750;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
-.dock-link{flex:none;border:0;background:none;color:var(--accent);font-size:.84rem;font-weight:650;min-height:var(--tap);padding:0 2px 0 8px;text-align:right;line-height:1.15}
-.dock-link .sm{display:none}
-body.has-dock{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+  padding:5px max(var(--gut),env(safe-area-inset-right,0px)) calc(7px + env(safe-area-inset-bottom,0px)) max(var(--gut),env(safe-area-inset-left,0px));
+  box-shadow:0 -4px 16px rgba(27,22,32,.06)}
+.dock-in{max-width:560px;margin:0 auto;display:grid;gap:2px}
+.dock-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px}
+/* жива цифра: натискається і теж веде до результату */
+.dock-sum{display:grid;flex:1 1 auto;min-width:0;min-height:48px;align-content:center;line-height:1.2;border:0;background:none;padding:0;text-align:left;color:var(--fg);border-radius:12px}
+.dock-sum:active{background:var(--soft)}
+.dock-sum:disabled{opacity:1;cursor:default}
+.dock-sum span{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock-sum b{font-size:17px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+/* головна кнопка форми — темна «Показати розрахунок»; корал з'являється лише на результаті */
+.dock-go{flex:none;display:inline-flex;align-items:center;gap:4px;border:0;background:var(--ink);color:var(--ink-on);font-size:15px;font-weight:700;min-height:48px;padding:0 12px 0 18px;border-radius:16px;white-space:nowrap;transition:transform .08s,filter .12s}
+.dock-go:active{transform:scale(.985);filter:brightness(.93)}
+.dock-go .sm{display:none}
+.dock-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;background:none;color:var(--fg);font-size:15px;font-weight:700;min-height:var(--tap);margin:0 0 -6px;padding:0 8px;border-radius:12px}
+.dock-link:active{background:var(--soft)}
+/* форма: жива сума + «Розрахунок»; результат: без дубля суми, з «Надіслати розрахунок у чат» */
+body[data-view="res"] .dock-top{display:none}
+body[data-view="form"] .dock-link,body[data-view="form"] .dock .btn.cta{display:none}
+body.has-dock{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))}
 body.kb .dock{display:none}
 @media (max-width:359px){
-  .dock-link .lg{display:none}.dock-link .sm{display:inline}
-  .big{font-size:1.8rem}.gap .v{font-size:1.5rem}
-  .card{padding:12px 14px}
-  .btn{font-size:.95rem}
-  .seg button{font-size:.84rem;padding:4px 2px}
+  .card{padding:14px}
+  .hero{padding:18px 16px}
+  .btn.cta .l1{font-size:15px;gap:6px}
+  .seg button{font-size:14px;padding:4px 2px;gap:4px}
+  .brand{display:flex;align-items:center;gap:7px;margin:0 0 2px;font-size:14px;font-weight:650;color:var(--muted);letter-spacing:-.005em}
+.ph h1{font-size:22px}
+  .chips button{padding:6px 11px}
+  .dock-sum b{font-size:16px}
+  .dock-go .lg{display:none}.dock-go .sm{display:inline}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* часова лінія «свої гроші → державна пенсія» (ранній вихід) */
+.tl{display:flex;gap:4px}
+.tl>div{flex:1 1 0;min-width:104px;display:grid;gap:6px;font-size:14px;color:var(--hero-mut);line-height:1.3}
+.tl i{display:block;height:12px;border-radius:6px;background:#fff}
+.tl i.own{background:none;border:2px dashed var(--hero-warn)}
+.tl b{color:#fff}
+.card-h{display:grid;gap:3px}
+/* на вузьких екранах кнопка форми коротша, щоб підпис живої цифри не обрізався */
+@media (max-width:379px){.dock-go .lg{display:none}.dock-go .sm{display:inline}}
