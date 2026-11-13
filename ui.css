@@ -291,3 +291,10 @@ body.kb .dock{display:none}
 .card-h{display:grid;gap:3px}
 /* на вузьких екранах кнопка форми коротша, щоб підпис живої цифри не обрізався */
 @media (max-width:379px){.dock-go .lg{display:none}.dock-go .sm{display:inline}}
+
+/* ---------- Поділитися (результат пенсії, дитячої, накопичення) ----------
+   Тихий блок нижче «Що буде після запису»: без коралу й заливки, не конкурує із записом у нижній панелі. */
+.share{gap:12px}
+.share-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.share-b .btn{min-height:48px;font-size:14.5px;gap:6px;padding:8px 6px;line-height:1.15;background:var(--card);color:var(--fg);border:1.5px solid var(--ctl)}
+.share-b .btn .ic{flex:none}
