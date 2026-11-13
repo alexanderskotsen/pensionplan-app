@@ -6,6 +6,8 @@
 <title>Інвестиційний калькулятор</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="bridge.js?v=4"></script>
+<script>/* S&P 500 сховано 13.11.2026: старі кнопки ведуть на «Накопичити». Повернути — INVEST_ON = true */
+var INVEST_ON = false; if (!INVEST_ON) location.replace('save.html' + location.search);</script>
 <style>
 *{box-sizing:border-box}html,body{margin:0}
 

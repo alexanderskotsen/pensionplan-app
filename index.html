@@ -59,7 +59,7 @@ dl{margin:10px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 10px;font
 </head>
 <body>
 <div class="wrap">
-  <div class="tabs"><button id="tab-n">Накопичити</button><button id="tab-p" class="on">Пенсія</button><button id="tab-c">Дитині</button><button id="tab-i">Інвестиції</button><button id="tab-s">Захист</button><button id="tab-g">Гра</button></div>
+  <div class="tabs"><button id="tab-n">Накопичити</button><button id="tab-p" class="on">Пенсія</button><button id="tab-c">Дитині</button><button id="tab-s">Захист</button><button id="tab-g">Гра</button></div>
 
   <!-- ПЕНСІЯ: ФОРМА -->
   <section id="p-form">
@@ -173,7 +173,7 @@ $('cpay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)
 $('cgoal-own').addEventListener('input',upd);
 $('tab-p').onclick=()=>{S.tab='p';upd()};$('tab-c').onclick=()=>{S.tab='c';upd()};
 const navGo=p=>{const q=new URLSearchParams(location.search);q.delete('tab');const t=q.toString();location.href=p+(t?'?'+t:'')};
-$('tab-n').onclick=()=>navGo('save.html');$('tab-i').onclick=()=>navGo('invest.html');$('tab-g').onclick=()=>navGo('game.html');$('tab-s').onclick=()=>navGo('insure.html');
+$('tab-n').onclick=()=>navGo('save.html');$('tab-g').onclick=()=>navGo('game.html');$('tab-s').onclick=()=>navGo('insure.html');
 $('p-back').onclick=()=>{S.view='form';upd();scrollTo(0,0)};
 const v=id=>Number($(id).value);
 function fill(el){const p=(el.value-el.min)/(el.max-el.min)*100;el.style.setProperty('--p',p+'%')}
