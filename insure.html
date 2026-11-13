@@ -5,89 +5,37 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Цивілка і медстраховка</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="ui.css?v=1">
 <script src="bridge.js?v=4"></script>
+<script src="ui.js?v=1"></script>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
-.navtabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;margin:0 auto 10px;max-width:520px;gap:2px}
-.navtabs button{flex:1;min-width:0;border:0;background:none;padding:9px 0;font:600 12.5px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#4f5868;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.navtabs button.on{background:#fff;color:#151b26;box-shadow:0 1px 2px rgba(0,0,0,.08)}
-[hidden]{display:none!important}
-:root{
-  --bg:#f5f7f9; --card:#ffffff; --fg:#14202b; --muted:#5b6b78; --line:#dde3e8; --soft:#eef2f5;
-  --accent:#1f5fbf; --accent-soft:#e7effb; --accent-ink:#ffffff;
-  --good:#1d7a4a; --good-soft:#e4f3ea; --bad:#b4372c; --bad-soft:#fbe9e7;
-  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#11161c; --card:#19212a; --fg:#e7edf2; --muted:#98a6b3; --line:#2b3642; --soft:#202a35;
-  --accent:#5b9bef; --accent-soft:#1c2c42; --accent-ink:#0b1622;
-  --good:#5fca8a; --good-soft:#163325; --bad:#f08a80; --bad-soft:#3a1d1a; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#11161c; --card:#19212a; --fg:#e7edf2; --muted:#98a6b3; --line:#2b3642; --soft:#202a35;
-  --accent:#5b9bef; --accent-soft:#1c2c42; --accent-ink:#0b1622;
-  --good:#5fca8a; --good-soft:#163325; --bad:#f08a80; --bad-soft:#3a1d1a; color-scheme:dark}
-body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
-.wrap{max-width:560px;margin:0 auto;display:grid;gap:14px}
-h1{font-size:1.4rem;line-height:1.2;margin:0;text-wrap:balance;letter-spacing:-.01em}
-h2{font-size:1rem;margin:0}
-.sub{margin:4px 0 0;color:var(--muted)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:14px;min-width:0}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--soft);border-radius:12px;padding:4px}
-.tabs button,.chips button{font:inherit;border:0;cursor:pointer;color:var(--fg);background:transparent;border-radius:9px;padding:9px 8px;font-weight:600}
-.tabs button[aria-selected="true"]{background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.lbl{display:grid;gap:6px;font-size:.86rem;font-weight:600;min-width:0}
-.lbl small{font-weight:400;color:var(--muted);font-size:.78rem}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{border:1px solid var(--line);padding:7px 12px;font-size:.9rem;font-weight:500}
-.chips button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
 .plans{display:grid;gap:8px}
-.plans button{font:inherit;text-align:left;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:12px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}
+.plans button{text-align:left;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:var(--r-sm);padding:10px 14px;min-height:56px;display:grid;gap:2px;font-weight:400}
 .plans button b{font-size:.95rem}
 .plans button span{font-size:.8rem;color:var(--muted)}
 .plans button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
-.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.9rem;font-weight:500;cursor:pointer}
-.toggle small{display:block;color:var(--muted);font-size:.78rem;font-weight:400}
-.toggle input{width:20px;height:20px;flex:none;accent-color:var(--accent)}
-button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.hero{display:grid;gap:4px}
-.hero .k{font-size:.85rem;color:var(--muted)}
-.big{font-size:2rem;font-weight:750;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
-.pill{display:inline-block;padding:4px 10px;border-radius:99px;font-weight:650;font-size:.85rem;justify-self:start;background:var(--good-soft);color:var(--good)}
+.plans button[aria-pressed="true"] b{color:var(--accent)}
 .kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.kv div{background:var(--soft);border-radius:10px;padding:10px;min-width:0}
+.kv div{background:var(--soft);border-radius:10px;padding:10px 8px;min-width:0}
 .kv b{display:block;font-size:.95rem;font-variant-numeric:tabular-nums}
-.kv span{font-size:.75rem;color:var(--muted)}
-.list{display:grid;gap:6px;margin:0;padding:0;list-style:none;font-size:.9rem}
-.list li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:6px}
-.list li:last-child{border-bottom:0;padding-bottom:0}
-.list b{white-space:nowrap;font-variant-numeric:tabular-nums}
-.callout{background:var(--accent-soft);border-radius:12px;padding:12px 14px;font-size:.92rem}
-.callout.warn{background:var(--bad-soft)}
-.note{font-size:.84rem;color:var(--muted);margin:0}
-.cta{display:block;width:100%;text-align:center;border:0;cursor:pointer;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:650;border-radius:12px;padding:13px}
-.cta2{display:block;width:100%;text-align:center;cursor:pointer;background:transparent;color:var(--accent);font:inherit;font-weight:600;font-size:.92rem;border:1px solid var(--line);border-radius:12px;padding:11px}
-.fine{font-size:.76rem;color:var(--muted);margin:0}
-.navtabs{overflow-x:auto;scrollbar-width:none}.navtabs::-webkit-scrollbar{display:none}.navtabs button{flex:0 0 auto;padding:9px 12px}
+.kv span{font-size:.74rem;color:var(--muted);line-height:1.25;display:block}
+.toggles{display:grid}
 </style>
 </head>
 <body>
-<nav class="navtabs"><button type="button" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="on" onclick="navGo('insure.html')">Захист</button><button type="button" onclick="navGo('game.html')">Гра</button></nav>
-<script>
-function navGo(page, tab){ const q = new URLSearchParams(location.search); q.delete('tab'); if (tab) q.set('tab', tab); const s = q.toString(); location.href = page + (s ? '?' + s : ''); }
-</script>
+<nav class="nav"><div class="nav-in"><button type="button" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="on" onclick="navGo('insure.html')">Захист</button><button type="button" onclick="navGo('game.html')">Гра</button></div></nav>
 
 <div class="wrap">
-  <div class="tabs" role="tablist">
+  <div class="seg" role="tablist">
     <button type="button" role="tab" id="tabAuto" aria-selected="true">🚗 Автоцивілка</button>
     <button type="button" role="tab" id="tabMed" aria-selected="false">🏥 Медстраховка</button>
   </div>
 
   <!-- ================= АВТОЦИВІЛКА ================= -->
-  <section id="auto" class="wrap" style="gap:14px">
-    <header>
-      <h1>Скільки коштує автоцивілка для вашого авто</h1>
-      <p class="sub">Орієнтовна ціна поліса ОСЦПВ на 2026 рік. Точну найнижчу ціну підберемо серед страхових.</p>
+  <section id="auto" class="stack">
+    <header class="ph">
+      <h1>Скільки коштує автоцивілка</h1>
+      <p>Чотири відповіді — й орієнтовна ціна поліса на 2026 рік. Найнижчу підберемо серед страхових.</p>
     </header>
     <div class="card">
       <div class="lbl">Двигун
@@ -102,16 +50,16 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
       <div class="lbl">Строк поліса
         <div class="chips" id="aTerm"><button type="button" data-v="12" aria-pressed="true">12 місяців</button><button type="button" data-v="6" aria-pressed="false">6 місяців</button></div>
       </div>
+      <div class="toggles">
       <label class="toggle"><span>Пільга 50%<small>УБД, особа з інвалідністю, пенсіонер — авто у власності, до 2,5 л</small></span><input type="checkbox" id="aBenefit"></label>
       <label class="toggle"><span>Таксі чи перевезення за гроші</span><input type="checkbox" id="aTaxi"></label>
+      </div>
     </div>
 
-    <div class="card" aria-live="polite">
-      <div class="hero">
-        <span class="k" id="aK">Поліс на 12 місяців коштуватиме орієнтовно</span>
-        <span class="big" id="aV">—</span>
-        <span class="pill" id="aP">—</span>
-      </div>
+    <div class="card res" aria-live="polite">
+      <span class="k" id="aK">Поліс на 12 місяців коштуватиме орієнтовно</span>
+      <span class="big" id="aV">—</span>
+      <span class="pill" id="aP">—</span>
       <div class="kv"><div><b>250 тис.</b><span>на ремонт чужого авто</span></div><div><b>500 тис.</b><span>на лікування людей</span></div><div><b>0 грн</b><span>франшиза</span></div></div>
       <p class="note" id="aNote"></p>
     </div>
@@ -127,15 +75,13 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
       <div class="callout">Цивілка захищає інших від вас. Щоб захистити себе, додають розширений ліміт (ДЦВ), КАСКО і страхування життя та здоров'я водія. Консультант покаже, що з цього варте ваших грошей.</div>
     </div>
 
-    <button class="cta" id="aCta" type="button">📞 Записатися на консультацію</button>
-    <button class="cta2" id="aCta2" type="button">Надіслати розрахунок у чат</button>
   </section>
 
   <!-- ================= МЕДСТРАХОВКА ================= -->
-  <section id="med" class="wrap" style="gap:14px" hidden>
-    <header>
+  <section id="med" class="stack" hidden>
+    <header class="ph">
       <h1>Скільки коштує медична страховка</h1>
-      <p class="sub">Орієнтовна ціна на рік для вас чи всієї родини. Точну ціну й клініки підберемо під вас.</p>
+      <p>Оберіть програму і склад родини — побачите орієнтовну ціну на рік. Клініки підберемо під вас.</p>
     </header>
     <div class="card">
       <div class="lbl">Програма
@@ -157,16 +103,16 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
       <div class="lbl">Місто
         <div class="chips" id="mZone"><button type="button" data-v="kyiv" aria-pressed="true">Київ</button><button type="button" data-v="obl" aria-pressed="false">Обласний центр</button><button type="button" data-v="small" aria-pressed="false">Інше місто</button></div>
       </div>
+      <div class="toggles">
       <label class="toggle"><span>Стоматологія<small>лікування гострого болю</small></span><input type="checkbox" id="mDent"></label>
       <label class="toggle"><span>Щорічний check-up<small>повне обстеження раз на рік</small></span><input type="checkbox" id="mCheck"></label>
+      </div>
     </div>
 
-    <div class="card" aria-live="polite">
-      <div class="hero">
-        <span class="k" id="mK">На рік орієнтовно</span>
-        <span class="big" id="mV">—</span>
-        <span class="pill" id="mP">—</span>
-      </div>
+    <div class="card res" aria-live="polite">
+      <span class="k" id="mK">На рік орієнтовно</span>
+      <span class="big" id="mV">—</span>
+      <span class="pill" id="mP">—</span>
       <p class="note" id="mNote"></p>
     </div>
 
@@ -181,13 +127,20 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
       <div class="callout warn">Більшість медстраховок не покривають онкологію, інсульт, інфаркт і хронічні хвороби. Саме вони коштують сотні тисяч. Їх закриває поліс страхування життя з покриттям критичних хвороб — він ще й накопичує гроші.</div>
     </div>
 
-    <button class="cta" id="mCta" type="button">📞 Записатися на консультацію</button>
-    <button class="cta2" id="mCta2" type="button">Надіслати розрахунок у чат</button>
   </section>
 
+  <p class="fine">Ціни орієнтовні. Точну назве консультант — безкоштовно.</p>
+  <details class="how"><summary>Як ми рахуємо?</summary><p>Ціни орієнтовні, станом на листопад 2026 року. З 2025 року ціну автоцивілки визначає кожна страхова сама, тому вона різниться між компаніями до 25%; ліміти покриття для всіх однакові. Ціна медстраховки залежить від програми, віку, здоров'я й переліку клінік — остаточну називає страхова після анкети. Ціни лікування — приблизні для приватних клінік великих міст.</p></details>
   <p class="fine" id="ctaNote" hidden>Відкрийте калькулятор через кнопку в Telegram-боті, щоб надіслати розрахунок консультанту.</p>
-  <p class="fine">Ціни орієнтовні, станом на листопад 2026 року. З 2025 року ціну автоцивілки визначає кожна страхова сама, тому вона різниться між компаніями до 25%; ліміти покриття для всіх однакові. Ціна медстраховки залежить від програми, віку, здоров'я й переліку клінік — остаточну називає страхова після анкети. Ціни лікування — приблизні для приватних клінік великих міст.</p>
 </div>
+
+<div class="dock"><div class="dock-in">
+  <div class="dock-top">
+    <div class="dock-sum"><span id="dockK"></span><b id="dockV"></b></div>
+    <button type="button" class="dock-link" id="cta2"><span class="lg">Надіслати розрахунок у чат</span><span class="sm">Надіслати в чат</span></button>
+  </div>
+  <button type="button" class="btn" id="cta">📞 Записатися на консультацію</button>
+</div></div>
 
 <script>
 (function(){
@@ -242,6 +195,8 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     $('mP').textContent = '≈ ' + fmt(m.lo / 12) + ' на місяць';
     $('mNote').textContent = 'Верхня межа — до ' + fmt(m.hi) + ' за дорожчі клініки чи стан здоров’я.' +
       (S.age === 'a4' ? ' Після 60 частина страхових не приймає нових клієнтів — підберемо тих, хто приймає.' : '');
+    $('dockK').textContent = S.tab === 'auto' ? 'Автоцивілка на ' + S.term + ' міс.' : 'Медстраховка на рік' + (m.n > 1 ? ' · ' + m.n + ' людей' : '');
+    $('dockV').textContent = 'від ' + fmt(S.tab === 'auto' ? a.lo : m.lo);
   }
 
   function chips(id, key, num){ $(id).querySelectorAll('button').forEach(b => b.onclick = () => {
@@ -264,11 +219,10 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     send({ a:'auto', w, v:{ engine:S.engine, zone:S.zone, dtp:S.dtp, term:S.term, benefit:S.benefit ? 1 : 0, taxi:S.taxi ? 1 : 0, lo:a.lo, hi:a.hi } }); };
   const sendMed = w => { const m = medPrice();
     send({ a:'med', w, v:{ plan:S.plan, adults:S.adults, age:S.age, kids:S.kids, zone:S.mzone, dent:S.dent ? 1 : 0, check:S.check ? 1 : 0, lo:m.lo, hi:m.hi } }); };
-  $('aCta').onclick = () => sendAuto(1); $('aCta2').onclick = () => sendAuto(0);
-  $('mCta').onclick = () => sendMed(1); $('mCta2').onclick = () => sendMed(0);
+  $('cta').onclick = () => (S.tab === 'auto' ? sendAuto : sendMed)(1);
+  $('cta2').onclick = () => (S.tab === 'auto' ? sendAuto : sendMed)(0);
   render();
 })();
 </script>
-<script>document.querySelectorAll('.navtabs .on,.tabs .on').forEach(b=>{try{b.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}})</script>
 </body>
 </html>

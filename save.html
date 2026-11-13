@@ -5,124 +5,86 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Накопичити гроші</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="ui.css?v=1">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=1"></script>
+<script src="ui.js?v=1"></script>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
-[hidden]{display:none!important}
-.navtabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;margin:0 auto 10px;max-width:520px;gap:2px}
-.navtabs button{flex:1;min-width:0;border:0;background:none;padding:9px 0;font:600 12.5px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#4f5868;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.navtabs button.on{background:#fff;color:#151b26;box-shadow:0 1px 2px rgba(0,0,0,.08)}
-:root{
-  --bg:#f5f7f9; --card:#ffffff; --fg:#14202b; --muted:#5b6b78; --line:#dde3e8; --soft:#eef2f5;
-  --accent:#1f5fbf; --accent-soft:#e7effb; --accent-ink:#ffffff;
-  --good:#1d7a4a; --good-soft:#e4f3ea; --gold:#e8a443; --gray:#8a94a3; --gray2:#c4cad3;
-  --warn:#8a5a00; --warn-soft:#fbf1dc;
-  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#11161c; --card:#19212a; --fg:#e7edf2; --muted:#98a6b3; --line:#2b3642; --soft:#202a35;
-  --accent:#5b9bef; --accent-soft:#1c2c42; --accent-ink:#0b1622;
-  --good:#5fca8a; --good-soft:#163325; --gold:#e0a24e; --gray:#6b7787; --gray2:#3a4552;
-  --warn:#e6b96a; --warn-soft:#3a2e15; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#11161c; --card:#19212a; --fg:#e7edf2; --muted:#98a6b3; --line:#2b3642; --soft:#202a35;
-  --accent:#5b9bef; --accent-soft:#1c2c42; --accent-ink:#0b1622;
-  --good:#5fca8a; --good-soft:#163325; --gold:#e0a24e; --gray:#6b7787; --gray2:#3a4552;
-  --warn:#e6b96a; --warn-soft:#3a2e15; color-scheme:dark}
-body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
-.wrap{max-width:560px;margin:0 auto;display:grid;gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;min-width:0}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--soft);border-radius:12px;padding:4px}
-.tabs button,.chips button{font:inherit;border:0;cursor:pointer;color:var(--fg);background:transparent;border-radius:9px;padding:9px 8px;font-weight:600}
-.tabs button[aria-selected="true"]{background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{border:1px solid var(--line);padding:7px 12px;font-size:.9rem;font-weight:500}
-.chips button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
-.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.86rem;color:var(--muted)}
-.row b{color:var(--fg);font-size:1rem;white-space:nowrap;font-variant-numeric:tabular-nums}
-.hint{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);margin-top:-6px}
-input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:28px;background:transparent;margin:0}
-input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(to right,var(--accent) var(--p,50%),var(--line) var(--p,50%))}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--accent);margin-top:-10px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:var(--line)}
-input[type=range]::-moz-range-progress{height:4px;border-radius:4px;background:var(--accent)}
-input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid var(--accent)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.res .k{font-size:.86rem;color:var(--muted)}
-.big{font-size:2rem;font-weight:750;letter-spacing:-.02em;line-height:1.1;color:var(--good);font-variant-numeric:tabular-nums}
-.big small{font-size:.95rem;color:var(--muted);font-weight:500}
-dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:.9rem}dt{color:var(--muted)}dt small{font-size:.74rem;opacity:.85}dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
-.pill{display:inline-block;padding:4px 10px;border-radius:99px;font-weight:650;font-size:.85rem;justify-self:start;background:var(--good-soft);color:var(--good)}
-.pill.warn{background:var(--warn-soft);color:var(--warn)}
-.big.flat{color:var(--fg)}
-.warnnote{font-size:.84rem;line-height:1.4;margin:0;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--warn)}
-.cta2{display:block;width:100%;text-align:center;cursor:pointer;background:transparent;color:var(--accent);font:inherit;font-weight:600;font-size:.92rem;border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:-4px}
-.shield{background:var(--accent-soft);border-radius:14px;padding:14px 16px;display:grid;gap:4px}
-.shield .k{font-size:.86rem}.shield .v{font-size:1.45rem;font-weight:750;color:var(--accent);font-variant-numeric:tabular-nums}
-.note{font-size:.8rem;color:var(--muted);margin:0;line-height:1.4}
 .legend{display:flex;gap:14px;font-size:.78rem;color:var(--muted)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-.cmp{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;font-size:.84rem}
-.cmp .b{height:24px;border-radius:6px;display:flex;align-items:center;padding:0 8px;color:#fff;font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;min-width:0}
-.cta{display:block;width:100%;text-align:center;border:0;cursor:pointer;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:650;border-radius:12px;padding:14px}
-button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 svg text{fill:var(--muted)}
-.navtabs{overflow-x:auto;scrollbar-width:none}.navtabs::-webkit-scrollbar{display:none}.navtabs button{flex:0 0 auto;padding:9px 12px}
+.shield{background:var(--accent-soft);border-radius:var(--r);padding:14px 16px;display:grid;gap:4px}
+.shield .k{color:var(--fg)}
+.shield .v{font-size:1.5rem;font-weight:750;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.shield .note{color:var(--fg);opacity:.85}
+/* порівняння: підпис над смугою, щоб текст не обрізався на вузьких екранах */
+.cmp{display:grid;gap:10px}
+.cmp .r{display:grid;gap:4px}
+.cmp .t{display:flex;justify-content:space-between;gap:10px;font-size:.86rem;flex-wrap:wrap}
+.cmp .t b{font-weight:650}
+.cmp .t span{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.cmp .tr{height:10px;border-radius:6px;background:var(--soft);overflow:hidden}
+.cmp .tr i{display:block;height:100%;border-radius:6px;background:var(--gray)}
+.cmp .tr i.g{background:var(--good)}
 </style>
 </head>
 <body>
-<nav class="navtabs"><button type="button" class="on" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" onclick="navGo('insure.html')">Захист</button><button type="button" onclick="navGo('game.html')">Гра</button></nav>
-<script>
-function navGo(page, tab){ const q = new URLSearchParams(location.search); q.delete('tab'); if (tab) q.set('tab', tab); const s = q.toString(); location.href = page + (s ? '?' + s : ''); }
-</script>
+<nav class="nav"><div class="nav-in"><button type="button" class="on" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" onclick="navGo('insure.html')">Захист</button><button type="button" onclick="navGo('game.html')">Гра</button></div></nav>
 
 <div class="wrap">
-  <div class="tabs" role="tablist">
+  <header class="ph">
+    <h1>Накопичити гроші</h1>
+    <p>Вкажіть внесок і строк — побачите, скільки збереться і на яку суму ви під захистом.</p>
+  </header>
+
+  <div class="seg" role="tablist">
     <button type="button" role="tab" id="tabAmount" aria-selected="true">Скільки накопичу</button>
     <button type="button" role="tab" id="tabGoal" aria-selected="false">Хочу суму</button>
   </div>
 
-  <div class="card">
-    <div class="row">Валюта</div>
-    <div class="chips" id="cCur"><button type="button" data-v="uah">₴ гривня</button><button type="button" data-v="usd">$ долар</button></div>
-  </div>
-
   <div class="card" id="boxPay">
-    <div class="row"><span id="payLbl">Відкладаю щомісяця</span><b id="payV"></b></div>
-    <input type="range" id="pay" aria-label="Сума внеску">
-    <div class="hint"><span id="payMin"></span><span id="payMax"></span></div>
-    <div class="chips" id="cFreq"><button type="button" data-v="m">щомісяця</button><button type="button" data-v="y">раз на рік</button></div>
-  </div>
-
-  <div class="card" id="boxGoal" hidden>
-    <div class="row"><span>Хочу накопичити</span><b id="goalV"></b></div>
-    <input type="range" id="goal" aria-label="Цільова сума">
-    <div class="hint"><span id="goalMin"></span><span id="goalMax"></span></div>
+    <div class="fld" id="payFld">
+      <div class="fld-h"><label for="payN" id="payLbl">Відкладаю щомісяця</label>
+        <span class="numbox" id="payBox"><input class="num" id="payN" data-for="pay" type="text" inputmode="numeric" autocomplete="off" aria-label="Сума внеску, можна ввести"><span class="u" id="payU">грн</span></span></div>
+      <input type="range" id="pay" aria-label="Сума внеску">
+      <div class="hint"><span id="payMin"></span><span id="payMax"></span></div>
+    </div>
+    <div class="fld" id="boxGoal" hidden>
+      <div class="fld-h"><label for="goalN">Хочу накопичити</label>
+        <span class="numbox" id="goalBox"><input class="num" id="goalN" data-for="goal" type="text" inputmode="numeric" autocomplete="off" aria-label="Цільова сума, можна ввести"><span class="u" id="goalU">грн</span></span></div>
+      <input type="range" id="goal" aria-label="Цільова сума">
+      <div class="hint"><span id="goalMin"></span><span id="goalMax"></span></div>
+    </div>
+    <div class="chips fill" id="cFreq" aria-label="Як вносити"><button type="button" data-v="m">щомісяця</button><button type="button" data-v="y">раз на рік</button></div>
+    <div class="chips fill" id="cCur" aria-label="Валюта"><button type="button" data-v="uah">₴ гривня</button><button type="button" data-v="usd">$ долар</button></div>
   </div>
 
   <div class="card">
-    <div class="row"><span>Строк</span><b id="termV"></b></div>
-    <input type="range" id="term" min="10" max="50" step="1" value="15" aria-label="Строк">
-    <div class="hint"><span>10 років</span><span id="termMax">50 років</span></div>
+    <div class="fld">
+      <div class="fld-h"><label for="termN">Строк</label>
+        <span class="numbox"><input class="num" id="termN" data-for="term" type="text" inputmode="numeric" autocomplete="off" aria-label="Строк у роках, можна ввести"><span class="u" id="termU">років</span></span></div>
+      <input type="range" id="term" min="10" max="50" step="1" value="15" aria-label="Строк">
+      <div class="hint"><span>10 років</span><span id="termMax">50 років</span></div>
+    </div>
+    <div class="fld">
+      <div class="fld-h"><label for="ageN">Мій вік</label>
+        <span class="numbox"><input class="num" id="ageN" data-for="age" type="text" inputmode="numeric" autocomplete="off" aria-label="Вік, можна ввести"><span class="u">р.</span></span></div>
+      <input type="range" id="age" min="18" max="65" step="1" value="32" aria-label="Вік">
+    </div>
+    <div class="rowc"><span class="l">Стать</span>
+      <div class="chips" id="cSex"><button type="button" data-v="f">Жінка</button><button type="button" data-v="m">Чоловік</button></div></div>
   </div>
 
-  <div class="grid2">
-    <div class="card"><div class="row"><span>Вік</span><b id="ageV"></b></div><input type="range" id="age" min="18" max="65" step="1" value="32" aria-label="Вік"></div>
-    <div class="card"><div class="row">Стать</div><div class="chips" id="cSex"><button type="button" data-v="f">Ж</button><button type="button" data-v="m">Ч</button></div></div>
-  </div>
-
-  <div class="card res">
+  <div class="card res" aria-live="polite">
     <div class="k" id="resK"></div>
-    <div class="big" id="resBig"></div>
-    <dl id="resDl"></dl>
+    <div class="big good" id="resBig"></div>
     <span class="pill" id="resPill"></span>
+    <dl id="resDl"></dl>
     <p class="warnnote" id="resWarn" hidden>На короткому строку і в старшому віці значна частина внеску йде на страховий захист, тому прогноз може бути меншим за внесене. Спробуйте довший строк — результат буде кращим.</p>
   </div>
 
   <div class="card">
-    <div class="row">Як ростуть гроші</div>
+    <h2>Як ростуть гроші</h2>
     <svg id="chart" viewBox="0 0 320 140" width="100%" height="140" role="img" aria-label="Графік накопичення"></svg>
     <div class="legend"><span><i style="background:var(--accent)"></i>внески</span><span><i style="background:var(--gold)"></i>дохід</span></div>
   </div>
@@ -130,23 +92,31 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
   <div class="shield">
     <div class="k">🛡 Весь цей час ви під захистом</div>
     <div class="v" id="protV"></div>
-    <p class="note" style="color:inherit">Якщо з вами щось станеться, сім'я отримає цю суму, навіть якщо ви встигли внести лише кілька платежів. Депозит і «конверт удома» так не вміють.</p>
+    <p class="note">Якщо з вами щось станеться, сім'я отримає цю суму, навіть якщо ви встигли внести лише кілька платежів. Депозит і «конверт удома» так не вміють.</p>
   </div>
 
   <div class="card">
-    <div class="row" id="cmpT"></div>
+    <h2>Те саме, але інакше</h2>
+    <p class="mini" id="cmpT"></p>
     <div class="cmp">
-      <span>Поліс</span><div class="b" id="bPolicy" style="background:var(--good)"></div>
-      <span>Депозит</span><div class="b" style="width:88%;background:var(--gray)">дохід є, захисту немає</div>
-      <span>Удома</span><div class="b" id="bHome" style="background:var(--gray2);color:var(--fg)"></div>
+      <div class="r"><div class="t"><b>Поліс</b><span id="cmpPolicy"></span></div><div class="tr"><i class="g" id="bPolicy"></i></div></div>
+      <div class="r"><div class="t"><b>Депозит</b><span>дохід є, захисту немає</span></div><div class="tr"><i style="width:88%"></i></div></div>
+      <div class="r"><div class="t"><b>Удома</b><span id="cmpHome"></span></div><div class="tr"><i id="bHome"></i></div></div>
     </div>
   </div>
 
-  <button type="button" class="cta" id="cta">📞 Записатися на консультацію</button>
-  <button type="button" class="cta2" id="cta2">Надіслати розрахунок у чат</button>
-  <p class="note" id="ctaNote" hidden>Відкрийте цю сторінку через Telegram-бота, щоб надіслати розрахунок.</p>
-  <p class="note" id="fine"></p>
+  <p class="fine">Розрахунок орієнтовний. Точні цифри покаже консультант безкоштовно.</p>
+  <details class="how"><summary>Як ми рахуємо?</summary><p id="fine"></p></details>
+  <p class="fine" id="ctaNote" hidden>Відкрийте цю сторінку через Telegram-бота, щоб надіслати розрахунок.</p>
 </div>
+
+<div class="dock"><div class="dock-in">
+  <div class="dock-top">
+    <div class="dock-sum"><span id="dockK"></span><b id="dockV"></b></div>
+    <button type="button" class="dock-link" id="cta2"><span class="lg">Надіслати розрахунок у чат</span><span class="sm">Надіслати в чат</span></button>
+  </div>
+  <button type="button" class="btn" id="cta">📞 Записатися на консультацію</button>
+</div></div>
 
 <script>
 (function(){
@@ -221,13 +191,13 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     $('age').value = S.age; paint($('age'));
     $('tabAmount').setAttribute('aria-selected', S.mode === 'amount'); $('tabGoal').setAttribute('aria-selected', S.mode === 'goal');
     $('boxGoal').hidden = S.mode !== 'goal';
-    $('payLbl').parentElement.parentElement.querySelector('.row').hidden = S.mode === 'goal';
-    $('pay').hidden = $('payMin').parentElement.hidden = S.mode === 'goal';
+    $('payFld').hidden = S.mode === 'goal';
     [['cCur','cur'],['cFreq','freq'],['cSex','sex']].forEach(([id,k]) => $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === String(S[k]))));
     $('payLbl').textContent = S.freq === 'y' ? 'Відкладаю раз на рік' : 'Відкладаю щомісяця';
-    $('payV').textContent = money(S.pay); $('goalV').textContent = money(S.goal);
-    $('termV').textContent = S.term + ' ' + (S.term % 10 >= 2 && S.term % 10 <= 4 && (S.term < 12 || S.term > 14) ? 'роки' : 'років');
-    $('ageV').textContent = S.age;
+    const yw = S.term % 10 >= 2 && S.term % 10 <= 4 && (S.term < 12 || S.term > 14) ? 'роки' : 'років';
+    const termTxt = S.term + ' ' + yw;
+    $('termU').textContent = yw;
+    ['payU','goalU'].forEach(id => { $(id).textContent = S.cur === 'uah' ? 'грн' : '$'; $(id).parentElement.classList.toggle('pre', S.cur !== 'uah'); });
 
     let pay = S.pay;
     const per = S.freq === 'y' ? 'на рік' : 'на місяць';
@@ -239,12 +209,12 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
     }
     const r = calc(pay), usd = S.cur === 'usd';
     const loss = r.proj < r.paid;  // прогноз менший за внесене (короткий строк у старшому віці)
-    $('resBig').classList.toggle('flat', loss);
+    $('resBig').classList.toggle('good', !loss);
     if (S.mode === 'goal') {
-      $('resK').textContent = `Щоб мати ${money(S.goal)} через ${$('termV').textContent}, відкладайте`;
+      $('resK').textContent = `Щоб мати ${money(S.goal)} через ${termTxt}, відкладайте`;
       $('resBig').innerHTML = `≈ ${money(pay).replace(' грн','')} <small>${usd ? '' : 'грн '}${per}</small>`;
     } else {
-      $('resK').textContent = `Через ${$('termV').textContent} у вас буде`;
+      $('resK').textContent = `Через ${termTxt} у вас буде`;
       $('resBig').innerHTML = `≈ ${approx(r.proj).replace(' грн','')} <small>${usd ? '' : 'грн'}</small>`;
     }
     let dl = `<dt>Внесете за ${S.term} р.</dt><dd>${money(r.paid)}</dd>`;
@@ -263,17 +233,20 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
                                     : '+' + pct + '% до внесеного';
     $('resWarn').hidden = !loss;
     $('protV').textContent = approx(r.cover);
-    $('cmpT').textContent = `Те саме, але інакше · ${S.term} р. по ${money(pay)} ${per}`;
-    // смуги пропорційні сумам: довша та, де грошей більше (але не вужча за 75%, щоб вмістився підпис)
-    const top = Math.max(r.proj, r.paid) || 1, bar = n => Math.max(75, Math.round(n / top * 100)) + '%';
-    $('bPolicy').style.width = bar(r.proj); $('bPolicy').textContent = `≈ ${approx(r.proj)} + захист`;
+    $('cmpT').textContent = `${S.term} р. по ${money(pay)} ${per} — куди покласти`;
+    // смуги пропорційні сумам: довша та, де грошей більше
+    const top = Math.max(r.proj, r.paid) || 1, bar = n => Math.max(8, Math.round(n / top * 100)) + '%';
+    $('bPolicy').style.width = bar(r.proj); $('cmpPolicy').textContent = `≈ ${approx(r.proj)} + захист`;
     $('bHome').style.width = bar(r.paid);
-    $('bHome').textContent = `${money(r.paid)}, з'їдає інфляція`;
+    $('cmpHome').textContent = `${money(r.paid)}, з'їдає інфляція`;
+    $('dockK').textContent = S.mode === 'goal' ? `Відкладати ${per}` : `Через ${termTxt}`;
+    $('dockV').textContent = S.mode === 'goal' ? `≈ ${money(pay)}` : `≈ ${approx(r.proj)}`;
     $('fine').textContent = usd
       ? 'Розрахунок орієнтовний. У доларових програмах дохідність не гарантована й залежить від інвестиційного доходу страхової. Частина внеску йде на страховий захист. Точні цифри покаже консультант безкоштовно.'
       : 'Розрахунок орієнтовний, за тарифами класичних накопичувальних програм. Гарантована сума — мінімум за договором; бонус від інвестицій нараховується щороку, але не гарантований. Частина внеску йде на страховий захист. Точні цифри покаже консультант безкоштовно.';
     chart(pay);
     S._pay = pay; S._r = r;
+    if (window.UI) UI.syncNums();
   }
 
   chips('cCur','cur'); chips('cFreq','freq'); chips('cSex','sex');
@@ -285,6 +258,11 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
   $('tabGoal').onclick = () => { S.mode = 'goal'; render(); };
   if (new URLSearchParams(location.search).get('tab') === 'goal') S.mode = 'goal';
   { const pa = +new URLSearchParams(location.search).get('pa'); if (pa >= 18 && pa <= 65) S.age = pa; }  // вік з анкети
+  // передзаповнення з пенсійного калькулятора («Порахувати детально»): amt — грн на місяць, yrs — строк, sx — стать
+  { const q = new URLSearchParams(location.search), amt = +q.get('amt'), yrs = +q.get('yrs'), sx = q.get('sx'), l = LIM.uah.m;
+    if (amt > 0) S.pay = Math.min(l[1], Math.max(l[0], Math.round(amt / l[2]) * l[2]));
+    if (yrs >= 10 && yrs <= 50) S.term = Math.round(yrs);
+    if (sx === 'f' || sx === 'm') S.sex = sx; }
 
   const tg = window.Telegram && window.Telegram.WebApp;
   try { if (tg && tg.platform && tg.platform !== 'unknown') { tg.ready(); tg.expand(); } } catch (e) {}
@@ -298,6 +276,5 @@ function navGo(page, tab){ const q = new URLSearchParams(location.search); q.del
   sync(); render();
 })();
 </script>
-<script>document.querySelectorAll('.navtabs .on,.tabs .on').forEach(b=>{try{b.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}})</script>
 </body>
 </html>

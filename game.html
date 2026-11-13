@@ -5,96 +5,77 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Капітал за 60 секунд</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="ui.css?v=1">
 <script src="bridge.js?v=4"></script>
+<script src="ui.js?v=1"></script>
 <style>
-*{box-sizing:border-box}html,body{margin:0}
-
-.navtabs{display:flex;background:#e2e7ee;border-radius:10px;padding:3px;margin:0 auto 10px;max-width:520px;gap:2px}
-.navtabs button{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;background:none;padding:9px 0;font:600 12.5px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#4f5868;border-radius:8px;cursor:pointer}
-.navtabs button.on{background:#fff;color:#151b26;box-shadow:0 1px 2px rgba(0,0,0,.08)}
-[hidden]{display:none!important}
-/* Layout: phone column — HUD (capital, age bar), play field canvas, overlays for start/end screens. Light, bright, money-themed. */
-:root{
-  --bg:#eef4f1; --card:#ffffff; --fg:#13241c; --muted:#5a6d63; --line:#d6e2dc;
-  --accent:#0f8a5f; --accent-ink:#ffffff; --accent-soft:#e1f3eb;
-  --gold:#e8a317; --bad:#c8372c; --bad-soft:#fbe7e5; --violet:#6d4fd6; --blue:#2a78d6;
-  --sky1:#dff1ff; --sky2:#f6fbf8;
-  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f1714; --card:#17221d; --fg:#e6f0eb; --muted:#94a89e; --line:#28372f;
-  --accent:#3cc48f; --accent-ink:#06261a; --accent-soft:#163428; --bad:#f0857a; --bad-soft:#3a1d1a;
-  --sky1:#13212b; --sky2:#121b17; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0f1714; --card:#17221d; --fg:#e6f0eb; --muted:#94a89e; --line:#28372f;
-  --accent:#3cc48f; --accent-ink:#06261a; --accent-soft:#163428; --bad:#f0857a; --bad-soft:#3a1d1a;
-  --sky1:#13212b; --sky2:#121b17; color-scheme:dark}
-html,body{background:var(--bg);color:var(--fg);overscroll-behavior:none}
-body{font-family:var(--font);font-size:15px;line-height:1.4;
-  padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));padding-block:10px 16px;
-  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+/* Гра: шапка (капітал, вік) → ігрове поле 2:3 → екрани старту/фіналу на всю область під навігацією. Токени — з ui.css. */
+:root{--violet:#5b3fc4;--blue:#2a78d6;--sky1:#dff1ff;--sky2:#f6fbf8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sky1:#13212b;--sky2:#121b17}}
+:root[data-theme="dark"]{--sky1:#13212b;--sky2:#121b17}
+html,body{overscroll-behavior:none}
+body{padding-bottom:12px;-webkit-user-select:none;user-select:none}
+.nav{margin-bottom:8px}
 .app{max-width:440px;margin:0 auto;display:grid;gap:8px}
 .hud{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:end}
-.cap{font-size:1.9rem;font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
-.capk{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.right{text-align:right;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.cap{font-size:clamp(1.35rem,7.4vw,1.9rem);font-weight:800;letter-spacing:-.02em;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.capk{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.right{display:flex;align-items:center;gap:8px;text-align:right;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.3}
 .right b{color:var(--fg)}
 .age{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .agebar{height:8px;background:var(--line);border-radius:6px;overflow:hidden}
-.agebar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:6px}
+.agebar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--good),var(--gold));border-radius:6px}
 .badges{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;min-height:24px}
-.badge{font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
-.badge.v{background:#ece7fb;color:var(--violet)} .badge.b{background:#e3eefb;color:var(--blue)}
-.stage{position:relative;width:100%;aspect-ratio:2/3;max-height:calc(100vh - 220px);max-height:calc(100dvh - 220px);margin:0 auto;border-radius:16px;overflow:hidden;
+.badge{font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--good-soft);color:var(--good)}
+.badge.v{background:#ece7fb;color:var(--violet)}
+/* поле завжди 2:3 — на низьких екранах звужується, а не обрізається знизу */
+.stage{position:relative;width:min(100%,calc((100vh - 200px)*2/3));width:min(100%,calc((100dvh - 200px)*2/3));aspect-ratio:2/3;margin:0 auto;border-radius:16px;overflow:hidden;
   border:1px solid var(--line);background:var(--card);touch-action:none}
 canvas{display:block;width:100%;height:100%;touch-action:none}
-.over{position:absolute;inset:0;display:grid;place-items:center;padding:18px;background:var(--card);overflow-y:auto}
-.btn.link{border-color:transparent;background:none;color:var(--accent);font-weight:600;font-size:.92rem;padding:6px 16px}
-.over .in{display:grid;gap:12px;justify-items:center;text-align:center;max-width:340px;width:100%}
-h1{font-size:1.7rem;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance}
-h2{font-size:1.25rem;margin:0}
+.over{position:fixed;z-index:10;left:0;right:0;top:49px;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);
+  padding:14px max(var(--gut),env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(var(--gut),env(safe-area-inset-left,0px))}
+.over .in{display:grid;gap:10px;justify-items:center;text-align:center;max-width:400px;width:100%;margin:0 auto}
+.over h1{font-size:1.6rem;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.over h2{font-size:1.15rem;margin:0}
 .lead{margin:0;color:var(--muted)}
 .legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;text-align:left;font-size:.82rem}
-.legend div{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;align-items:center;background:var(--bg);border-radius:10px;padding:6px 8px}
+.legend div{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}
 .legend canvas{width:30px;height:30px}
-.legend b{display:block;font-size:.82rem}
+.legend b{display:block;font-size:.82rem;color:var(--fg)}
+@media (max-width:359px){.legend{grid-template-columns:1fr}}
 .legend span{color:var(--muted);font-size:.74rem}
-.btn{font:inherit;font-weight:700;width:100%;padding:13px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
-.btn.main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:1.05rem}
-.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.mini{font:inherit;font-size:.78rem;background:none;border:1px solid var(--line);border-radius:8px;padding:4px 8px;color:var(--muted);cursor:pointer}
-.res{font-size:2.3rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.btn.main{font-size:1.02rem}
+.acts{display:flex;gap:8px;width:100%}
+.acts .btn{flex:1 1 0}
+.act-s{position:sticky;bottom:0;width:100%;background:linear-gradient(to top,var(--bg) 75%,transparent);padding-top:14px}
+.mute{flex:none;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:1.1rem;padding:0}
+.res{font-size:2.3rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;gap:0}
 .split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
-.split div{background:var(--bg);border-radius:10px;padding:10px}
+.split div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
 .split b{display:block;font-variant-numeric:tabular-nums}
 .split span{font-size:.75rem;color:var(--muted)}
-.grade{font-weight:700;padding:4px 12px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.grade{font-weight:700;font-size:.9rem;padding:4px 12px;border-radius:99px;background:var(--good-soft);color:var(--good)}
 .grade.low{background:var(--bad-soft);color:var(--bad)}
-.tip{font-size:.88rem;background:var(--accent-soft);border-radius:10px;padding:10px 12px;text-align:left}
-.fine{font-size:.72rem;color:var(--muted);margin:0}
+.tip{font-size:.88rem;background:var(--accent-soft);border-radius:12px;padding:12px 14px;text-align:left;width:100%}
 .count{position:absolute;inset:0;display:grid;place-items:center;font-size:5rem;font-weight:900;color:var(--accent);pointer-events:none;text-shadow:0 2px 0 var(--card)}
-.navtabs{overflow-x:auto;scrollbar-width:none}.navtabs::-webkit-scrollbar{display:none}.navtabs button{flex:0 0 auto;padding:9px 12px}
 </style>
 </head>
 <body>
-<nav class="navtabs"><button type="button" onclick="navGo('save.html')">Накопичити</button><button type="button" class="" onclick="navGo('index.html')">Пенсія</button><button type="button" class="" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="" onclick="navGo('insure.html')">Захист</button><button type="button" class="on" onclick="navGo('game.html')">Гра</button></nav>
-<script>
-function navGo(page, tab){ const q = new URLSearchParams(location.search); q.delete('tab'); if (tab) q.set('tab', tab); const s = q.toString(); location.href = page + (s ? '?' + s : ''); }
-</script>
+<nav class="nav"><div class="nav-in"><button type="button" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" onclick="navGo('insure.html')">Захист</button><button type="button" class="on" onclick="navGo('game.html')">Гра</button></div></nav>
 
 <div class="app">
   <div class="hud">
     <div><div class="capk">Капітал</div><div class="cap" id="cap">0 грн</div></div>
-    <div class="right">внесено <b id="dep">0 грн</b><br>рекорд <b id="best">0 грн</b> <button class="mini" id="mute" type="button">звук: так</button></div>
+    <div class="right"><span>внесено <b id="dep">0 грн</b><br>рекорд <b id="best">0 грн</b></span><button class="mute" id="mute" type="button" aria-label="Звук">🔊</button></div>
     <div class="age"><span id="ageL">30 р.</span><div class="agebar"><i id="ageBar"></i></div><span>60 р.</span></div>
     <div class="badges" id="badges"></div>
   </div>
   <div class="stage" id="stage">
     <canvas id="cv" aria-label="Ігрове поле: ловіть внески скарбничкою"></canvas>
     <div class="count" id="count" hidden></div>
-    <div class="over" id="over"></div>
   </div>
 </div>
+<div class="over" id="over"></div>
 
 <script>
 (function(){
@@ -129,7 +110,7 @@ const SND = {
   tick:() => tone('sine', 880, 0, 0.08, 0.15),
   end:() => [523,659,784,1047,784,1047].forEach((f, k) => tone('triangle', f, k * 0.12, 0.25, 0.2))
 };
-function setSnd(){ $('mute').textContent = 'звук: ' + (A.on ? 'так' : 'ні'); }
+function setSnd(){ $('mute').textContent = A.on ? '🔊' : '🔇'; $('mute').setAttribute('aria-label', 'Звук: ' + (A.on ? 'увімкнено' : 'вимкнено')); }
 
 // ---------- Полотно ----------
 const $ = id => document.getElementById(id);
@@ -145,7 +126,7 @@ const TYPES = {
   coin:  { good:true, val:100,  r:13, label:'100' },
   bill:  { good:true, val:500,  r:16, label:'500' },
   gold:  { good:true, val:2000, r:17, label:'2000' },
-  policy:{ ins:true, r:18, name:'Поліс страхування життя', short:'Поліс', col:'#0f8a5f' },
+  policy:{ ins:true, r:18, name:'Поліс страхування життя', short:'Поліс', col:'#0b7a53' },
   med:   { ins:true, r:16, name:'Медична страховка', short:'Медична', col:'#d9473a' },
   auto:  { ins:true, r:16, name:'Автоцивілка', short:'Авто', col:'#6d4fd6' },
   home:  { ins:true, r:16, name:'Страхування житла', short:'Житло', col:'#2a78d6' },
@@ -161,11 +142,11 @@ function drawItem(g, type, x, y, k){
   if (type === 'coin' || type === 'gold') {
     g.fillStyle = type === 'gold' ? '#f5b81c' : '#f2c94c'; g.beginPath(); g.arc(0, 0, t.r, 0, 7); g.fill();
     g.strokeStyle = '#b88a10'; g.lineWidth = 2; g.stroke();
-    g.fillStyle = '#8a6400'; g.font = '800 ' + (type === 'gold' ? 9 : 10) + 'px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(t.label, 0, 1);
+    g.fillStyle = '#5c4300'; g.font = '800 ' + (type === 'gold' ? 9 : 10) + 'px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(t.label, 0, 1);
     if (type === 'gold') { g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 2; g.beginPath(); g.arc(0, 0, t.r + 4, -0.6, 0.6); g.stroke(); }
   } else if (type === 'bill') {
     g.fillStyle = '#5fbf7f'; roundRect(g, -20, -12, 40, 24, 4); g.fill(); g.strokeStyle = '#2f8a50'; g.lineWidth = 2; g.stroke();
-    g.fillStyle = '#1f6b3a'; g.font = '800 11px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('500', 0, 1);
+    g.fillStyle = '#0c3b1e'; g.font = '800 11px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('500', 0, 1);
   } else if (t.ins) {
     const big = type === 'policy' ? 1.15 : 1; g.scale(big, big);
     g.fillStyle = t.col; g.beginPath(); g.moveTo(0, -17); g.lineTo(14, -11); g.lineTo(12, 6); g.quadraticCurveTo(6, 14, 0, 18); g.quadraticCurveTo(-6, 14, -12, 6); g.lineTo(-14, -11); g.closePath(); g.fill();
@@ -263,7 +244,7 @@ function catchItem(it){
   const T = TYPES[it.type], now = performance.now();
   if (T.good) {
     const v = T.val * comboMult(); G.cap += v; G.dep += v; G.combo++; G.hits.good++;
-    floatText(it.x, it.y - 10, '+' + Math.round(v), css('--accent')); burst(it.x, it.y, '#f2c94c', it.type === 'gold' ? 14 : 6);
+    floatText(it.x, it.y - 10, '+' + Math.round(v), css('--good')); burst(it.x, it.y, '#f2c94c', it.type === 'gold' ? 14 : 6);
     (it.type === 'coin' ? SND.coin : it.type === 'bill' ? SND.bill : SND.gold)(); haptic('light');
   } else if (T.ins) {
     if (!G.ins[it.type]) { G.ins[it.type] = true; if (it.type === 'policy') G.policyAge = Math.floor(30 + G.t / GAME_S * YEARS); floatText(it.x, it.y - 10, T.short.toUpperCase() + ' ✓', T.col); SND.shield(); haptic('medium'); burst(it.x, it.y, T.col, 12); }
@@ -399,7 +380,7 @@ function showStart(){
     '<div class="split"><div><b>' + dayB + '</b><span>' + dayS + '</span></div>' +
       '<div><b>' + (I.chalDone ? 'Виконано ✓' : 'Челендж дня') + '</b><span>' + I.chal.t + '</span></div></div>' +
     '<p class="lead" style="font-size:.85rem">Водіть пальцем по полю. Поліс краще впіймати першим: він захищає від найдорожчого.</p>' +
-    '<button class="btn main" id="go" type="button">Почати</button></div>';
+    '<div class="act-s"><button class="btn main" id="go" type="button">Почати</button></div></div>';
   over.querySelectorAll('[data-i]').forEach(el => el.replaceWith(icon(el.dataset.i)));
   $('go').onclick = countdown;
 }
@@ -415,7 +396,7 @@ async function countdown(){
   Object.assign(G, { running:false, t:0, cap:bonus, dep:bonus, items:[], parts:[], floats:[], px:W / 2, tx:W / 2, boostUntil:0, combo:0, spawnIn:0.3,
     hits:{ good:0, trap:0 }, lost:0, envYears:0, lastTick:0, lastTrap:null, ins:{ policy:false, med:false, auto:false, home:false },
     fm:planFM(), fmLost:0, fmSaved:0, fmLog:[], warn:null, policyAge:0, startBonus:bonus });
-  if (bonus) G.warn = { text:'Бонус серії: +' + bonus.toLocaleString('uk-UA') + ' грн', sub:'Заходьте щодня, і бонус росте', col:'#0f8a5f', until:performance.now() + 4000 };
+  if (bonus) G.warn = { text:'Бонус серії: +' + bonus.toLocaleString('uk-UA') + ' грн', sub:'Заходьте щодня, і бонус росте', col:'#0b7a53', until:performance.now() + 4000 };
   over.hidden = true; const c = $('count'); c.hidden = false;
   for (const n of ['3', '2', '1']) { c.textContent = n; SND.tick(); await new Promise(r => setTimeout(r, 600)); }
   c.hidden = true; last = 0; G.running = true;
@@ -444,11 +425,11 @@ function finish(){
   over.innerHTML = '<div class="in"><h2>Вам 60. Ваш капітал:</h2><div class="res">' + short(G.cap) + '</div>' +
     '<span class="grade ' + grade[0] + '">' + grade[1] + (isBest ? ' · новий рекорд!' : '') + '</span>' +
     '<div class="split"><div><b>' + short(G.dep) + '</b><span>ви внесли</span></div><div><b>+' + short(growth) + '</b><span>дав складний відсоток</span></div></div>' + chalLine +
-    '<div class="tip">' + tips.join('<br><br>') + '</div>' +
     '<button class="btn main" id="real" type="button">📞 Записатися на консультацію</button>' +
-    '<button class="btn link" id="tochat" type="button">Надіслати результат у чат</button>' +
-    '<button class="btn" id="share" type="button">Кинути виклик друзям</button>' +
-    '<button class="btn" id="again" type="button">Зіграти ще раз</button>' +
+    '<div class="acts"><button class="btn sec" id="again" type="button">Зіграти ще раз</button>' +
+    '<button class="btn sec" id="share" type="button">Виклик друзям</button></div>' +
+    '<button class="linkbtn" id="tochat" type="button">Надіслати результат у чат</button>' +
+    '<div class="tip">' + tips.join('<br><br>') + '</div>' +
     '<p class="fine">Гра умовна: 8% на рік — ілюстрація, а не обіцянка дохідності. Умови реальних страховок залежать від програми.</p></div>';
   // w:1 — «Записатися на консультацію» (бот одразу питає номер); w:0 — лише надіслати результат у чат
   const sendRes = w => {
@@ -470,7 +451,5 @@ showStart();
 requestAnimationFrame(frame);
 })();
 </script>
-
-<script>document.querySelectorAll('.navtabs .on,.tabs .on').forEach(b=>{try{b.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}})</script>
 </body>
 </html>
