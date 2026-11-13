@@ -27,9 +27,11 @@
   function project(annual, n, rate) {
     const net = Math.max(0, annual - P.fee), guar = net / rate;
     const g = irr(annual, n, guar), dB = Math.min(0.049, P.dB0 + P.dB1 * n), dO = Math.min(0.076, P.dO0 + P.dO1 * n);
-    return { guar, base: annual * sdd(n, g + dB), opt: annual * sdd(n, g + dO), cover: guar,
-             annual, rBase: g + dB, rOpt: g + dO,
-             at: y => annual * sdd(Math.min(y, n), g + dB) };  // базовий прогноз на кінець року y
+    // 13.11.2026: основний прогноз = сценарій 12% (base = opt); сценарій 9% — base9
+    const opt = annual * sdd(n, g + dO);
+    return { guar, base: opt, opt, base9: annual * sdd(n, g + dB), cover: guar,
+             annual, rBase: g + dO, rOpt: g + dO, r9: g + dB,
+             at: y => annual * sdd(Math.min(y, n), g + dO) };  // прогноз на кінець року y
   }
   // pay — внесок за період; freq 'm' (щомісяця) або 'y' (раз на рік)
   const toAnnual = (pay, freq) => freq === 'y' ? pay : pay * 12 / P.freq;
@@ -57,8 +59,20 @@
   }
   function single(amount, age, sex, n) {
     const guar = amount / rateSingle(age, sex, n), g = Math.pow(guar / amount, 1 / n) - 1;
-    return { guar, cover: guar, paid: amount, base: amount * Math.pow(1 + g + PS.dBase, n), opt: amount * Math.pow(1 + g + PS.dOpt, n),
-             at: y => amount * Math.pow(1 + g + PS.dBase, Math.min(y, n)) };
+    const opt = amount * Math.pow(1 + g + PS.dOpt, n);
+    return { guar, cover: guar, paid: amount, base: opt, opt, base9: amount * Math.pow(1 + g + PS.dBase, n),
+             at: y => amount * Math.pow(1 + g + PS.dOpt, Math.min(y, n)) };
+  }
+  // Довічна виплата (ануїтет): % капіталу на місяць за віком початку виплат (≥55), як annuity() у tariff.py
+  const ANN = { m: [[55, .00425], [60, .00474], [65, .00544], [70, .00652]], f: [[55, .00378], [60, .00418], [65, .00473], [70, .00551]] };
+  const ANN_MIN_AGE = 55;
+  function annuity(capital, age, sex) {
+    if (age < ANN_MIN_AGE) return null;
+    const t = ANN[sex === 'f' ? 'f' : 'm'];
+    for (let j = 0; j < t.length - 1; j++) { const [a0, k0] = t[j], [a1, k1] = t[j + 1];
+      if (age <= a1) return capital * (k0 + (k1 - k0) * (age - a0) / (a1 - a0)); }
+    const [a0, k0] = t[t.length - 2], [a1, k1] = t[t.length - 1];
+    return capital * (k1 + (k1 - k0) * (age - a1) / (a1 - a0));
   }
   // Звільнення від внесків у дитячій програмі (якщо з батьком/матір'ю щось станеться — внески платить страховик).
   // Річна доплата на 1 грн гарантованої суми за віком батька; для матері ≈ ×0,41. Батьку — до 55 років.
@@ -70,6 +84,6 @@
     if (a < 25) w = W[0][1];
     return guar * w * (parentSex === 'f' ? 0.41 : 1);
   }
-  const T = { P, sdd, rateAdult, rateChild, irr, project, adult, child, payFor, toAnnual, fromAnnual, rateSingle, single, waiver };
+  const T = { P, sdd, rateAdult, rateChild, irr, project, adult, child, payFor, toAnnual, fromAnnual, rateSingle, single, waiver, annuity, ANN_MIN_AGE };
   if (typeof module !== 'undefined') module.exports = T; else root.Tariff = T;
 })(this);

@@ -9,7 +9,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="ui.css?v=4">
 <script src="bridge.js?v=4"></script>
-<script src="tariff.js?v=2"></script>
+<script src="tariff.js?v=3"></script>
 <script src="ui.js?v=4"></script>
 </head>
 <body data-view="form">
@@ -188,13 +188,14 @@ function bridge(i,r){
   else if(r.pmt<500)notes.push('Найменший внесок у програмі: 500 грн/міс.');
   if(n>left)notes.push('Найкоротший строк програми: 10 років.');
   if(n<left)notes.push('Програма триває щонайдовше до 75 років, тому строк '+n+' р.');
-  if(t.base<t.paid)notes.push('На короткому строку і в старшому віці значна частина внеску йде на страховий захист, тому прогноз може бути меншим за внесене.');
+  if(t.base<t.paid)notes.push('На короткому строку в старшому віці прогноз може бути меншим за внески.');
+  const ann=TF.annuity?TF.annuity(t.base,i.age+n,i.sex):null;
   // 4 759 → 4 800: внесок у програмі кратний 100 грн, тому показуємо обидві суми й пояснюємо округлення
   const rounded=r.pmt>=500&&r.pmt<=20000&&amt!==r.pmt?` (${money(r.pmt)}, округлено до сотень)`:'';
   return `<div class="card bridge" id="bridge"><div class="card-h"><h2>Якщо відкладати цю суму в програмі накопичення</h2>
     <p class="note">${money(amt)}/міс${rounded} · ${n} ${yw(n)} · накопичувальне страхування життя</p></div>
-    <dl class="rows"><div><dt>Гарантовано<small>мінімум за договором</small></dt><dd>≈ ${k(t.guar)}</dd></div><div><dt>Базовий прогноз<small>бонус від інвестицій не гарантований</small></dt><dd class="${t.base<t.paid?'am':'gd'}">≈ ${k(t.base)}</dd></div></dl>
-    <p class="note">Самі внесете ${money(t.paid)}. Захист життя весь строк: ≈ ${k(t.cover)}.${notes.length?' '+notes.join(' '):''}</p>
+    <dl class="rows"><div><dt>Відкладете</dt><dd>${money(t.paid)}</dd></div><div><dt>Інвестиційний дохід<small>прогноз, не гарантований</small></dt><dd class="${t.base<t.paid?'am':'gd'}">${t.base<t.paid?'−':'+'} ≈ ${k(Math.abs(t.base-t.paid))}</dd></div><div><dt>Разом</dt><dd class="gd">≈ ${k(t.base)}</dd></div>${ann?`<div><dt>Або щомісяця довічно<small>з ${i.age+n} років</small></dt><dd class="gd">≈ ${money(Math.round(ann/100)*100)}</dd></div>`:''}</dl>
+    <p class="note">Якщо з вами щось станеться, сім'я отримає ≈ ${k(t.cover)}.${notes.length?' '+notes.join(' '):''}</p>
     <p class="note">Суми програми вказано в майбутніх гривнях, без поправки на інфляцію, тому напряму з потрібним капіталом (у сьогоднішніх цінах) їх не порівнюйте. Як закрити різницю, покаже консультант.</p>
     <button type="button" class="btn ghost" data-amt="${amt}" data-yrs="${n}" data-age="${i.age}" data-sx="${i.sex}">Порахувати детально${UI.icon('chev',18)}</button></div>`;
 }
@@ -250,7 +251,7 @@ function renderPension(){
   if(i.work==='fop')h+=tip('Як ФОП з мінімальним ЄСВ ви отримаєте пенсію, близьку до мінімальної, навіть з великим доходом.');
   if(i.work==='none')h+=tip('Неофіційна робота не додає ні стажу, ні пенсії: ці роки не зараховуються до стажу.');
   h+=UI.steps('Підберемо програму під ваш бюджет');
-  h+=UI.fine('<b>Розрахунок орієнтовний.</b> Оцінка за формулою ПФУ в цінах 2026 року, не рішення Пенсійного фонду. Бонус від інвестицій не гарантований.');
+  h+=UI.fine('<b>Розрахунок орієнтовний.</b> Оцінка за формулою ПФУ в цінах 2026 року, не рішення Пенсійного фонду. Інвестиційний дохід не гарантований.');
   $('p-out').innerHTML=h;
   if(S._enter)UI.count($('p-big'),bigTo,num,bigTo*0.7);
 }
@@ -261,16 +262,14 @@ function renderChild(){
   const got=r.guar?Math.round(r.base/1000)*1000:goal;
   let h=`<div class="hero">${UI.deco()}${UI.mark(15)}<p class="hero-k">У ${S.cpay} ${yw(S.cpay)} (${r.payYear} рік) дитина отримає</p>
     <p class="hero-v gd"><span class="pre">≈</span><span id="c-big">${num(got)}</span><small>грн</small></p>
-    ${r.guar?`<p class="hero-s">За базовим прогнозом. Гарантовано ≈ <b>${k(r.guar)}</b>.</p>`:''}</div>`;
+    ${r.guar?`<p class="hero-s">Прогноз, інвестиційний дохід не гарантований.</p>`:''}</div>`;
   h+=sumrow(`<b>Дитині ${a} ${yw(a)}</b>, ціль ${money(goal)} у ${S.cpay}`);
   h+=`<div class="card"><p class="k">Для цього відкладайте</p><p class="big"><span>≈ ${num(r.pmt)}</span><small>грн на місяць</small></p><dl class="rows"><div><dt>Програма</dt><dd>${r.years} ${yw(r.years)}</dd></div>${r.guar?`<div><dt>Внесете</dt><dd>${money(r.paid)}</dd></div>
-    <div><dt>Гарантовано<small>мінімум за договором</small></dt><dd>≈ ${k(r.guar)}</dd></div>
-    <div><dt>Базовий прогноз<small>з бонусом від інвестицій</small></dt><dd class="gd">≈ ${k(r.base)}</dd></div>
-    <div><dt>Якщо роки вдалі<small>оптимістичний прогноз</small></dt><dd>≈ ${k(r.opt)}</dd></div>`:''}</dl>
-    ${r.guar&&r.guar<r.paid?`<p class="warnnote">${UI.icon('info',18)}<span>Гарантована сума менша за внесене: частина внеску йде на страховий захист. Різницю має перекрити бонус від інвестицій, але він не гарантований.</span></p>`:''}</div>`;
+    <div><dt>Інвестиційний дохід<small>прогноз, не гарантований</small></dt><dd class="gd">+ ≈ ${k(Math.max(0,r.base-r.paid))}</dd></div>
+    <div><dt>Разом</dt><dd class="gd">≈ ${k(r.base)}</dd></div>`:''}</dl></div>`;
   h+=`<div class="card"><div class="info"><span class="ib">${UI.icon('shield',22)}</span><div><p>Можна додати опцію: якщо з батьками щось станеться, страхова продовжить внески, і <b>дитина все одно отримає суму</b>.</p><p>Внески можна щороку індексувати від інфляції. Точні умови пояснить консультант</p></div></div></div>`;
   h+=UI.steps('Підберемо внесок і строк під вашу дитину');
-  h+=UI.fine('<b>Розрахунок орієнтовний.</b> Бонус від інвестицій не гарантований, точні умови залежать від програми і страхової компанії.');
+  h+=UI.fine('<b>Розрахунок орієнтовний.</b> Інвестиційний дохід не гарантований, точні умови залежать від програми і страхової компанії.');
   $('c-out').innerHTML=h;
   if(S._enter)UI.count($('c-big'),got,num,got*0.7);
 }

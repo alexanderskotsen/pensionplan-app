@@ -9,7 +9,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="ui.css?v=4">
 <script src="bridge.js?v=4"></script>
-<script src="tariff.js?v=2"></script>
+<script src="tariff.js?v=3"></script>
 <script src="ui.js?v=4"></script>
 <style>
 /* «Швидше чи легше?» — та сама ціль з іншим строком; рядок натискається */
@@ -80,9 +80,9 @@
       <p class="hero-v"><span class="pre">≈</span><span id="resBig"></span><small id="resU"></small></p>
       <p class="hero-s" id="resS"></p>
       <p class="hero-x" id="resPill"></p>
-      <svg class="chart" id="chart" role="img" aria-label="Графік: гарантована сума, базовий прогноз і оптимістичний прогноз"></svg>
+      <svg class="chart" id="chart" role="img" aria-label="Графік: ваші внески і прогноз"></svg>
     </div>
-    <p class="warnnote" id="resWarn" hidden><i data-ic="info" data-px="18"></i><span>На короткому строку і в старшому віці значна частина внеску йде на страховий захист, тому прогноз може бути меншим за внесене. Спробуйте довший строк, результат буде кращим.</span></p>
+    <p class="warnnote" id="resWarn" hidden><i data-ic="info" data-px="18"></i><span>На короткому строку в старшому віці прогноз може бути меншим за внески. Спробуйте довший строк, результат буде кращим.</span></p>
 
     <div class="sumrow"><span id="sumT"></span><button type="button" class="linkbtn" id="back"><i data-ic="edit" data-px="18"></i>Змінити</button></div>
 
@@ -173,26 +173,21 @@
     $('payRng').textContent = short(l[S.freq][0]) + ' – ' + short(l[S.freq][1]);
     $('goalRng').textContent = short(l.goal[0]) + ' – ' + short(l.goal[1]);
   }
-  // Графік трьох сценаріїв: внески (площа), гарантовано, базовий прогноз (виділено, з числом біля точки), якщо роки вдалі.
+  // Графік: внески (площа) і прогноз (виділено, з числом біля точки). Гарантовану суму й інші сценарії не показуємо (рішення власника 13.11.2026).
   // Малюємо у справжніх пікселях, щоб підписи не дрібнішали на вузьких екранах.
   function chart(r){
     const svg = $('chart'), w = Math.floor(svg.getBoundingClientRect().width);
     if (!w) return;
     const n = S.term, LW = 124, pw = w - LW, H = 190, y0 = H - 24, top0 = 14;
     const perY = r.paid / n;
-    const top = Math.max(r.proj, r.paid, r.opt || 0, r.guar || 0) || 1;
+    const top = Math.max(r.proj, r.paid) || 1;
     const X = y => y / n * pw, Y = v => y0 - v / top * (y0 - top0);
     const line = f => { let d = ''; for (let y = 0; y <= n; y++) d += (y ? 'L' : 'M') + X(y).toFixed(1) + ' ' + Y(f(y)).toFixed(1); return d; };
     const T = window.Tariff, t = r.t;
     let h = `<path d="M0 ${y0}L${pw} ${Y(r.paid).toFixed(1)}V${y0}Z" fill="#fff" opacity=".1"/><path d="M0 ${y0}H${pw}" stroke="#fff" stroke-opacity=".22"/>`;
     const labs = [{ v: r.paid, n: bare(r.paid), l: 'ваші внески', c: 'paid' }];
-    if (t && r.opt != null) { h += `<path class="fade" d="${line(y => t.annual * T.sdd(y, t.rOpt))}" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"/>`;
-      labs.push({ v: r.opt, n: bare(rnd(r.opt)), l: 'якщо роки вдалі', c: 'opt' }); }
-    if (t && r.guar != null) { const g = T.irr(t.annual, n, t.guar);
-      h += `<path class="fade" d="${line(y => t.annual * T.sdd(y, g))}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="2"/>`;
-      labs.push({ v: r.guar, n: bare(rnd(r.guar)), l: 'гарантовано', c: 'guar' }); }
     h += `<path class="base" pathLength="1" d="${line(y => r.at(y))}" fill="none" stroke="var(--hero-good)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
-    labs.push({ v: r.proj, n: '≈ ' + bare(rnd(r.proj)), l: S.cur === 'usd' ? 'орієнтовно, 3%' : 'базовий прогноз', c: 'base' });
+    labs.push({ v: r.proj, n: '≈ ' + bare(rnd(r.proj)), l: S.cur === 'usd' ? 'орієнтовно, 3%' : 'прогноз', c: 'base' });
     // підписи праворуч: за висотою точок, без накладань
     labs.forEach(o => { o.y = Y(o.v); o.ty = o.y; }); labs.sort((a, b) => a.y - b.y);
     const GAP = 38, lo = 16, hi = y0 - 14;
@@ -241,8 +236,11 @@
       $('resU').textContent = usd ? '' : 'грн';
     }
     $('resS').innerHTML = loss
-      ? `Самі внесете <b>${money(r.paid)}</b>, а базовий прогноз на ≈ <b class="am">${approx(r.paid - r.proj)}</b> менший.`
-      : `Самі внесете <b>${money(r.paid)}</b>, ще ≈ <b class="gd">+${approx(r.proj - r.paid)}</b> ` + (usd ? 'за орієнтовної дохідності 3% на рік, вона не гарантована.' : 'за базовим прогнозом.');
+      ? `Самі внесете <b>${money(r.paid)}</b>, а прогноз на ≈ <b class="am">${approx(r.paid - r.proj)}</b> менший.`
+      : `Відкладете <b>${money(r.paid)}</b>, ще ≈ <b class="gd">+${approx(r.proj - r.paid)}</b> ` + (usd ? 'за орієнтовної дохідності 3% на рік, вона не гарантована.' : 'інвестиційного доходу (прогноз).');
+    // довічна виплата: якщо договір закінчується у 55+ (як в ануїтеті MetLife), лише гривня
+    const endAge = S.age + S.term, ann = !usd && window.Tariff.annuity ? window.Tariff.annuity(r.proj, endAge, S.sex) : null;
+    if (ann) $('resS').innerHTML += ` Або ≈ <b class="gd">${money(Math.round(ann / 100) * 100)}</b> щомісяця довічно з ${endAge} років.`;
     const pct = Math.round((r.proj / r.paid - 1) * 100);
     $('resPill').className = 'hero-x ' + (loss ? 'wr' : 'ok');
     $('resPill').innerHTML = UI.icon(loss ? 'info' : 'up', 18) + '<span>' + (loss ? (pct < 0 ? '−' + (-pct) + '% до внесеного' : 'трохи менше, ніж внесете')
@@ -261,10 +259,10 @@
     $('dockK').textContent = goalMode ? `Внесок ${per}` : `Через ${termTxt}`;
     $('dockV').textContent = goalMode ? `≈ ${money(pay)}` : `≈ ${approx(r.proj)}`;
     $('fine').textContent = usd
-      ? 'Розрахунок орієнтовний. У доларових програмах дохідність не гарантована й залежить від інвестиційного доходу страхової. Частина внеску йде на страховий захист. Точні цифри покаже консультант.'
-      : 'Розрахунок орієнтовний, за тарифами класичних накопичувальних програм. Гарантована сума: мінімум за договором; бонус від інвестицій нараховується щороку, але не гарантований. Частина внеску йде на страховий захист. Точні цифри покаже консультант.';
+      ? 'Розрахунок орієнтовний. У доларових програмах дохідність не гарантована й залежить від інвестиційного доходу страхової. Точні цифри покаже консультант.'
+      : 'Розрахунок орієнтовний, за тарифами класичних накопичувальних програм. Прогноз включає інвестиційний дохід страхової компанії, він нараховується щороку, але не гарантований. Довічна виплата можлива, якщо виплати починаються з 55 років. Суми в майбутніх гривнях. Точні цифри покаже консультант.';
     $('fineT').textContent = usd ? 'Дохідність у доларових програмах не гарантована.'
-      : (goalMode ? 'Внесок округлено вгору, щоб прогноз був не меншим за ціль. ' : '') + 'Гарантована сума: мінімум за договором, бонус від інвестицій не гарантований.';
+      : (goalMode ? 'Внесок округлено вгору, щоб прогноз був не меншим за ціль. ' : '') + 'Інвестиційний дохід не гарантований, суми в майбутніх гривнях.';
     S._pay = pay; S._r = r;
     $('vForm').hidden = S.view !== 'form'; $('vRes').hidden = S.view !== 'res';
     if (S.view === 'res') chart(r);
