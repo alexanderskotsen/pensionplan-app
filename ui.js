@@ -122,8 +122,8 @@
     if (!UI.shareOn) return '';
     shareTexts[kind] = o.t;
     return `<div class="card share" id="share"><div class="card-h"><h2>${o.title}</h2><p class="note">${o.note}</p></div>` +
-      `<div class="share-b"><button type="button" class="btn" data-share="${kind}" data-i="0">${UI.icon('people', 18)}${o.b[0]}</button>` +
-      `<button type="button" class="btn" data-share="${kind}" data-i="1">${UI.icon('heart', 18)}${o.b[1]}</button></div>` +
+      `<div class="share-b${o.b.length === 1 ? ' one' : ''}"><button type="button" class="btn" data-share="${kind}" data-i="0">${UI.icon('people', 18)}${o.b[0]}</button>` +
+      (o.b[1] ? `<button type="button" class="btn" data-share="${kind}" data-i="1">${UI.icon('heart', 18)}${o.b[1]}</button>` : '') + `</div>` +
       `<p class="mini">${o.mini}</p></div>`;
   };
   UI.shareLink = function (kind) {
