@@ -73,7 +73,9 @@
     up: '<circle cx="12" cy="12" r="9"/><path d="M12 16.5v-9M8.5 11L12 7.5l3.5 3.5"/>',
     sound: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.500 9.500z"/><path d="M15.5 9a4.200 4.200 0 0 1 0 6M18 6.500a7.800 7.800 0 0 1 0 11"/>',
     mute: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.500 9.500z"/><path d="M16 9.500l5 5M21 9.500l-5 5"/>',
-    replay: '<path d="M4 12a8 8 0 1 0 2.600-5.900"/><path d="M4 4.500v4h4"/>'
+    replay: '<path d="M4 12a8 8 0 1 0 2.600-5.900"/><path d="M4 4.500v4h4"/>',
+    people: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.200-5.500 6.500-5.500s5.900 1.900 6.500 5.500"/><path d="M16 4.800a3.500 3.500 0 0 1 0 6.400M18.500 14.900c1.700.9 2.700 2.600 3 5.100"/>',
+    heart: '<path d="M12 20.500s-7.500-4.600-7.500-10.200A4.300 4.300 0 0 1 12 7.600a4.300 4.300 0 0 1 7.500 2.700c0 5.600-7.500 10.200-7.500 10.200z"/>'
   };
   UI.icon = (name, px, sw) => `<svg class="ic" viewBox="0 0 24 24" width="${px || 20}" height="${px || 20}" fill="none" stroke="currentColor" stroke-width="${sw || 2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[name] || ''}</svg>`;
   // Знак «ФП»: кругла «Ф» + «П» з дахом і вирізаною стрілкою (brand/znak-hibryd-bez-fonu-*.svg)
@@ -98,6 +100,55 @@
     (el || document).querySelectorAll('[data-fine]').forEach(e => { e.outerHTML = UI.fine(e.innerHTML); });
   }
   UI.hydrate = hydrate;
+
+  // ---------- Поділитися ----------
+  // Блок на екрані результату: дві кнопки відкривають у Telegram вікно «Переслати» з готовим текстом і посиланням
+  // fu_<tg_id>_<kind>_a (хто прийде, закріпиться за тим самим консультантом). Вимикач — settings.share у боті (/api/share):
+  // поки відповіді немає або вимкнено, блоку немає. Сторінка слухає UI.onShare(fn), щоб перемалювати результат.
+  const SQ = new URLSearchParams(location.search);
+  const SAPI = (SQ.get('api') || 'https://pensionplan-bot.onrender.com').replace(/\/$/, '');
+  const shareTexts = {}, shareCbs = [];
+  UI.shareOn = false;
+  UI.onShare = fn => { shareCbs.push(fn); if (UI.shareOn) fn(); };
+  const setShare = on => { if (UI.shareOn === on) return; UI.shareOn = on; if (on) shareCbs.forEach(f => { try { f(); } catch (e) {} }); };
+  try {
+    const c = sessionStorage.getItem('share_on');
+    if (c === '1' || c === '0') setShare(c === '1');
+    else fetch(SAPI + '/api/share').then(r => r.json()).then(d => { const on = !!(d && d.on);
+      try { sessionStorage.setItem('share_on', on ? '1' : '0'); } catch (e) {} setShare(on); }).catch(() => {});
+  } catch (e) {}
+  // UI.shareCard(kind, {title, note, b:[підпис1, підпис2], t:[текст1, текст2], mini}) → HTML блоку або '' (вимкнено)
+  UI.shareCard = function (kind, o) {
+    if (!UI.shareOn) return '';
+    shareTexts[kind] = o.t;
+    return `<div class="card share" id="share"><div class="card-h"><h2>${o.title}</h2><p class="note">${o.note}</p></div>` +
+      `<div class="share-b"><button type="button" class="btn" data-share="${kind}" data-i="0">${UI.icon('people', 18)}${o.b[0]}</button>` +
+      `<button type="button" class="btn" data-share="${kind}" data-i="1">${UI.icon('heart', 18)}${o.b[1]}</button></div>` +
+      `<p class="mini">${o.mini}</p></div>`;
+  };
+  UI.shareLink = function (kind) {
+    let uid = 0;
+    try { uid = (inTg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) || 0; } catch (e) {}
+    if (!uid && /^\d+$/.test(SQ.get('tu') || '')) uid = SQ.get('tu');
+    return 'https://t.me/' + (SQ.get('bot') || 'tviy_finplan_bot') + '?start=fu_' + uid + '_' + kind + '_a';
+  };
+  UI.share = function (kind, text) {
+    const link = UI.shareLink(kind);
+    const url = 'https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent(text);
+    try {  // подія share_app_<kind> у боті (як trackOpen: initData або підписаний tu/ts)
+      const init = inTg && tg.initData, headers = { 'Content-Type': 'text/plain' };
+      if (init) headers['X-Init-Data'] = init;
+      if (init || SQ.get('tu')) fetch(SAPI + '/api/track', { method: 'POST', headers, keepalive: true,
+        body: JSON.stringify({ c: 'share_' + kind, tu: SQ.get('tu') || '', ts: SQ.get('ts') || '' }) }).catch(() => {});
+    } catch (e) {}
+    if (inTg) { try { tg.openTelegramLink(url); return; } catch (e) {} }
+    if (!inTg && navigator.share) { try { navigator.share({ text: text, url: link }).catch(() => {}); return; } catch (e) {} }
+    try { if (!window.open(url, '_blank')) location.href = url; } catch (e) { location.href = url; }
+  };
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('[data-share]');
+    if (b && shareTexts[b.dataset.share]) UI.share(b.dataset.share, shareTexts[b.dataset.share][+b.dataset.i || 0]);
+  });
 
   // ---------- Дорахунок цифр (≈450 мс), вимикається з prefers-reduced-motion ----------
   // UI.count(el, число, fmt[, from]) — fmt(n) повертає текст; from — з якого значення почати (типово з попереднього)
