@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор пенсії · Твій фінансовий план</title>
+<style>
+  :root { --bg:#fff; --ink:#161616; --muted:#6b6b72; --accent:#E84037; --card:#f4f5f7; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111; --ink:#f2f2f2; --muted:#a0a0a8; --card:#1c1c1f; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:460px; margin:0 auto; padding:40px 16px 48px; text-align:center; }
+  .logo { width:84px; height:84px; border-radius:22px; background:linear-gradient(135deg,#F85745,#E84037); color:#fff; font-weight:800; font-size:34px; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+  h1 { font-size:26px; line-height:1.25; margin:0 0 8px; }
+  p { color:var(--muted); margin:0 0 24px; }
+  .btn { display:block; width:100%; padding:18px 16px; border-radius:16px; background:var(--accent); color:#fff; font-weight:800; font-size:19px; text-decoration:none; }
+  .alt { display:inline-block; margin-top:16px; color:var(--muted); font-size:15px; }
+  .card { background:var(--card); border-radius:16px; padding:14px 16px; margin-top:28px; text-align:left; font-size:15px; color:var(--muted); }
+  .card b { color:var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">ФП</div>
+  <h1>Порахуй свою пенсію за 1 хвилину</h1>
+  <p>Безкоштовний калькулятор у Telegram: державна пенсія, скільки відкладати, накопичення.</p>
+  <a class="btn" id="go" href="https://t.me/tviy_finplan_bot">Відкрити калькулятор у Telegram</a>
+  <a class="alt" id="web" href="https://t.me/tviy_finplan_bot">Не відкривається? Натисни тут</a>
+  <div class="card">Якщо ви в TikTok чи Instagram: натисни <b>⋯</b> вгорі справа → <b>«Відкрити в браузері»</b>, і кнопка спрацює одразу.</div>
+</main>
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var s = (q.get("s") || "site").replace(/[^a-z0-9_]/gi, "").slice(0, 20);
+    var web = "https://t.me/tviy_finplan_bot?start=" + s;
+    var app = "tg://resolve?domain=tviy_finplan_bot&start=" + s;
+    var btn = document.getElementById("go"), alt = document.getElementById("web");
+    btn.href = app; alt.href = web;
+    btn.addEventListener("click", function () {
+      setTimeout(function () { location.href = web; }, 1200);
+    });
+  })();
+</script>
+</body>
+</html>
