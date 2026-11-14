@@ -66,7 +66,6 @@
   <div class="web">
     <p class="sub">Безкоштовний калькулятор у Telegram: державна пенсія, скільки відкладати, накопичення.</p>
     <a class="btn" id="go" href="https://t.me/tviy_finplan_bot">Відкрити калькулятор у Telegram</a>
-    <span class="small" id="auto">Відкриваємо Telegram…</span>
   </div>
 </main>
 <script>
@@ -98,11 +97,6 @@
       hit("inapp");
     } else {
       hit("browser");
-      // у звичайному браузері одразу пробуємо відкрити Telegram; кнопка лишається запасною
-      setTimeout(function () { location.href = app; }, 400);
-      setTimeout(function () {
-        document.getElementById("auto").textContent = "Не відкрилось? Натисни червону кнопку.";
-      }, 2500);
     }
   })();
 </script>
