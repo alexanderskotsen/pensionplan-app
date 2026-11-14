@@ -23,6 +23,10 @@
   .arrow { position:fixed; top:6px; right:14px; font-size:34px; display:none; animation:b 1s infinite; }
   @keyframes b { 50% { transform:translateY(-6px); } }
   body.in .inapp, body.in .arrow { display:block; }
+  body.in #go, body.in #web { display:none; }
+  .copy { display:none; width:100%; margin-top:14px; padding:14px; border-radius:14px; border:2px solid var(--accent); background:transparent; color:var(--accent); font-weight:700; font-size:16px; }
+  body.in .copy { display:block; }
+  .inapp .big { font-size:19px; }
 </style>
 </head>
 <body>
@@ -33,16 +37,17 @@
   <p>Безкоштовний калькулятор у Telegram: державна пенсія, скільки відкладати, накопичення.</p>
 
   <div class="inapp">
-    <h2>Telegram не відкривається з цього застосунку</h2>
-    <ol>
-      <li>Натисни <span class="dots">⋯</span> угорі справа</li>
-      <li>Обери <b>«Відкрити в браузері»</b></li>
-      <li>Натисни червону кнопку ще раз</li>
+    <h2>Ще 2 кроки, і ти в калькуляторі</h2>
+    <ol class="big">
+      <li>Натисни <span class="dots">⋯</span> угорі справа ↗️</li>
+      <li>Обери <b>«Відкрити в браузері»</b>, там натисни червону кнопку</li>
     </ol>
+    <p style="margin:12px 0 0;font-size:14px">ТікТок та Інстаграм не відкривають Telegram зі своїх сторінок, тому потрібен звичайний браузер.</p>
   </div>
 
   <a class="btn" id="go" href="https://t.me/tviy_finplan_bot">Відкрити калькулятор у Telegram</a>
-  <a class="alt" id="ext" href="#" style="display:none">Відкрити цю сторінку в браузері</a>
+  <button class="copy" id="cp">Скопіювати адресу, щоб вставити в браузер</button>
+  <a class="alt" id="ext" href="#" style="display:none">Спробувати відкрити в браузері автоматично</a>
   <br><a class="alt" id="web" href="https://t.me/tviy_finplan_bot">Або знайди в Telegram: @tviy_finplan_bot</a>
 </main>
 <script>
@@ -56,6 +61,11 @@
     var ios = /iPhone|iPad|iPod/i.test(ua), android = /Android/i.test(ua);
     var btn = document.getElementById("go"), web2 = document.getElementById("web"), ext = document.getElementById("ext");
     btn.href = web; web2.href = web;
+    document.getElementById("cp").addEventListener("click", function () {
+      var b = this, done = function () { b.textContent = "Скопійовано ✓ Встав у браузер"; };
+      if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(done, function () { prompt("Скопіюй адресу:", location.href); });
+      else prompt("Скопіюй адресу:", location.href);
+    });
     if (inApp) {
       document.body.classList.add("in");
       // спроба вийти у звичайний браузер
