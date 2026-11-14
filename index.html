@@ -7,10 +7,10 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=7">
+<link rel="stylesheet" href="ui.css?v=8">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=3"></script>
-<script src="ui.js?v=7"></script>
+<script src="ui.js?v=8"></script>
 </head>
 <body data-view="form">
 <nav class="nav"><div class="nav-in"><button type="button" id="tab-n">Накопичити</button><button type="button" id="tab-p" class="on">Пенсія</button><button type="button" id="tab-c">Дитині</button><button type="button" id="tab-s">Захист</button><!-- Гра схована 14.11.2026 --></div></nav>
@@ -252,7 +252,7 @@ function renderPension(){
   if(i.work==='none')h+=tip('Неофіційна робота не додає ні стажу, ні пенсії: ці роки не зараховуються до стажу.');
   h+=UI.steps('Підберемо програму під ваш бюджет');
   // поділитися: у тексті лише державна пенсія (якщо вона є); власних накопичень і доходу не розкриваємо
-  const sp=r.pension>0;
+  const sp=r.pension>0&&i.age<45;  // з 45+ без власної цифри: пенсіонер шле дітям, «моя пенсія вийде» звучить дивно
   h+=UI.shareCard('pension',{title:'А скільки вийде у ваших близьких?',note:'Надішліть їм калькулятор. Це хвилина і безкоштовно.',b:['Надіслати близьким'],
     t:sp?[`Моя державна пенсія вийде ≈ ${money(r.pension)} на місяць 😬 Цікаво, скільки в тебе. Тут рахує за хвилину.`]
         :['Тут за хвилину видно, якою буде державна пенсія і скільки не вистачить до бажаного доходу. Глянь, цікаво, що вийде в тебе.'],
