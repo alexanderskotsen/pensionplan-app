@@ -13,20 +13,37 @@
   .logo { width:84px; height:84px; border-radius:22px; background:linear-gradient(135deg,#F85745,#E84037); color:#fff; font-weight:800; font-size:34px; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
   h1 { font-size:26px; line-height:1.25; margin:0 0 8px; }
   p { color:var(--muted); margin:0 0 24px; }
-  .btn { display:block; width:100%; padding:18px 16px; border-radius:16px; background:var(--accent); color:#fff; font-weight:800; font-size:19px; text-decoration:none; }
+  .btn { display:block; width:100%; padding:18px 16px; border-radius:16px; background:var(--accent); color:#fff; font-weight:800; font-size:19px; text-decoration:none; border:0; }
   .alt { display:inline-block; margin-top:16px; color:var(--muted); font-size:15px; }
-  .card { background:var(--card); border-radius:16px; padding:14px 16px; margin-top:28px; text-align:left; font-size:15px; color:var(--muted); }
-  .card b { color:var(--ink); }
+  .inapp { display:none; text-align:left; background:var(--card); border-radius:18px; padding:18px; margin-bottom:22px; }
+  .inapp h2 { font-size:20px; margin:0 0 10px; }
+  .inapp ol { margin:0; padding-left:22px; }
+  .inapp li { margin:6px 0; }
+  .dots { display:inline-block; font-weight:800; background:var(--bg); border-radius:8px; padding:0 8px; }
+  .arrow { position:fixed; top:6px; right:14px; font-size:34px; display:none; animation:b 1s infinite; }
+  @keyframes b { 50% { transform:translateY(-6px); } }
+  body.in .inapp, body.in .arrow { display:block; }
 </style>
 </head>
 <body>
+<div class="arrow">↗️</div>
 <main>
   <div class="logo">ФП</div>
   <h1>Порахуй свою пенсію за 1 хвилину</h1>
   <p>Безкоштовний калькулятор у Telegram: державна пенсія, скільки відкладати, накопичення.</p>
+
+  <div class="inapp">
+    <h2>Telegram не відкривається з цього застосунку</h2>
+    <ol>
+      <li>Натисни <span class="dots">⋯</span> угорі справа</li>
+      <li>Обери <b>«Відкрити в браузері»</b></li>
+      <li>Натисни червону кнопку ще раз</li>
+    </ol>
+  </div>
+
   <a class="btn" id="go" href="https://t.me/tviy_finplan_bot">Відкрити калькулятор у Telegram</a>
-  <a class="alt" id="web" href="https://t.me/tviy_finplan_bot">Не відкривається? Натисни тут</a>
-  <div class="card">Якщо ви в TikTok чи Instagram: натисни <b>⋯</b> вгорі справа → <b>«Відкрити в браузері»</b>, і кнопка спрацює одразу.</div>
+  <a class="alt" id="ext" href="#" style="display:none">Відкрити цю сторінку в браузері</a>
+  <br><a class="alt" id="web" href="https://t.me/tviy_finplan_bot">Або знайди в Telegram: @tviy_finplan_bot</a>
 </main>
 <script>
   (function () {
@@ -34,11 +51,21 @@
     var s = (q.get("s") || "site").replace(/[^a-z0-9_]/gi, "").slice(0, 20);
     var web = "https://t.me/tviy_finplan_bot?start=" + s;
     var app = "tg://resolve?domain=tviy_finplan_bot&start=" + s;
-    var btn = document.getElementById("go"), alt = document.getElementById("web");
-    btn.href = app; alt.href = web;
-    btn.addEventListener("click", function () {
-      setTimeout(function () { location.href = web; }, 1200);
-    });
+    var ua = navigator.userAgent || "";
+    var inApp = /musical_ly|Bytedance|TikTok|Instagram|FBAN|FBAV|FB_IAB|Threads/i.test(ua);
+    var ios = /iPhone|iPad|iPod/i.test(ua), android = /Android/i.test(ua);
+    var btn = document.getElementById("go"), web2 = document.getElementById("web"), ext = document.getElementById("ext");
+    btn.href = web; web2.href = web;
+    if (inApp) {
+      document.body.classList.add("in");
+      // спроба вийти у звичайний браузер
+      var self = location.href.replace(/^https?:\/\//, "");
+      if (ios) { ext.href = "x-safari-https://" + self; ext.style.display = "inline-block"; }
+      if (android) { ext.href = "intent://" + self + "#Intent;scheme=https;end"; ext.style.display = "inline-block"; }
+    } else {
+      btn.href = app;
+      btn.addEventListener("click", function () { setTimeout(function () { location.href = web; }, 1200); });
+    }
   })();
 </script>
 </body>
