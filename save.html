@@ -7,10 +7,10 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=5">
+<link rel="stylesheet" href="ui.css?v=6">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=3"></script>
-<script src="ui.js?v=5"></script>
+<script src="ui.js?v=6"></script>
 <style>
 /* «Швидше чи легше?» — та сама ціль з іншим строком; рядок натискається */
 .alt{display:grid}
@@ -95,6 +95,8 @@
       <div><p>Якщо з вами щось станеться, сім'я отримає <b id="protV"></b>. Це накопичувальне страхування життя.</p><p>Точні умови пояснить консультант.</p></div></div></div>
 
     <div data-steps="Підберемо внесок і строк під вас"></div>
+
+    <div id="shareBox" hidden></div>
 
     <details class="how"><summary>Як ми рахуємо?</summary><p id="fine"></p></details>
     <p data-fine><b>Розрахунок орієнтовний.</b> <span id="fineT"></span></p>
@@ -308,6 +310,12 @@
   };
   $('cta').onclick = () => sendCalc(1);
   $('cta2').onclick = () => sendCalc(0);
+  // «Поділитися»: без власних сум у тексті
+  UI.onShare(() => { $('shareBox').hidden = false; $('shareBox').innerHTML = UI.shareCard('save', { title: 'А скільки накопичили&nbsp;б ваші близькі?', note: 'Надішліть їм калькулятор. Це хвилина і безкоштовно.',
+    b: ['Другу чи партнеру', 'Батькам'],
+    t: ['Глянь, скільки можна накопичити, якщо відкладати потроху щомісяця. Підстав свою суму, рахує за хвилину.',
+        'Мам, тат, тут видно, скільки можна накопичити, якщо відкладати потроху щомісяця. Гляньте, це хвилина.'],
+    mini: 'Ваших сум у повідомленні не буде. Текст можна змінити перед надсиланням.' }); });
   sync(); render();
   // з пенсійного калькулятора людина приходить по деталі — показуємо одразу результат
   if (fromBridge) (document.readyState === 'loading' ? fn => document.addEventListener('DOMContentLoaded', fn) : fn => fn())(() => show('res'));

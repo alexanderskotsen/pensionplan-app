@@ -18,10 +18,11 @@ a{color:inherit;text-decoration:none}
 .wrap{max-width:560px;margin:0 auto;padding:12px 12px calc(86px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
 #view{display:flex;flex-direction:column;gap:10px;min-width:0}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:40px}
+.top>div:first-child{min-width:0;flex:0 0 auto}
 .top h1{margin:0;font-size:20px;letter-spacing:-.01em;line-height:1.15}
 .top small{display:block;color:var(--mut);font-size:12.5px;font-weight:500;margin-top:1px}
-.top .r{display:flex;align-items:center;gap:6px;flex:0 0 auto}
-.role{font-size:12px;font-weight:600;padding:3px 9px;border-radius:12px;background:var(--gray-s);color:var(--gray);white-space:nowrap}
+.top .r{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0}
+.role{font-size:12px;font-weight:600;padding:3px 9px;border-radius:12px;background:var(--gray-s);color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:52vw}
 .gear{border:0;background:var(--gray-s);color:var(--gray);width:34px;height:34px;border-radius:50%;font-size:16px;line-height:1;padding:0}
 .card{background:var(--card);border-radius:14px;padding:12px 14px;min-width:0}
 h3{margin:0 0 8px;font-size:12.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;gap:8px}
@@ -105,8 +106,9 @@ dt{color:var(--mut)}dd{margin:0;text-align:right;font-weight:600;overflow-wrap:a
 .dot{width:9px;height:9px;border-radius:50%;background:var(--good);flex:0 0 auto;display:inline-block}
 .dot.wait{background:#e0a23c}.dot.off{background:#b8bec9}
 .node .nm{flex:1;min-width:0}
-.node .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.node .nm b{display:block;font-weight:600;overflow-wrap:break-word;word-break:normal}
 .node .nm small{color:var(--mut);font-size:12px;display:block}
+.node .tg{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:8px}
 .legend span{display:flex;align-items:center;gap:5px}
 .lv{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
@@ -128,7 +130,11 @@ dt{color:var(--mut)}dd{margin:0;text-align:right;font-weight:600;overflow-wrap:a
 .sheet{background:var(--bg);width:100%;max-width:560px;max-height:94vh;overflow:auto;border-radius:18px 18px 0 0;padding:8px 12px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
 .grab{width:38px;height:4px;border-radius:2px;background:var(--line);margin:2px auto 0;flex:0 0 auto}
 .sh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:4px 2px 0}
-.sh h2{margin:0;font-size:20px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.sh>div:first-child{min-width:0;flex:1}
+.sh h2{margin:0;font-size:20px;letter-spacing:-.01em;overflow-wrap:break-word;word-break:normal}
+.sh .tags{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:5px}
+.sh .tags .tag{margin-top:0}
+.phone-ro{font-size:17px;font-weight:700;letter-spacing:.01em;user-select:all}
 .sh .sub{font-size:13px;color:var(--mut);margin-top:3px;overflow-wrap:anywhere}
 .sh .tag{font-size:12.5px;padding:4px 9px;margin-top:2px;flex:0 0 auto}
 .x{border:0;background:var(--gray-s);color:var(--gray);width:30px;height:30px;border-radius:50%;font-size:15px;flex:0 0 auto;padding:0}
@@ -136,7 +142,7 @@ dt{color:var(--mut)}dd{margin:0;text-align:right;font-weight:600;overflow-wrap:a
 .err{background:var(--card);border-radius:14px;padding:22px 16px;text-align:center;line-height:1.5}
 .load{color:var(--mut);text-align:center;padding:30px 0;font-size:14px}
 [hidden]{display:none!important}
-@media (max-width:350px){.call{padding:9px 9px;font-size:13px}.bars .r{grid-template-columns:84px minmax(0,1fr) 70px}.o{font-size:12px}}
+@media (max-width:350px){.call{padding:9px 9px;font-size:13px}.bars .r{grid-template-columns:84px minmax(0,1fr) 70px}.o{font-size:12px}.node{gap:6px}.sh h2{font-size:18px}}
 </style>
 </head>
 <body>
@@ -178,14 +184,27 @@ function applyTheme() {
 try { tg.ready(); tg.expand(); tg.onEvent('themeChanged', applyTheme); } catch (e) {}
 applyTheme();
 
+/* Помилки сервера зрозумілою мовою: службові коди (forbidden, not found, HTTP 500) людині не показуємо */
+const ERR_CODES = { forbidden: 1, 'not found': 1, 'bad request': 1, auth: 1, server: 1 };
+function errText(status, msg) {
+  if (msg && !ERR_CODES[msg]) return msg;  // сервер уже пояснив українською («Цей час уже минув»)
+  if (status === 401) return 'Telegram не підтвердив вхід. Закрийте і відкрийте кабінет ще раз.';
+  if (status === 403) return 'Немає доступу: це може зробити лише той, хто веде заявку, або головний адмін.';
+  if (status === 404) return 'Не знайшов. Можливо, запис уже видалено.';
+  if (status >= 500) return 'Сервер тимчасово не відповідає. Спробуйте ще раз за хвилину.';
+  return 'Не вдалося виконати дію. Спробуйте ще раз.';
+}
 async function api(path, data) {
-  const r = await fetch(API + path, {
-    method: data ? 'POST' : 'GET',
-    headers: Object.assign({'X-Init-Data': INIT}, data ? {'Content-Type': 'application/json'} : {}),
-    body: data ? JSON.stringify(data) : undefined,
-  });
+  let r;
+  try {
+    r = await fetch(API + path, {
+      method: data ? 'POST' : 'GET',
+      headers: Object.assign({'X-Init-Data': INIT}, data ? {'Content-Type': 'application/json'} : {}),
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  } catch (e) { const err = new Error('Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.'); err.status = 0; throw err; }
   let j = {}; try { j = await r.json(); } catch (e) {}
-  if (!r.ok) { const e = new Error(j.error || ('HTTP ' + r.status)); e.status = r.status; throw e; }
+  if (!r.ok) { const e = new Error(errText(r.status, j.error)); e.status = r.status; throw e; }
   return j;
 }
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2400); }
@@ -238,9 +257,10 @@ function go(t) {
   window.scrollTo(0, 0);
 }
 function loading() { $('#view').innerHTML = '<div class="load">Завантаження…</div>'; }
-function errView(e) { $('#view').innerHTML = `<div class="err">Не вдалося завантажити: ${esc(e.message)}<br><br><button class="btn sec" onclick="go(S.tab)">Спробувати ще раз</button></div>`; }
+function errView(e) { $('#view').innerHTML = `<div class="err">${esc(e.message)}<br><br><button class="btn sec" onclick="go(S.tab)">Спробувати ще раз</button></div>`; }
 function setBadge(n) { const b = $('#badge'); b.textContent = n; b.hidden = !n; }
-const callBtn = (x, sm) => x.phone ? `<a class="call${sm ? ' sm' : ''}" href="tel:${esc(x.phone)}" onclick="haptic('medium')">📞 Набрати</a>` : '';
+/* «Набрати» лише тому, хто веде заявку: керівник гілки й перегляд бачать номер у картці, але не дзвонять */
+const callBtn = (x, sm) => x.phone && x.can_edit ? `<a class="call${sm ? ' sm' : ''}" href="tel:${esc(x.phone)}" onclick="haptic('medium')">📞 Набрати</a>` : '';
 
 /* ---------- сьогодні ---------- */
 let TODAY = null;
@@ -310,13 +330,15 @@ async function loadLeads() {
 /* ---------- картка заявки ---------- */
 let L = null, LMODE = '';
 async function leadSheet(id) {
-  let l; try { l = await api('/api/lead?id=' + id); } catch (e) { return toast(e.status === 404 ? 'Заявку не знайдено' : e.status === 403 ? 'Це не ваша заявка' : 'Помилка: ' + e.message); }
+  let l; try { l = await api('/api/lead?id=' + id); } catch (e) { return toast(e.status === 404 ? 'Заявку не знайдено' : e.status === 403 ? 'Ця заявка не з вашої структури' : e.message); }
   L = l; LMODE = ''; drawLead();
 }
 function drawLead() {
   const l = L, open = { new: 1, contacted: 1, consult: 1 }[l.status];
-  let h = `<div class="sh"><div><h2>${esc(l.name)}</h2><div class="sub">Заявка #${l.id} · ${dt(l.created)} · ${esc(l.source)}${l.time ? ' · зручно ' + esc(l.time.toLowerCase()) : ''}</div></div>${leadTag(l)}<button class="x" onclick="closeSheet()">✕</button></div>`;
-  if (l.phone) {
+  let h = `<div class="sh"><div><h2>${esc(l.name)}</h2><div class="tags">${leadTag(l)}</div><div class="sub">Заявка #${l.id} · ${dt(l.created)} · ${esc(l.source)}${l.time ? ' · зручно ' + esc(l.time.toLowerCase()) : ''}</div></div><button class="x" onclick="closeSheet()">✕</button></div>`;
+  if (l.phone && !l.can_edit) {  // бачить, але не веде: номер текстом, без «Подзвонити»
+    h += `<div class="card"><h3><span>Телефон</span></h3><div class="phone-ro">${esc(l.phone_fmt)}</div></div>`;
+  } else if (l.phone) {
     h += `<a class="btn" href="tel:${esc(l.phone)}" onclick="haptic('medium')">📞 Подзвонити<small>${esc(l.phone_fmt)}</small></a>`;
     h += `<div class="g2">${l.username ? `<button class="btn sec" onclick="openLink('https://t.me/${esc(l.username)}')">✈️ Написати в Telegram</button>` : ''}<button class="btn sec" ${l.username ? '' : 'style="grid-column:1/3"'} onclick="copy('${esc(l.phone)}')">📋 Скопіювати номер</button></div>`;
   }
@@ -380,8 +402,8 @@ async function renderFunnel() {
   const periods = [[1, 'Сьогодні'], [7, '7 днів'], [30, '30 днів'], [0, 'Усі']];
   let h = `<div class="seg">${periods.map(([k, n]) => `<button class="${S.days === k ? 'on' : ''}" onclick="S.days=${k};renderFunnel()">${n}</button>`).join('')}</div>` + scopeUI('renderFunnel');
   const mx = Math.max(1, ...d.steps.map(s => s.n));
-  h += `<div class="card"><h3><span>Шлях людини</span></h3><div class="bars">${d.steps.map((s, i) => `<div class="r"><span>${esc(s.name)}</span><i style="width:${Math.max(2, s.n / mx * 100)}%"></i><em>${num(s.n)}<small>${i && d.steps[i - 1].n ? pct(s.n, d.steps[i - 1].n) : ''}</small></em></div>`).join('')}</div>
-    <div class="mini" style="margin-top:8px">Скільки людей пройшли кожен крок за період. Відсоток показує перехід з попереднього кроку. Команда й тестові заявки не рахуються.</div></div>`;
+  h += `<div class="card"><h3><span>Шлях людини</span></h3><div class="bars">${d.steps.map((s, i) => `<div class="r"><span>${esc(s.name)}</span><i style="width:${Math.max(2, s.n / mx * 100)}%"></i><em>${num(s.n)}<small>${i && d.steps[i - 1].n && s.n <= d.steps[i - 1].n ? pct(s.n, d.steps[i - 1].n) : ''}</small></em></div>`).join('')}</div>
+    <div class="mini" style="margin-top:8px">Скільки людей пройшли кожен крок за період. Відсоток показує перехід з попереднього кроку; понад 100% не показуємо (крок рахує й тих, хто прийшов раніше). Команда й тестові заявки не рахуються.</div></div>`;
   h += `<div class="card"><h3><span>Робота із заявками</span></h3>
     <div class="row"><span>Відповідь на заявку (медіана)</span><span>${d.median === null ? 'ще немає' : `<b class="${d.median > 7200 ? 'w' : 'v'}">${dur(d.median)}</b>`}</span></div>
     <div class="row"><span>Зараз нових</span><span><b class="v">${d.open.new}</b>${d.open.idle ? ` · <b class="w">без дії ${d.open.idle}</b>` : ''}</span></div>
@@ -395,8 +417,15 @@ async function renderFunnel() {
   h += `<div class="card"><h3><span>Прогрів</span></h3><div class="row"><span>Зараз отримують листи</span><span><b class="v">${d.nurture.now}</b></span></div>
     <div class="row"><span>Записи з прогріву за період</span><span><b class="v">${d.nurture.leads}</b></span></div>
     ${d.nurture.lost.map(x => `<div class="row"><span>Пішли після: ${esc(x.step)}</span><span><b class="v">${x.n}</b></span></div>`).join('')}</div>`;
-  if (d.share.clicked || d.share.came) h += `<div class="card"><h3><span>Поділитися</span><span>${d.share.on ? 'увімкнено' : 'вимкнено'}</span></h3>
-    <div class="row"><span>Натиснули «Поділитися»</span><span><b class="v">${d.share.clicked}</b></span></div><div class="row"><span>Прийшло за запрошеннями</span><span><b class="v">${d.share.came}</b></span></div><div class="row"><span>З них записались</span><span><b class="v">${d.share.leads}</b></span></div></div>`;
+  const sh = d.share;
+  if (sh.clicked || sh.came || (sh.places || []).length) {
+    const st = [['Натиснули «поділитися»', sh.clicked], ['Прийшли за запрошенням', sh.came], ['Порахували', sh.calc], ['Записались', sh.leads], ['Поліс', sh.policies]];
+    h += `<div class="card"><h3><span>Поділитися</span><span>${sh.on ? 'увімкнено' : 'вимкнено'}</span></h3>
+    ${st.map(x => `<div class="row"><span>${x[0]}</span><span><b class="v">${num(x[1] || 0)}</b></span></div>`).join('')}
+    ${sh.per_sharer === null || sh.per_sharer === undefined ? '' : `<div class="mini" style="margin-top:6px">На одного, хто поділився, прийшло ${String(sh.per_sharer).replace('.', ',')} (поділились: ${num(sh.sharers)}).</div>`}
+    ${(sh.places || []).length ? `<h3 style="margin-top:12px"><span>За місцем</span></h3>${sh.places.map(p => `<div class="row"><span>${esc(p.name)}${p.shown === null ? '' : `<br><span class="mini">показали: ${num(p.shown)}</span>`}</span><span><b class="v">${p.clicked === null ? '·' : num(p.clicked)} → ${num(p.came)} → ${num(p.calc)} → ${num(p.leads)} → ${num(p.policies)}</b></span></div>`).join('')}
+    <div class="mini" style="margin-top:6px">Натиснули → прийшли → порахували → записались → поліс. У портреті й після запису кнопка одразу відкриває Telegram, тому натискань там не видно: показуємо, скільком людям її показали.</div>` : ''}</div>`;
+  }
   $('#view').innerHTML = h;
 }
 
@@ -416,10 +445,10 @@ async function renderTeam() {
   if (S.me.role !== 'viewer') h += `<button class="btn" onclick="inviteSheet(${isAgent() ? `'${S.me.agent.code}'` : 'null'})">＋ Запросити в команду</button>`;
   h += `<div class="card"><h3><span>${isAgent() ? 'Моя гілка' : 'Структура'}</span><b>${total} ${ppl(total)}</b></h3>`;
   if (!rows.length || (rows.length === 1 && rows[0][0].me)) h += `<div class="empty">Команди ще немає. Натисніть «Запросити в команду», введіть ім'я і перешліть людині посилання.</div>`;
-  h += `<div class="tree">${rows.map(([n, dep]) => `<button class="node" style="padding-left:${4 + Math.min(dep, 6) * 16}px" onclick="agentSheet('${n.code}')">
+  const step = window.innerWidth <= 350 ? 10 : 16;  // на вузькому менший відступ, щоб імена не різались
+  h += `<div class="tree">${rows.map(([n, dep]) => `<button class="node" style="padding-left:${4 + Math.min(dep, 6) * step}px" onclick="agentSheet('${n.code}')">
       ${dep ? '<span class="ind">└</span>' : ''}<span class="dot ${n.state}"></span>
-      <span class="nm"><b>${n.me ? 'Ви · ' : ''}${esc(n.name)}</b><small>${num(n.users)} ${pl(n.users, 'людина', 'людини', 'людей')} · ${num(n.leads)} ${pl(n.leads, 'заявка', 'заявки', 'заявок')} · ${num(n.contracts)} ${pl(n.contracts, 'поліс', 'поліси', 'полісів')}${n.resp ? ' · відповідь ' + esc(n.resp) : ''}</small></span>
-      ${n.idle ? `<span class="tag late">без дії ${n.idle}</span>` : ''}${n.level ? `<span class="tag">рів. ${n.level}</span>` : ''}</button>`).join('')}</div>`;
+      <span class="nm"><b>${n.me ? 'Ви · ' : ''}${esc(n.name)}</b><small>${num(n.users)} ${pl(n.users, 'людина', 'людини', 'людей')} · ${num(n.leads)} ${pl(n.leads, 'заявка', 'заявки', 'заявок')} · ${num(n.contracts)} ${pl(n.contracts, 'поліс', 'поліси', 'полісів')}${n.resp ? ' · відповідь ' + esc(n.resp) : ''}</small>${n.idle || n.level ? `<span class="tg">${n.idle ? `<span class="tag late">без дії ${n.idle}</span>` : ''}${n.level ? `<span class="tag">рів. ${n.level}</span>` : ''}</span>` : ''}</span></button>`).join('')}</div>`;
   h += `<div class="legend"><span><i class="dot"></i>підключений</span><span><i class="dot wait"></i>ще не підключився</span><span><i class="dot off"></i>вимкнений</span></div>
     <div class="mini" style="margin-top:6px">Цифри за 30 днів. «Без дії» означає нові заявки, яким ще ніхто не дзвонив. Відступ показує, хто в чиїй команді.</div></div>`;
   $('#view').innerHTML = h;
@@ -433,7 +462,7 @@ async function agentSheet(code, days) {
   let h = `<div class="sh"><div><h2>${esc(a.name)}</h2><div class="sub"><span class="dot ${a.state}" style="margin-right:5px"></span>${st}${a.level ? ' · рівень ' + a.level : ''}${a.boss ? ' · керівник: ' + esc(a.boss) : ''}</div></div><button class="x" onclick="closeSheet()">✕</button></div>`;
   h += `<div class="seg">${[[7, '7 днів'], [30, '30 днів'], [0, 'Усі']].map(([k, n]) => `<button class="${days === k ? 'on' : ''}" onclick="agentSheet('${code}',${k})">${n}</button>`).join('')}</div>`;
   h += `<div class="card"><div class="fun" style="grid-template-columns:repeat(3,1fr);margin:0"><div><b>${num(s.users)}</b><span>людей у боті</span></div><div><b>${num(s.leads)}</b><span>заявок</span></div><div><b>${num(s.contracts)}</b><span>полісів</span></div></div>
-    <div class="row" style="margin-top:6px"><span>Перехід у заявку</span><span><b class="v">${pct(s.leads, s.users) || '0%'}</b></span></div>
+    ${s.leads <= s.users ? `<div class="row" style="margin-top:6px"><span>Перехід у заявку</span><span><b class="v">${pct(s.leads, s.users) || '0%'}</b></span></div>` : ''}
     <div class="row"><span>У команді</span><span><b class="v">${a.team}</b></span></div>${a.team ? `<div class="row"><span>Команда: людей · заявок · полісів</span><span><b class="v">${num(s.team.users)} · ${num(s.team.leads)} · ${num(s.team.contracts)}</b></span></div>` : ''}</div>`;
   if (!isAgent()) h += `<button class="btn sec" onclick="S.agent='${code}';S.status='all';closeSheet();go('ld')">📋 Заявки цього консультанта</button>`;
   if (a.can_level) h += `<div class="card"><h3><span>Рівень Starlife</span></h3><div class="lv">${Array.from({length: 16}, (_, i) => i + 1).map(n => `<button class="${a.level === n ? 'on' : ''}" onclick="setLevel('${code}',${n},${days})">${n}</button>`).join('')}</div>
@@ -518,6 +547,13 @@ function removeViewer(id) { const name = (VIEWERS.find(v => v.id === id) || {}).
 function openSheet(h) { const bg = $('#sheet'); const keep = bg.firstElementChild ? bg.firstElementChild.scrollTop : 0, same = !bg.hidden; bg.innerHTML = `<div class="sheet"><div class="grab"></div>${h}</div>`; bg.hidden = false; if (same && openSheet.id === h.slice(0, 80)) bg.firstElementChild.scrollTop = keep; openSheet.id = h.slice(0, 80); bg.onclick = e => { if (e.target === bg) closeSheet(); }; document.body.style.overflow = 'hidden'; try { tg.BackButton.show(); } catch (e) {} }
 function closeSheet() { $('#sheet').hidden = true; $('#sheet').innerHTML = ''; document.body.style.overflow = ''; try { tg.BackButton.hide(); } catch (e) {} }
 try { tg.BackButton.onClick(closeSheet); } catch (e) {}
+/* Повернулись у кабінет (з чату чи після дзвінка): оновити «Сьогодні» / список, якщо картка не відкрита */
+function refreshVisible() {
+  if (!S.me || document.visibilityState !== 'visible' || !$('#sheet').hidden) return;
+  if (S.tab === 'td') renderToday(); else if (S.tab === 'ld') loadLeads();
+}
+document.addEventListener('visibilitychange', refreshVisible);
+try { tg.onEvent('activated', refreshVisible); } catch (e) {}
 
 boot();
 </script>
