@@ -260,7 +260,16 @@ function loading() { $('#view').innerHTML = '<div class="load">Завантаж�
 function errView(e) { $('#view').innerHTML = `<div class="err">${esc(e.message)}<br><br><button class="btn sec" onclick="go(S.tab)">Спробувати ще раз</button></div>`; }
 function setBadge(n) { const b = $('#badge'); b.textContent = n; b.hidden = !n; }
 /* «Набрати» лише тому, хто веде заявку: керівник гілки й перегляд бачать номер у картці, але не дзвонять */
-const callBtn = (x, sm) => x.phone && x.can_edit ? `<a class="call${sm ? ' sm' : ''}" href="tel:${esc(x.phone)}" onclick="haptic('medium')">📞 Набрати</a>` : '';
+// Telegram (особливо на айфоні) ігнорує tel: усередині Mini App: відкриваємо call.html у браузері телефону, вона набирає номер
+function dial(phone) {
+  haptic('medium');
+  const n = String(phone || '').replace(/[^\d+]/g, '');
+  if (tg && tg.openLink && tg.platform && tg.platform !== 'unknown') {
+    try { tg.openLink(new URL('call.html?n=' + encodeURIComponent(n), location.href).href); return false; } catch (e) {}
+  }
+  return true;  // поза Telegram спрацює звичайне посилання tel:
+}
+const callBtn = (x, sm) => x.phone && x.can_edit ? `<a class="call${sm ? ' sm' : ''}" href="tel:${esc(x.phone)}" onclick="return dial('${esc(x.phone)}')">📞 Набрати</a>` : '';
 
 /* ---------- сьогодні ---------- */
 let TODAY = null;
@@ -339,7 +348,7 @@ function drawLead() {
   if (l.phone && !l.can_edit) {  // бачить, але не веде: номер текстом, без «Подзвонити»
     h += `<div class="card"><h3><span>Телефон</span></h3><div class="phone-ro">${esc(l.phone_fmt)}</div></div>`;
   } else if (l.phone) {
-    h += `<a class="btn" href="tel:${esc(l.phone)}" onclick="haptic('medium')">📞 Подзвонити<small>${esc(l.phone_fmt)}</small></a>`;
+    h += `<a class="btn" href="tel:${esc(l.phone)}" onclick="return dial('${esc(l.phone)}')">📞 Подзвонити<small>${esc(l.phone_fmt)}</small></a>`;
     h += `<div class="g2">${l.username ? `<button class="btn sec" onclick="openLink('https://t.me/${esc(l.username)}')">✈️ Написати в Telegram</button>` : ''}<button class="btn sec" ${l.username ? '' : 'style="grid-column:1/3"'} onclick="copy('${esc(l.phone)}')">📋 Скопіювати номер</button></div>`;
   }
   const nxt = [l.next_txt ? '⏰ Передзвонити ' + l.next_txt : '', l.consult_txt ? '🗓 Консультація ' + l.consult_txt : '', l.attempts ? 'не додзвонились: ' + l.attempts : ''].filter(Boolean).join(' · ');
