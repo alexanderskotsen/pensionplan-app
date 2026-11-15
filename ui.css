@@ -233,6 +233,9 @@ details.how[open] summary::after{transform:rotate(-135deg);margin-top:4px}
 details.how p{margin:0;padding:0 16px 14px;font-size:14px;color:var(--muted);line-height:1.5}
 /* згорнутий блок програми на результаті пенсії: картка всередині без власної рамки */
 details.how.fold{background:var(--card)}
+/* «Уточнити» у формі пенсії: поля всередині з тими самими відступами, що в картці */
+#p-more{background:var(--card)}
+#p-more .more-in{padding:0 16px 8px}
 details.how.fold .card{border:0;box-shadow:none;margin:0;background:transparent}
 details.how.fold .card p{padding:0}
 .fine{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--muted);margin:0;line-height:1.45;padding:0 2px}
