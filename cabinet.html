@@ -127,6 +127,18 @@ dt{color:var(--mut)}dd{margin:0;text-align:right;font-weight:600;overflow-wrap:a
 .bar .on{color:var(--fg)}.bar .on i{filter:none;opacity:1}
 .bar em{font-style:normal;background:var(--coral);color:#fff;border-radius:9px;font-size:10px;padding:1px 5px;position:absolute;top:-2px;left:calc(50% + 6px)}
 .sheet-bg{position:fixed;inset:0;background:var(--shade);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.dgrp{font-size:12px;font-weight:700;color:var(--mut);margin:12px 0 2px;padding-top:10px;border-top:1px solid var(--line)}
+.drow{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;background:none;border:0;border-top:1px solid var(--line);padding:9px 0;text-align:left}
+.dgrp+.drow{border-top:0}
+.drow .dn{min-width:0;flex:1 1 auto}.drow .dn b{display:block;font-size:14px;font-weight:600;overflow-wrap:anywhere}.drow .dn .mini{display:block}
+.drow .tag{flex:0 0 auto}.dz{color:var(--mut);font-size:13px;flex:0 0 auto;padding-right:6px}
+.dseg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 6px;font-size:12.5px;color:var(--mut)}
+.dseg button{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:5px 10px;font-size:12.5px;font-weight:600;color:var(--fg)}
+.dseg button.on{background:var(--ink);border-color:var(--ink);color:var(--ink-fg)}.dseg button i{font-style:normal;opacity:.65}
+.dtxt{white-space:pre-line;font-size:14px;line-height:1.4;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.sgt{font-size:12px;font-weight:700;color:var(--mut);margin:10px 0 2px}.sgt:first-of-type{margin-top:0}
+.sgl{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px;padding:4px 0}.sgl span:first-child{min-width:0;overflow-wrap:anywhere}.sgl .tag{flex:0 0 auto}
+.pbtn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 10px;font-weight:600;font-size:12.5px;color:var(--fg)}
 .sheet{background:var(--bg);width:100%;max-width:560px;max-height:94vh;overflow:auto;border-radius:18px 18px 0 0;padding:8px 12px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
 .grab{width:38px;height:4px;border-radius:2px;background:var(--line);margin:2px auto 0;flex:0 0 auto}
 .sh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:4px 2px 0}
@@ -424,8 +436,9 @@ async function renderFunnel() {
   if (d.miniapp.length) h += `<div class="card"><h3><span>Калькулятори</span></h3>${d.miniapp.map(m => `<div class="row"><span>${esc(m.name)}</span><span><b class="v">${num(m.opened)}${m.moved!=null?' → '+num(m.moved)+' → '+num(m.result):''} → ${num(m.done)} → ${num(m.leads)}</b></span></div>`).join('')}
     <div class="mini" style="margin-top:6px">Відкрили → (змінили дані → побачили результат) → натиснули «записатися» або «у чат» → записались. Кроки в дужках рахуються з 15.11. Відкрили хоч щось: ${d.miniapp_any.opened}, з них нічого не дорахували: ${d.miniapp_any.nothing}.</div></div>`;
   h += `<div class="card"><h3><span>Прогрів</span></h3><div class="row"><span>Зараз отримують листи</span><span><b class="v">${d.nurture.now}</b></span></div>
-    <div class="row"><span>Записи з прогріву за період</span><span><b class="v">${d.nurture.leads}</b></span></div>
-    ${d.nurture.lost.map(x => `<div class="row"><span>Пішли після: ${esc(x.step)}</span><span><b class="v">${x.n}</b></span></div>`).join('')}</div>`;
+    <div class="row"><span>Записи з прогріву за період</span><span><b class="v">${d.nurture.leads}</b></span></div></div>`;
+  DROP = d.dropoff; DSEG = { dim: '', v: '' };
+  if (DROP) h += `<div class="card" id="drop">${dropHtml(DROP)}</div>`;
   const sh = d.share;
   if (sh.clicked || sh.came || (sh.places || []).length) {
     const st = [['Натиснули «поділитися»', sh.clicked], ['Прийшли за запрошенням', sh.came], ['Порахували', sh.calc], ['Записались', sh.leads], ['Поліс', sh.policies]];
@@ -437,6 +450,54 @@ async function renderFunnel() {
   }
   $('#view').innerHTML = h;
 }
+
+/* ---------- де відвалюються ---------- */
+let DROP = null, DSEG = { dim: '', v: '' };
+const goneTag = r => r.gone ? `<span class="tag ${r.lvl === 2 ? 'bad' : r.lvl === 1 ? 'late' : ''}">пішли ${num(r.gone)}${r.sent >= 5 ? ' · ' + pct(r.gone, r.sent) : ''}</span>` : `<span class="dz">0</span>`;
+function dropHtml(d) {
+  const all = DROP || d;
+  let h = `<h3><span>Де відвалюються</span>${d.from_txt ? `<span>облік з ${esc(d.from_txt)}</span>` : ''}</h3>`;
+  if ((all.segs || []).length) {
+    h += `<div class="dseg"><span>Показати за:</span><button class="${DSEG.dim ? '' : 'on'}" onclick="dropSeg('','')">усі</button>${all.segs.map(s => `<button class="${DSEG.dim === s.dim ? 'on' : ''}" onclick="dropSeg('${s.dim}','')">${esc(s.title)}</button>`).join('')}</div>`;
+    const cur = all.segs.find(s => s.dim === DSEG.dim);
+    if (cur) h += `<div class="dseg">${cur.opts.map(o => `<button class="${DSEG.v === o.v ? 'on' : ''}" onclick="dropSeg('${cur.dim}','${esc(o.v)}')">${esc(o.name)} <i>${num(o.n)}</i></button>`).join('')}</div>`;
+  }
+  if (DSEG.dim && !DSEG.v) return h + `<div class="mini" style="margin-top:8px">Оберіть групу: таблиця покаже лише цих людей.</div>`;
+  if (!d.groups.length) h += `<div class="empty">${d.seg ? 'Для цієї групи за період даних немає.' : `Бот ще не надсилав повідомлень за цей період${d.from_txt ? ' (облік ведеться з ' + esc(d.from_txt) + ')' : ''}.`}</div>`;
+  else h += `<div class="mini" style="margin:2px 0 4px">${num(d.total.people)} ${ppl(d.total.people)} отримали повідомлення, після них пішли ${num(d.total.gone)}${d.total.sent ? ' (' + pct(d.total.gone, d.total.sent) + ' від надісланого)' : ''}. Натисніть рядок: текст, хто пішов і які це люди.</div>`;
+  d.groups.forEach(g => {
+    h += `<div class="dgrp">${esc(g.name)}</div>` + g.rows.map(r => `<button class="drow" onclick="dropSheet('${esc(r.key)}')"><span class="dn"><b>${esc(r.name)}</b><span class="mini">надіслано ${num(r.sent)} · відреагували ${num(r.react)}${r.sent >= 5 ? ' (' + pct(r.react, r.sent) + ')' : ''}${r.lead ? ' · записались ' + num(r.lead) : ''}</span></span>${goneTag(r)}</button>`).join('');
+  });
+  if (d.groups.length) h += `<div class="mini" style="margin-top:8px">«Відреагували»: людина після повідомлення щось зробила (натиснула кнопку, написала, відкрила калькулятор) до наступного повідомлення бота. «Пішли»: відписались або заблокували бота, коли це повідомлення було останнім. Бурштин і червоний: відвал помітно вищий за середній. Відсотки показуємо від 5 отримувачів.</div>`;
+  if (!d.seg && (d.hist || []).length) {
+    h += `<div class="dgrp">Пішли до початку обліку</div>` + d.hist.map(x => `<button class="drow" onclick="dropSheet('${esc(x.key)}')"><span class="dn"><b>${esc(x.name)}</b></span><span class="tag">пішли ${num(x.n)}</span></button>`).join('');
+    h += `<div class="mini" style="margin-top:8px">Для цих людей останнє повідомлення відновлено з історії нагадувань і кроків прогріву. Скільки таких повідомлень було надіслано й чи на них реагували, за той час не видно.</div>`;
+  }
+  return h;
+}
+async function dropSeg(dim, v) {
+  DSEG = { dim, v }; haptic();
+  const box = $('#drop'); if (!box) return;
+  if (dim && !v) { box.innerHTML = dropHtml(DROP); return; }
+  if (!dim) { box.innerHTML = dropHtml(DROP); return; }
+  let d; try { d = await api(`/api/dropoff?days=${S.days}&seg=${encodeURIComponent(v)}&${scopeQ()}`); } catch (e) { return toast(e.message); }
+  if (DSEG.v === v && $('#drop')) $('#drop').innerHTML = dropHtml(d);
+}
+const segLine = r => `<div class="sgl"><span><b>${esc(r.name)}</b>: пішли ${num(r.gone)} з ${num(r.n)} (${pct(r.gone, r.n) || '0%'})${r.rest_n ? ` · решта ${num(r.rest_gone)} з ${num(r.rest_n)} (${pct(r.rest_gone, r.rest_n) || '0%'})` : ''}</span>${r.lvl ? `<span class="tag ${r.lvl === 2 ? 'bad' : 'late'}">вище</span>` : ''}</div>`;
+async function dropSheet(key) {
+  let d; try { d = await api(`/api/dropoff?days=${S.days}&key=${encodeURIComponent(key)}&${scopeQ()}`); } catch (e) { return toast(e.message); }
+  let h = `<div class="sh"><div><h2>${esc(d.name)}</h2><div class="sub">${d.sent ? `Отримали ${num(d.sent)} ${ppl(d.sent)}, після нього пішли ${num(d.gone)}${d.sent >= 5 ? ' (' + pct(d.gone, d.sent) + ')' : ''}` : `Пішли ${num(d.people.length + d.more)}`}</div></div><button class="x" onclick="closeSheet()">✕</button></div>`;
+  if (d.text) h += `<div class="card"><h3><span>Текст повідомлення</span></h3><div class="dtxt">${esc(d.text)}</div></div>`;
+  if (d.people.length) {
+    h += `<div class="card"><h3><span>Хто пішов</span><span>проти тих, хто лишився</span></h3>`;
+    if (d.breakdown.length) h += d.breakdown.map(b => `<div class="sgt">${esc(b.title)}</div>${b.rows.map(segLine).join('')}${b.few ? `<div class="mini">ще ${num(b.few)} ${ppl(b.few)} у малих групах: мало даних</div>` : ''}`).join('')
+      + `<div class="mini" style="margin-top:8px">Усього ${num(d.sent)} ${pl(d.sent, 'отримувач', 'отримувачі', 'отримувачів')}, пішли ${num(d.gone)}. Групи до 5 людей не показуємо. Числа малі: це підказка, де придивитись, а не висновок.</div>`;
+    else h += `<div class="mini">Мало даних для розбивки за групами: отримувачів ${num(d.sent)}, потрібно хоча б 5 у групі.</div>`;
+    h += `</div><div class="card"><h3><span>Люди</span><b>${num(d.people.length + d.more)}</b></h3>${d.people.map(p => `<div class="row"><span><b>${esc(p.name)}</b>${p.username ? ` <a href="#" onclick="openLink('https://t.me/${esc(p.username)}');return false" style="color:var(--blue)">@${esc(p.username)}</a>` : ''}<br><span class="mini">${p.how === 'block' ? 'заблокували бота' : 'відписались'} · ${dt(p.at)}${p.on ? ' · виявилось на: ' + esc(p.on) : ''}</span></span><span>${p.lead ? `<button class="pbtn" onclick="leadSheet(${p.lead})">🗂 Картка</button>` : isAgent() ? '' : `<button class="pbtn" onclick="findWho(${p.id})">🔎 Знайти</button>`}</span></div>`).join('')}${d.more ? `<div class="mini">і ще ${num(d.more)}</div>` : ''}</div>`;
+  } else h += `<div class="card"><div class="empty">Після цього повідомлення за період ніхто не пішов 👌</div></div>`;
+  openSheet(h);
+}
+function findWho(id) { copy('/who ' + id).then(() => toast('Скопійовано «/who ' + id + '». Надішліть це боту в чаті.')); }
 
 /* ---------- команда ---------- */
 const pl = (n, one, few, many) => (n % 10 === 1 && n % 100 !== 11) ? one : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? few : many;
