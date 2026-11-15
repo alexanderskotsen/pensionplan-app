@@ -41,8 +41,6 @@
       <div class="fld" id="net-f"><div class="fld-h"><label for="net-n">На руки зараз</label>
         <span class="numbox"><input class="num" id="net-n" data-for="net" type="text" inputmode="numeric" autocomplete="off" aria-label="Зарплата на руки, можна ввести"><span class="u">грн</span></span></div>
         <input type="range" id="net" min="5000" max="150000" step="1000" value="25000" aria-label="На руки зараз"></div>
-
-</div>
     </div>
     <details class="how" id="p-more"><summary>Уточнити: вік виходу, дохід раніше, бажана пенсія</summary>
       <div class="more-in">
@@ -55,7 +53,7 @@
       <hr class="sep">
       <div class="fld"><div class="fld-h"><label for="want-n">Хочу мати на пенсії</label>
         <span class="numbox"><input class="num" id="want-n" data-for="want" type="text" inputmode="numeric" autocomplete="off" aria-label="Бажаний дохід на пенсії, можна ввести"><span class="u">грн/міс</span></span></div>
-        <input type="range" id="want" min="5000" max="100000" step="1000" value="20000" aria-label="Хочу мати на пенсії">
+        <input type="range" id="want" min="5000" max="100000" step="1000" value="20000" aria-label="Хочу мати на пенсії"></div>
       </div></details>
     <p data-fine>Оцінка за формулою ПФУ в цінах 2026 року, не рішення Пенсійного фонду.</p>
   </section>
@@ -159,7 +157,7 @@ const PF=(()=>{try{const q=new URLSearchParams(location.search);return{pa:+q.get
 if(['emp','fop','none'].includes(PF.pw))S.work=PF.pw;
 function chips(id,key,num){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   [...$(id).children].forEach(x=>x.classList.toggle('on',x===b));const v=b.dataset.v;S[key]=num&&v!=='own'?Number(v):v;if(key==='past')S.pastSet=true;upd()})}
-if(PF.pa>=18&&PF.pa<=65)$('age').value=PF.pa;
+if(PF.pa>=18&&PF.pa<=65){$('age').value=PF.pa;$('stazh').value=Math.max(0,Math.min(45,PF.pa-22))}  // стаж не питали: приблизно з 22 років
 if(PF.pn>=5000)$('net').value=Math.min(150000,PF.pn);
 if(PF.pr>=40&&PF.pr<=70&&PF.pr>+$('age').value)$('ret').value=PF.pr;
 if(PF.pwant>=5000&&PF.pwant<=100000)$('want').value=PF.pwant;
@@ -250,22 +248,33 @@ function renderPension(){
     h+=`<div class="card"><dl class="rows"><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div>${r.stateAge?`<div><dt>До ${r.stateAge}: щомісяця</dt><dd>${money(i.want)}</dd></div><div><dt>Після ${r.stateAge}: доплата до пенсії</dt><dd>${money(r.gap)}</dd></div>`:''}</dl></div>`;
     h+=bridgeFold(i,r);
   }else{
+    // у вік виходу стажу не вистачає, але пенсію призначать пізніше (63/65): показуємо її, а не «0 грн»
+    const alt=!r.eligible&&r.altAge?calculate(i.sex,i.age,r.altAge,i.stazh,i.future,i.pastK,i.salary,i.want):null;
+    const shown=alt?alt.pension:r.pension;
     const share=r.eligible?Math.min(100,Math.round(r.pension/i.want*100)):0;
-    bigTo=r.pension;
-    h+=hero0+`<p class="hero-k">Пенсія від держави у ${i.ret} років</p>
-      <p class="hero-v"><span id="p-big">${num(r.pension)}</span><small>грн/міс</small></p>`;
-    const lack=r.gap>0?`До бажаних ${money(i.want)} не вистачає <b class="am">${money(r.gap)}</b> щомісяця.`:'';
+    bigTo=shown;
+    h+=hero0+`<p class="hero-k">Пенсія від держави ${alt?'з '+r.altAge:'у '+i.ret} років</p>
+      <p class="hero-v"><span id="p-big">${num(shown)}</span><small>грн/міс</small></p>`;
+    const gapShown=alt?Math.max(0,i.want-alt.pension):r.gap;  // після призначення пенсії з 63/65
+    const lack=gapShown>0?`До бажаних ${money(i.want)} не вистачатиме <b class="am">${money(gapShown)}</b> щомісяця${alt?' і після '+r.altAge:''}.`:'';
     if(r.eligible)h+=`<p class="hero-s">${r.ratio?(i.work==='fop'?`Це близько ${r.ratio}% мінімальної зарплати, з якої ви платите ЄСВ. `:`Це близько ${r.ratio}% вашої зарплати. `):''}${lack||`За розрахунком державна пенсія <b class="gd">покриває бажаний дохід</b> ${money(i.want)}/міс.`}</p>`;
-    else h+=`<p class="hero-s"><b class="am">Права на пенсію у ${i.ret} немає:</b> потрібно ${r.need} р. стажу, буде ${r.total}.${r.altAge?` Оформити можна з ${r.altAge} років.`:''} ${lack}</p>`;
-    if(r.gap>0)h+=`<div class="split"><div class="split-b">${share>0?`<i style="width:${share}%"></i>`:''}<s></s></div>
-      <div class="split-l"><span><b>${num(r.pension)}</b>дасть держава</span><span><b>${num(r.gap)}</b>не вистачає</span></div></div>`;
+    else h+=`<p class="hero-s"><b class="am">У ${i.ret} права на пенсію ще не буде:</b> потрібно ${r.need} р. стажу, буде ${r.total}.${alt?` Тому державну пенсію призначать з ${r.altAge} років.`:' Державної пенсії за віком не буде.'} ${lack}</p>`;
+    const shareShown=alt?Math.min(100,Math.round(alt.pension/i.want*100)):share;
+    if(gapShown>0)h+=`<div class="split"><div class="split-b">${shareShown>0?`<i style="width:${shareShown}%"></i>`:''}<s></s></div>
+      <div class="split-l"><span><b>${num(shown)}</b>дасть держава</span><span><b>${num(gapShown)}</b>не вистачає</span></div></div>`;
     if(r.eligible)h+=`<p class="hero-x ok">${UI.icon('check',18,2.4)}<span>Право на пенсію є: стаж ${r.total} р.</span></p>`;
     h+=`</div>`;
     h+=sumrow(`<b>${i.sex==='f'?'Жінка':'Чоловік'}, ${i.age} р.</b>, на пенсію у ${i.ret}`);
-    if(r.gap>0)h+=`<div class="card"><p class="k">Щоб мати ${money(i.want)}/міс, відкладайте</p>
+    // внесок понад 20 000 грн/міс або понад половину доходу: цифру не показуємо, пропонуємо реальні варіанти (15.11.2026)
+    const unreal=r.gap>0&&r.pmt>0&&(r.pmt>20000||(i.net&&r.pmt>i.net*0.5));
+    const left=i.ret-i.age;
+    if(r.gap>0&&unreal)h+=`<div class="card"><p class="k">Щоб мати ${money(i.want)}/міс на пенсії</p>
+      <p class="big"><span>за ${left} ${yw(left)} таку суму не зібрати</span></p>
+      <p class="note">Але є реальні варіанти: накопичення на 10 років для себе або капітал для дітей чи онуків. Консультант покаже цифри саме для вас.</p></div>`;
+    else if(r.gap>0)h+=`<div class="card"><p class="k">Щоб мати ${money(i.want)}/міс, відкладайте</p>
       <p class="big"><span>≈ ${num(r.pmt)}</span><small>грн на місяць</small></p>
-      <dl class="rows"><div><dt>До пенсії лишилось</dt><dd>${i.ret-i.age} р.</dd></div><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div></dl></div>`;
-    if(r.gap>0)h+=bridgeFold(i,r);
+      <dl class="rows"><div><dt>До пенсії лишилось</dt><dd>${left} р.</dd></div><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div></dl></div>`;
+    if(r.gap>0&&!unreal)h+=bridgeFold(i,r);
   }
   const tip=t=>`<div class="card"><div class="info"><span class="ib">${UI.icon('info',22)}</span><div><p>${t}</p></div></div></div>`;
   if(i.work==='fop')h+=tip('Як ФОП з мінімальним ЄСВ ви отримаєте пенсію, близьку до мінімальної, навіть з великим доходом.');
