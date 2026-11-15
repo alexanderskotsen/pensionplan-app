@@ -7,12 +7,12 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=8">
+<link rel="stylesheet" href="ui.css?v=9">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=3"></script>
 <script src="ui.js?v=8"></script>
 </head>
-<body data-view="form">
+<body class="no-sum" data-view="form">
 <nav class="nav"><div class="nav-in"><button type="button" id="tab-n">Накопичити</button><button type="button" id="tab-p" class="on">Пенсія</button><button type="button" id="tab-c">Дитині</button><button type="button" id="tab-s">Захист</button><!-- Гра схована 14.11.2026 --></div></nav>
 
 <div class="wrap">
@@ -308,7 +308,7 @@ function upd(){
   if(S.tab==='p'&&S.view==='res')renderPension();
   if(S.tab==='c'&&S.cview==='res')renderChild();
   UI.setView(view,()=>show('form'));
-  $('main').hidden=view==='form';  // у формі головна кнопка — темна «Показати розрахунок» у рядку з живою цифрою
+  $('main').hidden=view==='form';  // у формі — лише велика «Показати розрахунок» (body.no-sum, ui.css), цифра тільки на результаті
   const sec=$('second');
   // нижня панель. Форма: жива цифра + темна «Показати розрахунок». Результат: запис (корал) + «у чат», без дубля суми
   if(S.tab==='p'){

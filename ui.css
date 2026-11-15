@@ -267,6 +267,11 @@ details.how p{margin:0;padding:0 16px 14px;font-size:14px;color:var(--muted);lin
 /* форма: жива сума + «Розрахунок»; результат: без дубля суми, з «Надіслати розрахунок у чат» */
 body[data-view="res"] .dock-top{display:none}
 body[data-view="form"] .dock-link,body[data-view="form"] .dock .btn.cta{display:none}
+/* калькулятори без цифри на формі (пенсія, дитина, накопичення; 15.11.2026): лише велика «Показати розрахунок» */
+body.no-sum[data-view="form"] .dock-sum{display:none}
+body.no-sum[data-view="form"] .dock-go{flex:1;justify-content:center;min-height:58px;font-size:18px}
+body.no-sum[data-view="form"] .dock-go .sm{display:none}
+body.no-sum[data-view="form"] .dock-go .lg{display:inline}
 body.has-dock{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))}
 body.kb .dock{display:none}
 @media (max-width:359px){
