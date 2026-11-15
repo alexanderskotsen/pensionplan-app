@@ -39,7 +39,7 @@
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.45;
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.45;
   padding:0 max(var(--gut),env(safe-area-inset-right,0px)) 32px max(var(--gut),env(safe-area-inset-left,0px));
   overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
 button{font-family:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
@@ -56,7 +56,7 @@ svg.mk{flex:none;display:inline-block;color:var(--brand)}
 .nav-in{display:flex;max-width:592px;margin:0 auto;padding:0 8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nav-in::-webkit-scrollbar{display:none}
 .nav button{flex:1 0 auto;position:relative;min-height:48px;min-width:48px;padding:0 10px 4px;border:0;background:none;
-  font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap}
+  font-size:15px;font-weight:600;color:var(--muted);white-space:nowrap}
 .nav button.on{color:var(--fg);font-weight:700}
 /* «дах» — єдиний гострий акцент системи: шеврон під активною вкладкою */
 .nav button.on::after{content:"";position:absolute;left:50%;bottom:3px;width:26px;height:9px;margin-left:-13px;
@@ -68,9 +68,9 @@ svg.mk{flex:none;display:inline-block;color:var(--brand)}
 
 /* ---------- Заголовок сторінки ---------- */
 .ph{display:grid;gap:6px;padding:4px 2px 0}
-.brand{display:flex;align-items:center;gap:7px;margin:0 0 2px;font-size:14px;font-weight:650;color:var(--muted);letter-spacing:-.005em}
+.brand{display:flex;align-items:center;gap:7px;margin:0 0 2px;font-size:15px;font-weight:650;color:var(--muted);letter-spacing:-.005em}
 .ph h1{font-size:24px;font-weight:750;line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance}
-.ph p{margin:0;color:var(--muted);font-size:15px;text-wrap:pretty}
+.ph p{margin:0;color:var(--muted);font-size:16px;text-wrap:pretty}
 h2{font-size:17px;font-weight:700;margin:0;line-height:1.25;letter-spacing:-.01em;text-wrap:balance}
 
 /* ---------- Картки ---------- */
@@ -78,31 +78,31 @@ h2{font-size:17px;font-weight:700;margin:0;line-height:1.25;letter-spacing:-.01e
 .card>*{min-width:0}
 .card.tint{background:var(--soft);border-color:transparent;box-shadow:none}
 .sep{border:0;border-top:1px solid var(--line);margin:0}
-.note,.mini{font-size:14px;color:var(--muted);margin:0;line-height:1.45}
-.warnnote{font-size:14px;line-height:1.45;margin:0;padding:10px 12px;border-radius:var(--r-sm);background:var(--warn-soft);color:var(--warn);display:flex;gap:8px}
+.note,.mini{font-size:15px;color:var(--muted);margin:0;line-height:1.45}
+.warnnote{font-size:15px;line-height:1.45;margin:0;padding:10px 12px;border-radius:var(--r-sm);background:var(--warn-soft);color:var(--warn);display:flex;gap:8px}
 .warnnote svg{margin-top:2px}
 .am{color:var(--warn);font-weight:700}
 .gd{color:var(--good);font-weight:700}
 
 /* ---------- Перемикач режиму (2 вкладки в межах сторінки) ---------- */
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:3px}
-.seg button{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;min-height:var(--tap);border:0;background:transparent;border-radius:12px;padding:4px 8px;font-size:15px;font-weight:600;color:var(--muted);line-height:1.15}
+.seg button{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;min-height:var(--tap);border:0;background:transparent;border-radius:12px;padding:4px 8px;font-size:16px;font-weight:600;color:var(--muted);line-height:1.15}
 .seg button.on,.seg button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--card);color:var(--fg);box-shadow:0 1px 2px rgba(27,22,32,.14),0 0 0 1px var(--line)}
 
 /* ---------- Поля ---------- */
 .fld{display:grid;gap:4px;min-width:0}
 .fld-h{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:var(--tap)}
-.fld-h>label,.fld-h>.l,.lbl{font-size:15px;font-weight:600;color:var(--fg);min-width:0;line-height:1.25}
+.fld-h>label,.fld-h>.l,.lbl{font-size:16px;font-weight:600;color:var(--fg);min-width:0;line-height:1.25}
 .lbl{display:grid;gap:8px}
-.lbl small,.fld-h small,.toggle small{display:block;font-weight:400;color:var(--muted);font-size:14px;line-height:1.3;margin-top:1px}
-.hint{display:flex;justify-content:space-between;gap:8px;font-size:14px;color:var(--muted);padding:0 52px;margin-top:-2px}
+.lbl small,.fld-h small,.toggle small{display:block;font-weight:400;color:var(--muted);font-size:15px;line-height:1.3;margin-top:1px}
+.hint{display:flex;justify-content:space-between;gap:8px;font-size:15px;color:var(--muted);padding:0 52px;margin-top:-2px}
 /* значення поруч із повзунком: можна тапнути і ввести число */
 .numbox{display:inline-flex;align-items:baseline;gap:5px;flex:none;min-height:var(--tap);padding:0 12px;border:1.5px solid var(--ctl);border-radius:var(--r-sm);
   background:var(--card);font-weight:750;cursor:text;line-height:42px}
 .numbox.pre{flex-direction:row-reverse}
 .numbox input{border:0;background:none;outline:0;padding:0;margin:0;height:41px;min-width:2ch;max-width:11ch;text-align:right;
   font:inherit;font-size:18px;letter-spacing:-.01em;color:var(--fg)}
-.numbox .u{font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap}
+.numbox .u{font-size:15px;font-weight:500;color:var(--muted);white-space:nowrap}
 .numbox:focus-within{border-color:var(--fg);box-shadow:0 0 0 3px var(--soft)}
 .inp{font:inherit;font-size:16px;width:100%;min-height:var(--tap);padding:8px 12px;border:1.5px solid var(--ctl);border-radius:var(--r-sm);background:var(--card);color:var(--fg)}
 
@@ -124,16 +124,16 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 /* ---------- Чипи ---------- */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{min-height:var(--tap);min-width:var(--tap);padding:6px 14px;border:1.5px solid var(--ctl);background:var(--card);border-radius:var(--r-sm);
-  font-size:15px;font-weight:600;color:var(--fg);line-height:1.2;transition:background .12s,color .12s,border-color .12s}
+  font-size:16px;font-weight:600;color:var(--fg);line-height:1.2;transition:background .12s,color .12s,border-color .12s}
 .chips button.on,.chips button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--ink-on)}
 .chips button:disabled{opacity:.38}
 .chips.fill button{flex:1 1 0;padding-left:8px;padding-right:8px}
 .rowc{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.rowc>.l{font-size:15px;font-weight:600}
+.rowc>.l{font-size:16px;font-weight:600}
 
 /* ---------- Перемикач-рядок (весь рядок натискається) ---------- */
 .toggles{display:grid}
-.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:8px 0;font-size:15px;font-weight:600;cursor:pointer;line-height:1.25}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:8px 0;font-size:16px;font-weight:600;cursor:pointer;line-height:1.25}
 .toggle input{-webkit-appearance:none;appearance:none;flex:none;width:54px;height:32px;border-radius:99px;background:var(--ctl);position:relative;margin:0;cursor:pointer;transition:background .15s}
 .toggle input::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
 .toggle input:checked{background:var(--good)}
@@ -145,17 +145,17 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .hero{position:relative;overflow:hidden;background:var(--hero);color:var(--hero-fg);border-radius:24px;padding:20px;display:grid;gap:10px;min-width:0}
 .hero>*{position:relative;min-width:0}
 .hero>svg.deco{position:absolute;overflow:visible;right:-70px;top:-70px;width:240px;height:240px;pointer-events:none}
-.hero-k{font-size:15px;color:var(--hero-mut);line-height:1.35;margin:0;padding-right:40px;text-wrap:pretty}
+.hero-k{font-size:16px;color:var(--hero-mut);line-height:1.35;margin:0;padding-right:40px;text-wrap:pretty}
 .hero-v{font-size:clamp(34px,11.2vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1.02;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px}
 .hero-v small{font-size:17px;font-weight:600;letter-spacing:0;color:var(--hero-mut)}
 .hero-v.gd{color:var(--hero-good)}
 .hero-v.gd small,.hero-v.gd .pre{color:var(--hero-good);opacity:.85}
 .hero-v .pre{font-size:22px;font-weight:600;letter-spacing:0;color:var(--hero-mut)}
 .hero-v.txt{font-size:26px;letter-spacing:-.02em;line-height:1.15}
-.hero-s{font-size:15px;line-height:1.45;margin:0;text-wrap:pretty}
+.hero-s{font-size:16px;line-height:1.45;margin:0;text-wrap:pretty}
 .hero-s .gd{color:var(--hero-good)}
 .hero-s .am,.hero .am{color:var(--hero-warn)}
-.hero-x{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--hero-mut);margin:0;line-height:1.4}
+.hero-x{display:flex;gap:8px;align-items:flex-start;font-size:15px;color:var(--hero-mut);margin:0;line-height:1.4}
 .hero-x svg{margin-top:2px}
 .hero-x.ok svg{color:var(--hero-good)}
 .hero-x.wr svg{color:var(--hero-warn)}
@@ -166,13 +166,13 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .split-b{display:flex;height:12px;gap:3px}
 .split-b i{display:block;border-radius:6px;background:#fff;min-width:6px}
 .split-b s{flex:1;border-radius:6px;border:2px dashed var(--hero-warn);min-width:10px}
-.split-l{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--hero-mut);line-height:1.3}
+.split-l{display:flex;justify-content:space-between;gap:12px;font-size:15px;color:var(--hero-mut);line-height:1.3}
 .split-l b{display:block;font-size:16px;color:#fff}
 .split-l span:last-child{text-align:right}
 .split-l span:last-child b{color:var(--hero-warn)}
 /* графік трьох сценаріїв */
 .chart{display:block;width:100%;overflow:visible}
-.chart text{font-family:var(--font);fill:var(--hero-mut);font-size:13px}
+.chart text{font-family:var(--font);fill:var(--hero-mut);font-size:14px}
 .chart text.n{fill:#fff;font-size:16px;font-weight:750}
 .chart text.nb{fill:var(--hero-good);font-size:17px;font-weight:800}
 .chart text.lb{fill:var(--hero-good);font-weight:700}
@@ -186,51 +186,51 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .view-in>*:nth-child(2){animation-delay:.04s}.view-in>*:nth-child(3){animation-delay:.08s}.view-in>*:nth-child(n+4){animation-delay:.12s}
 
 /* ---------- Блоки результату ---------- */
-.k{font-size:15px;color:var(--muted);margin:0;line-height:1.35}
+.k{font-size:16px;color:var(--muted);margin:0;line-height:1.35}
 .big{font-size:32px;font-weight:800;letter-spacing:-.025em;line-height:1.1;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px}
 .big small{font-size:16px;color:var(--muted);font-weight:600;letter-spacing:0}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-weight:700;font-size:14px;justify-self:start;background:var(--good-soft);color:var(--good);line-height:1.25}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-weight:700;font-size:15px;justify-self:start;background:var(--good-soft);color:var(--good);line-height:1.25}
 .pill.warn{background:var(--warn-soft);color:var(--warn)}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
-dl.rows{margin:0;display:grid;font-size:15px}
+dl.rows{margin:0;display:grid;font-size:16px}
 dl.rows>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
 dl.rows>div:first-child{border-top:0;padding-top:0}
 dl.rows>div:last-child{padding-bottom:0}
 dl.rows dt{color:var(--fg);min-width:0}
-dl.rows dt small{display:block;font-size:14px;color:var(--muted)}
+dl.rows dt small{display:block;font-size:15px;color:var(--muted)}
 dl.rows dd{margin:0;font-weight:700;text-align:right;white-space:nowrap}
 dl.rows dd.wrapok{white-space:normal}
 /* рядок «що ви обрали» + «Змінити» */
-.sumrow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:4px 6px 4px 16px;min-height:56px;font-size:15px;line-height:1.3;box-shadow:var(--shadow)}
+.sumrow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:4px 6px 4px 16px;min-height:56px;font-size:16px;line-height:1.3;box-shadow:var(--shadow)}
 .sumrow>span{min-width:0}
-.linkbtn{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--fg);font-size:15px;font-weight:700;min-height:var(--tap);min-width:var(--tap);padding:0 10px;text-align:left;border-radius:12px;text-decoration:underline;text-decoration-color:var(--ctl);text-underline-offset:3px}
+.linkbtn{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--fg);font-size:16px;font-weight:700;min-height:var(--tap);min-width:var(--tap);padding:0 10px;text-align:left;border-radius:12px;text-decoration:underline;text-decoration-color:var(--ctl);text-underline-offset:3px}
 .linkbtn:active{background:var(--soft)}
 /* іконка + текст (захист, примітки) */
 .info{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start}
 .info>.ib{width:40px;height:40px;border-radius:12px;background:var(--soft);display:grid;place-items:center;color:var(--fg)}
-.info p{margin:0;font-size:15px;line-height:1.4}
-.info p+p{margin-top:4px;color:var(--muted);font-size:14px}
+.info p{margin:0;font-size:16px;line-height:1.4}
+.info p+p{margin-top:4px;color:var(--muted);font-size:15px}
 /* «Що буде після запису» */
-.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:15px;line-height:1.35;counter-reset:st}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:16px;line-height:1.35;counter-reset:st}
 .steps li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;counter-increment:st}
-.steps li::before{content:counter(st);width:28px;height:28px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:14px;font-weight:750;margin-top:-3px}
-.trust{font-size:14px;color:var(--muted);margin:0;line-height:1.4;padding-top:12px;border-top:1px solid var(--line)}
-.list{display:grid;margin:0;padding:0;list-style:none;font-size:15px;line-height:1.3}
+.steps li::before{content:counter(st);width:28px;height:28px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:15px;font-weight:750;margin-top:-3px}
+.trust{font-size:15px;color:var(--muted);margin:0;line-height:1.4;padding-top:12px;border-top:1px solid var(--line)}
+.list{display:grid;margin:0;padding:0;list-style:none;font-size:16px;line-height:1.3}
 .list li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:1px solid var(--line);padding:11px 0}
 .list li:first-child{border-top:0;padding-top:0}
 .list li:last-child{padding-bottom:0}
 .list b{white-space:nowrap;text-align:right}
 .list b.wrapok{white-space:normal;max-width:52%}
-.callout{background:var(--soft);border-radius:var(--r);padding:16px;display:grid;gap:10px;font-size:15px;line-height:1.45}
+.callout{background:var(--soft);border-radius:var(--r);padding:16px;display:grid;gap:10px;font-size:16px;line-height:1.45}
 .callout p{margin:0}
 
 /* ---------- «Як ми рахуємо?» і дрібний рядок бренду ---------- */
 details.how{border:1px solid var(--line);border-radius:var(--r);background:transparent}
-details.how summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:0 16px;font-size:15px;font-weight:600;color:var(--fg);cursor:pointer}
+details.how summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:0 16px;font-size:16px;font-weight:600;color:var(--fg);cursor:pointer}
 details.how summary::-webkit-details-marker{display:none}
 details.how summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin:-4px 4px 0 0;transition:transform .15s}
 details.how[open] summary::after{transform:rotate(-135deg);margin-top:4px}
-details.how p{margin:0;padding:0 16px 14px;font-size:14px;color:var(--muted);line-height:1.5}
+details.how p{margin:0;padding:0 16px 14px;font-size:15px;color:var(--muted);line-height:1.5}
 /* згорнутий блок програми на результаті пенсії: картка всередині без власної рамки */
 details.how.fold{background:var(--card)}
 /* «Уточнити» у формі пенсії: поля всередині з тими самими відступами, що в картці */
@@ -238,7 +238,7 @@ details.how.fold{background:var(--card)}
 #p-more .more-in{padding:0 16px 8px}
 details.how.fold .card{border:0;box-shadow:none;margin:0;background:transparent}
 details.how.fold .card p{padding:0}
-.fine{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--muted);margin:0;line-height:1.45;padding:0 2px}
+.fine{display:flex;gap:8px;align-items:flex-start;font-size:15px;color:var(--muted);margin:0;line-height:1.45;padding:0 2px}
 .fine svg.mk{margin-top:3px}
 .fine b{color:var(--fg);font-weight:700}
 
@@ -249,9 +249,9 @@ details.how.fold .card p{padding:0}
 /* Головна дія: запис на консультацію. Єдине місце із заливкою коралом. */
 .btn.cta{background:var(--cta);color:var(--cta-on);flex-direction:column;gap:1px;min-height:54px;padding:6px 12px}
 .btn.cta .l1{display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:750}
-.btn.cta .l2{font-size:14px;font-weight:600;line-height:1.2}
-.btn.sec{background:var(--soft);color:var(--fg);min-height:var(--tap);font-size:15px;border:1.5px solid var(--ctl)}
-.btn.ghost{background:var(--card);color:var(--fg);border:1.5px solid var(--ctl);min-height:48px;font-size:15px;justify-content:space-between;padding:8px 14px 8px 16px;text-align:left}
+.btn.cta .l2{font-size:15px;font-weight:600;line-height:1.2}
+.btn.sec{background:var(--soft);color:var(--fg);min-height:var(--tap);font-size:16px;border:1.5px solid var(--ctl)}
+.btn.ghost{background:var(--card);color:var(--fg);border:1.5px solid var(--ctl);min-height:48px;font-size:16px;justify-content:space-between;padding:8px 14px 8px 16px;text-align:left}
 
 /* ---------- Закріплена панель дії ---------- */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);
@@ -263,13 +263,13 @@ details.how.fold .card p{padding:0}
 .dock-sum{display:grid;flex:1 1 auto;min-width:0;min-height:48px;align-content:center;line-height:1.2;border:0;background:none;padding:0;text-align:left;color:var(--fg);border-radius:12px}
 .dock-sum:active{background:var(--soft)}
 .dock-sum:disabled{opacity:1;cursor:default}
-.dock-sum span{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock-sum span{font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dock-sum b{font-size:17px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
 /* головна кнопка форми — темна «Показати розрахунок»; корал з'являється лише на результаті */
-.dock-go{flex:none;display:inline-flex;align-items:center;gap:4px;border:0;background:var(--ink);color:var(--ink-on);font-size:15px;font-weight:700;min-height:48px;padding:0 12px 0 18px;border-radius:16px;white-space:nowrap;transition:transform .08s,filter .12s}
+.dock-go{flex:none;display:inline-flex;align-items:center;gap:4px;border:0;background:var(--ink);color:var(--ink-on);font-size:16px;font-weight:700;min-height:48px;padding:0 12px 0 18px;border-radius:16px;white-space:nowrap;transition:transform .08s,filter .12s}
 .dock-go:active{transform:scale(.985);filter:brightness(.93)}
 .dock-go .sm{display:none}
-.dock-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;background:none;color:var(--fg);font-size:15px;font-weight:700;min-height:var(--tap);margin:0 0 -6px;padding:0 8px;border-radius:12px}
+.dock-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;background:none;color:var(--fg);font-size:16px;font-weight:700;min-height:var(--tap);margin:0 0 -6px;padding:0 8px;border-radius:12px}
 .dock-link:active{background:var(--soft)}
 /* форма: жива сума + «Розрахунок»; результат: без дубля суми, з «Надіслати розрахунок у чат» */
 body[data-view="res"] .dock-top{display:none}
@@ -284,9 +284,9 @@ body.kb .dock{display:none}
 @media (max-width:359px){
   .card{padding:14px}
   .hero{padding:18px 16px}
-  .btn.cta .l1{font-size:15px;gap:6px}
-  .seg button{font-size:14px;padding:4px 2px;gap:4px}
-  .brand{display:flex;align-items:center;gap:7px;margin:0 0 2px;font-size:14px;font-weight:650;color:var(--muted);letter-spacing:-.005em}
+  .btn.cta .l1{font-size:16px;gap:6px}
+  .seg button{font-size:15px;padding:4px 2px;gap:4px}
+  .brand{display:flex;align-items:center;gap:7px;margin:0 0 2px;font-size:15px;font-weight:650;color:var(--muted);letter-spacing:-.005em}
 .ph h1{font-size:22px}
   .chips button{padding:6px 11px}
   .dock-sum b{font-size:16px}
@@ -296,7 +296,7 @@ body.kb .dock{display:none}
 
 /* часова лінія «свої гроші → державна пенсія» (ранній вихід) */
 .tl{display:flex;gap:4px}
-.tl>div{flex:1 1 0;min-width:104px;display:grid;gap:6px;font-size:14px;color:var(--hero-mut);line-height:1.3}
+.tl>div{flex:1 1 0;min-width:104px;display:grid;gap:6px;font-size:15px;color:var(--hero-mut);line-height:1.3}
 .tl i{display:block;height:12px;border-radius:6px;background:#fff}
 .tl i.own{background:none;border:2px dashed var(--hero-warn)}
 .tl b{color:#fff}
@@ -309,5 +309,5 @@ body.kb .dock{display:none}
 .share{gap:12px}
 .share-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .share-b.one{grid-template-columns:1fr}
-.share-b .btn{min-height:48px;font-size:14.5px;gap:6px;padding:8px 6px;line-height:1.15;background:var(--card);color:var(--fg);border:1.5px solid var(--ctl)}
+.share-b .btn{min-height:48px;font-size:15.5px;gap:6px;padding:8px 6px;line-height:1.15;background:var(--card);color:var(--fg);border:1.5px solid var(--ctl)}
 .share-b .btn .ic{flex:none}
