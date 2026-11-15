@@ -7,7 +7,7 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=8">
+<link rel="stylesheet" href="ui.css?v=9">
 <script src="bridge.js?v=4"></script>
 <script src="ui.js?v=8"></script>
 <style>
@@ -24,7 +24,7 @@
 .rng .split-l span:last-child b{color:#fff}
 </style>
 </head>
-<body data-view="form">
+<body class="no-sum" data-view="form">
 <nav class="nav"><div class="nav-in"><button type="button" onclick="navGo('save.html')">Накопичити</button><button type="button" onclick="navGo('index.html')">Пенсія</button><button type="button" onclick="navGo('index.html','child')">Дитині</button><button type="button" class="on" onclick="navGo('insure.html')">Захист</button><!-- Гра схована 14.11.2026 --></div></nav>
 
 <div class="wrap">
@@ -249,12 +249,15 @@
     ['aHero', 'aMore'].forEach(id => $(id).hidden = S.tab !== 'auto'); ['mHero', 'mMore'].forEach(id => $(id).hidden = S.tab !== 'med');
   }
   function show(v){
+    if (v === 'res' && window.trackOpen) trackOpen('res_' + S.tab);
     S.view = v; S._enter = v === 'res';
     UI.setView(v, () => show('form'));
     render(); S._enter = false; scrollTo(0, 0);
     if (v === 'res') UI.enter($('vRes'));
   }
   $('toRes').onclick = $('dockSum').onclick = () => show('res');
+  const moved = () => window.trackOpen && trackOpen('move_' + S.tab);
+  ['auto', 'med'].forEach(id => { const f = $(id); f.addEventListener('input', moved); f.addEventListener('click', e => { if (e.target.closest('button')) moved(); }); });
   $('back').onclick = () => show('form');
 
   function chips(id, key, num){ $(id).querySelectorAll('button').forEach(b => b.onclick = () => {
