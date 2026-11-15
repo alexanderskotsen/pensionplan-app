@@ -166,8 +166,11 @@ $('cgoal-own').addEventListener('input',upd);
 $('tab-p').onclick=()=>{S.tab='p';upd();scrollTo(0,0)};$('tab-c').onclick=()=>{S.tab='c';upd();scrollTo(0,0)};
 $('tab-n').onclick=()=>navGo('save.html');$('tab-s').onclick=()=>navGo('insure.html');
 // форма ↔ результат (окремо для пенсії й дитячої програми)
-function show(v){const k=S.tab==='p'?'view':'cview';S[k]=v;S._enter=v==='res';upd();S._enter=false;scrollTo(0,0);if(v==='res')UI.enter($(S.tab==='p'?'p-out':'c-out'))}
+function show(v){if(v==='res'&&window.trackOpen)trackOpen(S.tab==='c'?'res_child':'res_pension');const k=S.tab==='p'?'view':'cview';S[k]=v;S._enter=v==='res';upd();S._enter=false;scrollTo(0,0);if(v==='res')UI.enter($(S.tab==='p'?'p-out':'c-out'))}
 $('toResC').onclick=()=>show('res');
+// аналітика: людина вперше щось змінила у формі (повзунок, чип, поле)
+['p-form','c-form'].forEach(id=>{const f=$(id);if(!f)return;const h=()=>{if(window.trackOpen)trackOpen(id==='c-form'?'move_child':'move_pension')};
+  f.addEventListener('input',h);f.addEventListener('click',e=>{if(e.target.closest('button'))h()})});
 // жива цифра в панелі теж веде до результату (у дитячій — коли вказано суму)
 $('dockSum').onclick=()=>{if(S.tab==='p'||childGoal())show('res')};
 // «Змінити» і «Порахувати детально →» у блоці-містку: save.html з тією ж сумою, строком, віком і статтю
@@ -312,14 +315,15 @@ function upd(){
     const i=pensionInput(), r=calculate(i.sex,i.age,i.ret,i.stazh,i.future,i.pastK,i.salary,i.want);
     $('toResC').hidden=false;
     if(S.view==='form'){setMain('show');sec.hidden=true;
-      $('dockK').textContent='Держпенсія'+(r.stateAge?' з '+r.stateAge+' р.':'');
-      $('dockV').textContent=r.pension>0?'≈ '+money(r.pension)+'/міс':'не буде: мало стажу'}
+      // цифру на формі не показуємо: людина бачить її лише на екрані результату (разом з «не вистачить» і записом)
+      $('dockK').textContent='Ваша пенсія';
+      $('dockV').textContent='≈ ••• грн/міс'}
     else{setMain('cta');sec.hidden=false;
       $('dockK').textContent=r.pmt>0?'Відкладати до '+i.ret+' р.':'Пенсія від держави';
       $('dockV').textContent='≈ '+money(r.pmt>0?r.pmt:r.pension)+'/міс'}
   }else{setMain('cta');sec.hidden=!g;$('toResC').hidden=!g;
     $('dockK').textContent='Внесок для дитини';
-    $('dockV').textContent=g?'≈ '+money(childCalc(ca,S.cpay,g).pmt)+'/міс':'вкажіть суму'}
+    $('dockV').textContent=!g?'вкажіть суму':S.cview==='form'?'≈ ••• грн/міс':'≈ '+money(childCalc(ca,S.cpay,g).pmt)+'/міс'}
 }
 function payload(action){
   const i=pensionInput(), d={a:action,p:{sex:i.sex,age:i.age,ret:i.ret,stazh:i.stazh,work:i.work,net:i.net,past:i.pastIdx,want:i.want,calc:S.view==='res'?1:0}};

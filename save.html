@@ -271,6 +271,7 @@
     if (window.UI) UI.syncNums();
   }
   function show(v){
+    if (v === 'res' && window.trackOpen) trackOpen('res_save');
     S.view = v; S._enter = v === 'res';
     UI.setView(v, () => show('form'));
     render(); S._enter = false; scrollTo(0, 0);
@@ -287,6 +288,8 @@
   $('tabAmount').onclick = () => { S.mode = 'amount'; render(); };
   $('tabGoal').onclick = () => { S.mode = 'goal'; render(); };
   $('toRes').onclick = $('dockSum').onclick = () => show('res');
+  // аналітика: людина вперше щось змінила у формі
+  document.addEventListener('input', () => window.trackOpen && trackOpen('move_save'), { once: true });
   $('back').onclick = () => show('form');
   $('alt').onclick = e => { const b = e.target.closest('button[data-t]'); if (b) { S.term = +b.dataset.t; render(); } };
   window.addEventListener('resize', () => { if (S.view === 'res') { $('chart').classList.remove('draw'); chart(S._r); } });
