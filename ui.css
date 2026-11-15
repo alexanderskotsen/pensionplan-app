@@ -231,6 +231,10 @@ details.how summary::-webkit-details-marker{display:none}
 details.how summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin:-4px 4px 0 0;transition:transform .15s}
 details.how[open] summary::after{transform:rotate(-135deg);margin-top:4px}
 details.how p{margin:0;padding:0 16px 14px;font-size:14px;color:var(--muted);line-height:1.5}
+/* згорнутий блок програми на результаті пенсії: картка всередині без власної рамки */
+details.how.fold{background:var(--card)}
+details.how.fold .card{border:0;box-shadow:none;margin:0;background:transparent}
+details.how.fold .card p{padding:0}
 .fine{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--muted);margin:0;line-height:1.45;padding:0 2px}
 .fine svg.mk{margin-top:3px}
 .fine b{color:var(--fg);font-weight:700}

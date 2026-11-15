@@ -7,7 +7,7 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=9">
+<link rel="stylesheet" href="ui.css?v=10">
 <script src="bridge.js?v=4"></script>
 <script src="tariff.js?v=3"></script>
 <script src="ui.js?v=8"></script>
@@ -90,7 +90,7 @@
     <button type="button" class="dock-go" id="toResC" data-tores hidden><span class="lg">Показати розрахунок</span><span class="sm">Розрахунок</span><i data-ic="chev" data-px="18"></i></button>
   </div>
   <button type="button" class="btn" id="main">Показати повний розрахунок</button>
-  <button type="button" class="dock-link" id="second" hidden><i data-ic="plane" data-px="18"></i>Надіслати розрахунок у чат</button>
+  <button type="button" class="dock-link" id="second" hidden><i data-ic="plane" data-px="18"></i>Зберегти розрахунок у боті</button>
 </div></div>
 
 <script>
@@ -181,6 +181,8 @@ const num=n=>jround(n).toLocaleString('uk-UA').replace(/\u00a0|\u202f/g,' ');
 const yw=n=>n%10===1&&n%100!==11?'рік':n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?'роки':'років';
 const sumrow=t=>`<div class="sumrow"><span>${t}</span><button type="button" class="linkbtn" data-back>${UI.icon('edit',18)}Змінити</button></div>`;
 // Місток до рішення: що дасть сума «відкладати ≈ X грн/міс» у програмі накопичення (модель tariff.js, межі як у save.html)
+// результат пенсії коротший (15.11.2026): блок програми згорнуто, на першому екрані лише пенсія, розрив і «відкладайте»
+function bridgeFold(i,r){const b=bridge(i,r);return b?`<details class="how fold"><summary>Що дасть ця сума в програмі накопичення</summary>${b}</details>`:''}
 function bridge(i,r){
   if(!TF||!r.pmt||r.pmt<=0)return '';
   const left=i.ret-i.age, n=Math.min(Math.max(10,Math.min(50,75-i.age)),Math.max(10,left));
@@ -231,7 +233,7 @@ function renderPension(){
     }
     h+=sumrow(`<b>${i.sex==='f'?'Жінка':'Чоловік'}, ${i.age} р.</b>, на пенсію у ${i.ret}`);
     h+=`<div class="card"><dl class="rows"><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div>${r.stateAge?`<div><dt>До ${r.stateAge}: щомісяця</dt><dd>${money(i.want)}</dd></div><div><dt>Після ${r.stateAge}: доплата до пенсії</dt><dd>${money(r.gap)}</dd></div>`:''}</dl></div>`;
-    h+=bridge(i,r);
+    h+=bridgeFold(i,r);
   }else{
     const share=r.eligible?Math.min(100,Math.round(r.pension/i.want*100)):0;
     bigTo=r.pension;
@@ -248,7 +250,7 @@ function renderPension(){
     if(r.gap>0)h+=`<div class="card"><p class="k">Щоб мати ${money(i.want)}/міс, відкладайте</p>
       <p class="big"><span>≈ ${num(r.pmt)}</span><small>грн на місяць</small></p>
       <dl class="rows"><div><dt>До пенсії лишилось</dt><dd>${i.ret-i.age} р.</dd></div><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div></dl></div>`;
-    if(r.gap>0)h+=bridge(i,r);
+    if(r.gap>0)h+=bridgeFold(i,r);
   }
   const tip=t=>`<div class="card"><div class="info"><span class="ib">${UI.icon('info',22)}</span><div><p>${t}</p></div></div></div>`;
   if(i.work==='fop')h+=tip('Як ФОП з мінімальним ЄСВ ви отримаєте пенсію, близьку до мінімальної, навіть з великим доходом.');
@@ -314,6 +316,7 @@ function upd(){
   if(S.tab==='p'){
     const i=pensionInput(), r=calculate(i.sex,i.age,i.ret,i.stazh,i.future,i.pastK,i.salary,i.want);
     $('toResC').hidden=false;
+    $('toResC').querySelector('.lg').textContent='Показати мою пенсію';$('toResC').querySelector('.sm').textContent='Моя пенсія';
     if(S.view==='form'){setMain('show');sec.hidden=true;
       // цифру на формі не показуємо: людина бачить її лише на екрані результату (разом з «не вистачить» і записом)
       $('dockK').textContent='Ваша пенсія';
@@ -322,6 +325,7 @@ function upd(){
       $('dockK').textContent=r.pmt>0?'Відкладати до '+i.ret+' р.':'Пенсія від держави';
       $('dockV').textContent='≈ '+money(r.pmt>0?r.pmt:r.pension)+'/міс'}
   }else{setMain('cta');sec.hidden=!g;$('toResC').hidden=!g;
+    $('toResC').querySelector('.lg').textContent='Показати розрахунок';$('toResC').querySelector('.sm').textContent='Розрахунок';
     $('dockK').textContent='Внесок для дитини';
     $('dockV').textContent=!g?'вкажіть суму':S.cview==='form'?'≈ ••• грн/міс':'≈ '+money(childCalc(ca,S.cpay,g).pmt)+'/міс'}
 }
