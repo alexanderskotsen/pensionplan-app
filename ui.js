@@ -106,7 +106,7 @@
   // fu_<tg_id>_<kind>_a (хто прийде, закріпиться за тим самим консультантом). Вимикач — settings.share у боті (/api/share):
   // поки відповіді немає або вимкнено, блоку немає. Сторінка слухає UI.onShare(fn), щоб перемалювати результат.
   const SQ = new URLSearchParams(location.search);
-  const SAPI = (SQ.get('api') || 'https://pensionplan-bot.onrender.com').replace(/\/$/, '');
+  const SAPI = (SQ.get('api') || 'https://finplan.57.129.193.181.sslip.io').replace(/\/$/, '');
   const shareTexts = {}, shareCbs = [];
   UI.shareOn = false;
   UI.onShare = fn => { shareCbs.push(fn); if (UI.shareOn) fn(); };
