@@ -6,7 +6,7 @@ window.toBot = async function (data, start) {
   const tg = window.Telegram && window.Telegram.WebApp;
   const inTg = !!(tg && tg.platform && tg.platform !== 'unknown');
   const q = new URLSearchParams(location.search);
-  const api = (q.get('api') || 'https://finplan.57.129.193.181.sslip.io').replace(/\/$/, '');
+  const api = (q.get('api') || 'https://app.tviyfinplan.com.ua').replace(/\/$/, '');
   const bot = q.get('bot') || 'tviy_finplan_bot';
   if (inTg && !tg.initData) {
     try { tg.sendData(data); return true; } catch (e) {}
@@ -34,7 +34,7 @@ window.toBot = async function (data, start) {
     try {
       const tg = window.Telegram && window.Telegram.WebApp;
       const q = new URLSearchParams(location.search);
-      const api = (q.get('api') || 'https://finplan.57.129.193.181.sslip.io').replace(/\/$/, '');
+      const api = (q.get('api') || 'https://app.tviyfinplan.com.ua').replace(/\/$/, '');
       const init = tg && tg.initData;
       if (!init && !q.get('tu')) return;
       const headers = { 'Content-Type': 'text/plain' };

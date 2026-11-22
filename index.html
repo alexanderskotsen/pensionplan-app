@@ -2,6 +2,8 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
+<script>/* Головна сторінка домену поза Telegram → вітрина. Mini App завжди відкривається з параметрами або #tgWebApp… */
+if(/(^|\.)tviyfinplan\.com\.ua$/.test(location.hostname)&&!location.search&&location.hash.indexOf("tgWebApp")<0&&location.pathname.replace(/index\.html$/,"")==="/")location.replace("/p.html");</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Твій фінансовий план</title>
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
