@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /cabinet.html
+Disallow: /call.html
+Disallow: /go.html
+Sitemap: https://tviyfinplan.com.ua/sitemap.xml

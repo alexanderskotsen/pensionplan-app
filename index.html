@@ -2,379 +2,101 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<script>/* Головна сторінка домену поза Telegram → вітрина. Mini App завжди відкривається з параметрами або #tgWebApp… */
-if(/(^|\.)tviyfinplan\.com\.ua$/.test(location.hostname)&&!location.search&&location.hash.indexOf("tgWebApp")<0&&location.pathname.replace(/index\.html$/,"")==="/")location.replace("/p.html");</script>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Твій фінансовий план</title>
-<link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=12">
-<script src="bridge.js?v=5"></script>
-<script src="tariff.js?v=3"></script>
-<script src="ui.js?v=9"></script>
+<script>/* Mini App пенсії переїхала в pension.html (23.11.2026). Усе, що відкривається з Telegram (#tgWebApp…) або зі старими
+   параметрами бота (tu, ts, tab, pa…), одразу йде туди. Звичайний відвідувач і Google бачать лендінг. */
+(function(){var h=location.hash,q=location.search.replace(/^\?/,'');
+var keys=q?q.split('&').map(function(x){return x.split('=')[0]}).filter(function(k){return k&&!/^(utm_|fbclid|gclid|ttclid|yclid)/.test(k)}):[];
+if(h.indexOf('tgWebApp')>=0||keys.length)location.replace('/pension.html'+location.search+h);})();</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Пенсійний калькулятор 2026: розрахувати пенсію онлайн | Твій фінансовий план</title>
+<meta name="description" content="Безкоштовний пенсійний калькулятор: за хвилину порахуйте свою майбутню пенсію від держави за формулою ПФУ, скільки стажу потрібно і скільки відкладати самому. Без реєстрації.">
+<link rel="canonical" href="https://tviyfinplan.com.ua/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Пенсійний калькулятор 2026: яка буде ваша пенсія">
+<meta property="og:description" content="За хвилину порахуйте пенсію від держави і скільки відкладати самому. Без реєстрації.">
+<meta property="og:url" content="https://tviyfinplan.com.ua/">
+<meta property="og:image" content="https://tviyfinplan.com.ua/og.png">
+<meta property="og:locale" content="uk_UA">
+<link rel="icon" href="/logo.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/site.css?v=1">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[
+{"@type":"WebApplication","name":"Пенсійний калькулятор «Твій фінансовий план»","url":"https://tviyfinplan.com.ua/","applicationCategory":"FinanceApplication","operatingSystem":"Any","inLanguage":"uk","offers":{"@type":"Offer","price":"0","priceCurrency":"UAH"}},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Як рахується пенсія в Україні?","acceptedAnswer":{"@type":"Answer","text":"Пенсія = середня зарплата для обчислення пенсії × ваш коефіцієнт заробітку × коефіцієнт стажу. У 2026 році середня зарплата для нових пенсій 17 482,87 грн, коефіцієнт стажу дорівнює 1% за кожен рік стажу."}},
+{"@type":"Question","name":"Скільки стажу потрібно для пенсії у 60 років?","acceptedAnswer":{"@type":"Answer","text":"У 2026 році 33 роки, у 2027 році 34 роки, з 2028 року 35 років. Якщо стажу менше, пенсію призначать у 63 (від 23–25 років стажу) або в 65 (від 15 років)."}},
+{"@type":"Question","name":"Яка мінімальна пенсія у 2026 році?","acceptedAnswer":{"@type":"Answer","text":"Мінімальна пенсія за віком для людини з повним стажем (30 років для жінок, 35 для чоловіків) у 2026 році 2 595 грн, з 65 років вища."}},
+{"@type":"Question","name":"Чи точний цей калькулятор?","acceptedAnswer":{"@type":"Answer","text":"Це орієнтовний розрахунок за формулою ПФУ в цінах 2026 року. Точну суму призначає Пенсійний фонд за вашими реальними даними про стаж і зарплату."}}
+]}]}</script>
 </head>
-<body class="no-sum" data-view="form">
-<nav class="nav"><div class="nav-in"><button type="button" id="tab-n">Накопичити</button><button type="button" id="tab-p" class="on">Пенсія</button><button type="button" id="tab-c">Дитині</button><button type="button" id="tab-s">Захист</button><!-- Гра схована 14.11.2026 --></div></nav>
+<body data-page="home">
+<div class="w">
+<header class="top">
+  <a class="logo" href="/"><img src="/logo.svg" alt="" width="36" height="36">Твій фінансовий план</a>
+  <a class="tg" data-bot="top" href="https://t.me/tviy_finplan_bot?start=site">Telegram</a>
+</header>
 
-<div class="wrap">
-  <!-- ПЕНСІЯ: ФОРМА -->
-  <section id="p-form" class="stack">
-    <header class="ph">
-      <i data-brand></i>
-      <h1>Яка буде моя пенсія</h1>
-      <p>Кілька коротких відповідей, і побачите свою пенсію.</p>
-    </header>
-    <div class="card">
-      <div class="rowc"><span class="l">Стать</span>
-        <div class="chips" id="sex"><button type="button" data-v="f" class="on">Жінка</button><button type="button" data-v="m">Чоловік</button></div></div>
-      <hr class="sep">
-      <div class="fld"><div class="fld-h"><label for="age-n">Вік зараз<small>18–65 років</small></label>
-        <span class="numbox"><input class="num" id="age-n" data-for="age" type="text" inputmode="numeric" autocomplete="off" aria-label="Вік, можна ввести"><span class="u">р.</span></span></div>
-        <input type="range" id="age" min="18" max="65" value="35" aria-label="Вік зараз"></div>
-      <hr class="sep">
-      <div class="fld"><div class="fld-h"><label for="stazh-n">Офіційний стаж<small>приблизно, скільки років працювали офіційно</small></label>
-        <span class="numbox"><input class="num" id="stazh-n" data-for="stazh" type="text" inputmode="numeric" autocomplete="off" aria-label="Стаж у роках, можна ввести"><span class="u">р.</span></span></div>
-        <input type="range" id="stazh" min="0" max="45" value="12" aria-label="Офіційний стаж"></div>
-    </div>
-    <div class="card">
-      <div class="lbl">Як працюю зараз
-        <div class="chips" id="work"><button type="button" data-v="emp" class="on">Офіційно за наймом</button><button type="button" data-v="fop">ФОП</button><button type="button" data-v="none">Неофіційно / не працюю</button></div></div>
-      <div class="fld" id="net-f"><div class="fld-h"><label for="net-n">На руки зараз</label>
-        <span class="numbox"><input class="num" id="net-n" data-for="net" type="text" inputmode="numeric" autocomplete="off" aria-label="Зарплата на руки, можна ввести"><span class="u">грн</span></span></div>
-        <input type="range" id="net" min="5000" max="150000" step="1000" value="25000" aria-label="На руки зараз"></div>
-    </div>
-    <details class="how" id="p-more"><summary>Уточнити: вік виходу, дохід раніше, бажана пенсія</summary>
-      <div class="more-in">
-      <div class="fld"><div class="fld-h"><label for="ret-n">Хочу на пенсію у<small>державна з 60</small></label>
-        <span class="numbox"><input class="num" id="ret-n" data-for="ret" type="text" inputmode="numeric" autocomplete="off" aria-label="Вік виходу на пенсію, можна ввести"><span class="u">р.</span></span></div>
-        <input type="range" id="ret" min="40" max="70" value="60" aria-label="Вік виходу на пенсію"></div>
-      <hr class="sep">
-      <div class="lbl">Раніше в середньому на руки, тис. грн<small style="display:block;font-weight:400;color:var(--muted)">за всі роки роботи; якщо не змінювати, беремо як зараз</small>
-        <div class="chips" id="past"><button type="button" data-v="0">до 10</button><button type="button" data-v="1">10–20</button><button type="button" data-v="2" class="on">20–30</button><button type="button" data-v="3">30–45</button><button type="button" data-v="4">45–65</button><button type="button" data-v="5">65+</button><button type="button" data-v="6">не знаю</button></div></div>
-      <hr class="sep">
-      <div class="fld"><div class="fld-h"><label for="want-n">Хочу мати на пенсії</label>
-        <span class="numbox"><input class="num" id="want-n" data-for="want" type="text" inputmode="numeric" autocomplete="off" aria-label="Бажаний дохід на пенсії, можна ввести"><span class="u">грн/міс</span></span></div>
-        <input type="range" id="want" min="5000" max="100000" step="1000" value="20000" aria-label="Хочу мати на пенсії"></div>
-      </div></details>
-    <p data-fine>Оцінка за формулою ПФУ в цінах 2026 року, не рішення Пенсійного фонду.</p>
-  </section>
+<main>
+<h1>Пенсійний калькулятор 2026</h1>
+<p class="lead">Порахуйте за хвилину, яку пенсію дасть держава, чи вистачить вам стажу і скільки відкладати самому, щоб на пенсії не рахувати копійки. Без реєстрації.</p>
 
-  <!-- ПЕНСІЯ: РЕЗУЛЬТАТ -->
-  <section id="p-res" class="stack" hidden aria-live="polite"><div id="p-out" class="stack"></div></section>
-
-  <!-- ДИТИНА: ФОРМА -->
-  <section id="c-form" class="stack" hidden>
-    <header class="ph">
-      <i data-brand></i>
-      <h1>Капітал дитині на старт</h1>
-      <p>Оберіть вік дитини й суму, і побачите, скільки відкладати щомісяця.</p>
-    </header>
-    <div class="card">
-      <div class="fld"><div class="fld-h"><label for="cage-n">Вік дитини<small>0–17 років</small></label>
-        <span class="numbox"><input class="num" id="cage-n" data-for="cage" type="text" inputmode="numeric" autocomplete="off" aria-label="Вік дитини, можна ввести"><span class="u" id="cage-u">років</span></span></div>
-        <input type="range" id="cage" min="0" max="17" value="4" aria-label="Вік дитини"></div>
-      <hr class="sep">
-      <div class="lbl">Отримати гроші у віці<div class="chips" id="cpay"></div>
-        <small>програма триває щонайменше 10 років</small></div>
-      <hr class="sep">
-      <div class="lbl"><span>Зібрати <b id="cgoal-v"></b></span>
-        <div class="chips" id="cgoal"><button type="button" data-v="200000">200 тис.</button><button type="button" data-v="500000">500 тис.</button><button type="button" data-v="1000000" class="on">1 млн</button><button type="button" data-v="own">своя сума</button></div>
-        <input type="number" class="inp" id="cgoal-own" inputmode="numeric" placeholder="Сума, грн" min="10000" step="10000" hidden>
-        <small id="cgoal-h" hidden>Вкажіть суму від 10 000 грн.</small></div>
-    </div>
-    <p data-fine><b>Розрахунок орієнтовний.</b> Точні цифри покаже консультант.</p>
-  </section>
-
-  <!-- ДИТИНА: РЕЗУЛЬТАТ -->
-  <section id="c-res" class="stack" hidden aria-live="polite"><div id="c-out" class="stack"></div></section>
-</div>
-
-<div class="dock"><div class="dock-in">
-  <div class="dock-top">
-    <button type="button" class="dock-sum" id="dockSum"><span id="dockK"></span><b id="dockV"></b></button>
-    <button type="button" class="dock-go" id="toResC" data-tores hidden><span class="lg">Показати розрахунок</span><span class="sm">Розрахунок</span><i data-ic="chev" data-px="18"></i></button>
+<form id="calc" class="card calc" novalidate>
+  <div class="row"><span class="lbl">Стать</span>
+    <div class="chips" data-k="sex"><button type="button" data-v="f" class="on">Жінка</button><button type="button" data-v="m">Чоловік</button></div></div>
+  <div class="grid2">
+    <div class="row"><label for="age">Ваш вік</label><input id="age" type="number" inputmode="numeric" min="18" max="64" value="35"></div>
+    <div class="row"><label for="stazh">Стаж зараз, років</label><input id="stazh" type="number" inputmode="numeric" min="0" max="50" value="10">
+      <p class="hint">Офіційна робота або ФОП</p></div>
   </div>
-  <button type="button" class="btn" id="main">Показати повний розрахунок</button>
-  <button type="button" class="dock-link" id="second" hidden><i data-ic="plane" data-px="18"></i>Зберегти розрахунок у боті</button>
-</div></div>
+  <div class="row"><span class="lbl">Як працюєте зараз</span>
+    <div class="chips" data-k="work"><button type="button" data-v="emp" class="on">Офіційно</button><button type="button" data-v="fop">ФОП</button><button type="button" data-v="none">Неофіційно</button></div></div>
+  <div class="row" id="netrow"><label for="net">Зарплата на руки, грн/міс</label><input id="net" type="number" inputmode="numeric" min="0" step="500" value="20000"></div>
+  <div class="grid2">
+    <div class="row"><span class="lbl">На пенсію у</span>
+      <div class="chips" data-k="ret"><button type="button" data-v="60" class="on">60</button><button type="button" data-v="63">63</button><button type="button" data-v="65">65</button></div></div>
+    <div class="row"><label for="want">Хочу мати на пенсії, грн/міс</label><input id="want" type="number" inputmode="numeric" min="1000" step="1000" value="15000"></div>
+  </div>
+  <button class="btn ink" type="submit">Порахувати мою пенсію</button>
+  <div id="res" class="res" hidden aria-live="polite"></div>
+</form>
 
-<script>
-// ===== Формула: та сама, що в calc.py бота =====
-const ZP=17482.87, AVG_NOW=26269, PM=2595, MIN65=3758, MAX=25950, BASE_YEAR=2026, MIN_WAGE=8647;
-const NET_TO_GROSS=1/(1-0.18-0.05), CHILD_RETURN=0.07, RET=0.03, YEARS=20;
-const PAST=[8000,15000,25000,37500,55000,80000,null];
-const jround=x=>Math.floor(x+0.5);
-const money=n=>jround(n).toLocaleString('uk-UA').replace(/ /g,' ')+' грн';
-const mln=n=>n>=1e6?(Math.round(n/1e5)/10).toString().replace('.',',')+' млн грн':money(n);
-function req(y){const k=Math.min(Math.max(y-2026,0),2);return {r60:33+k,r63:23+k,r65:15}}
-function statePension(sex,age,sa,total,kz){
-  const year=BASE_YEAR+Math.max(0,jround(sa-age)), full=sex==='f'?30:35;
-  const ks=Math.floor(total*12)/1200, raw=ZP*kz*ks;
-  const over=Math.max(0,Math.floor(total-full)), extra=over*Math.min(raw*0.01,PM*0.01);
-  const minP=total>=full?(sa>=65?MIN65:PM):PM*total/full;
-  const p=Math.min(MAX,Math.max(raw+extra,minP)), rq=req(year);
-  const need=sa>=65?rq.r65:sa>=63?rq.r63:rq.r60;
-  return {p,ok:total>=need,need,rq,year};
-}
-const annuity=(m,n,r)=>(n<=0||m<=0)?0:(r>0?m*12*(1-Math.pow(1+r,-n))/r:m*12*n);
-function calculate(sex,age,ret,stazh,future,pastK,salary,want){
-  const total=stazh+future, futK=salary/AVG_NOW;
-  const kz=total>0?(stazh*pastK+future*futK)/total:0, early=ret<60;
-  let p,eligible,need,altAge=null,stateAge=null,bridge=0,gap,cap,year;
-  if(!early){
-    const s=statePension(sex,age,ret,total,kz); p=s.p;eligible=s.ok;need=s.need;year=s.year;
-    if(!eligible){p=0;altAge=total>=s.rq.r63?63:total>=s.rq.r65?65:null}
-    stateAge=eligible?ret:null; gap=Math.max(0,want-p); cap=annuity(gap,YEARS,RET);
-  }else{
-    p=0;eligible=false;need=null;
-    for(const sa of [60,63,65]){const s=statePension(sex,age,sa,total,kz);if(need===null)need=s.need;if(s.ok){stateAge=sa;p=s.p;eligible=true;need=s.need;break}}
-    year=BASE_YEAR+Math.max(0,jround(ret-age)); gap=Math.max(0,want-p);
-    if(stateAge){bridge=stateAge-ret;cap=annuity(want,bridge,RET)+annuity(gap,YEARS,RET)/Math.pow(1+RET,bridge)}
-    else{bridge=60-ret+YEARS;cap=annuity(want,bridge,RET)}
-  }
-  const months=Math.max(1,jround((ret-age)*12)), rm=Math.pow(1+RET,1/12)-1;
-  const pmt=ret>age?cap*rm/(Math.pow(1+rm,months)-1):null;
-  return {pension:jround(p),eligible,need,total,altAge,year,early,stateAge,bridge,gap:jround(gap),capital:jround(cap),pmt:pmt===null?null:jround(pmt),ratio:salary>0?jround(p/salary*100):null};
-}
-function childOptions(a){const e=Math.max(18,a+10);if(e>27)return[];return [...new Set([e,...[18,21,23,25,27].filter(x=>x>=e)])].sort((x,y)=>x-y)}
-// Дитяча програма: внесок, щоб базовий прогноз = goal; модель — tariff.js (та сама в tariff.py бота)
-const TF=typeof Tariff!=='undefined'?Tariff:(typeof require!=='undefined'?require('./tariff.js'):null);
-function childCalc(a,pay,goal){const y=pay-a;
-  if(!TF){const m=y*12,rm=Math.pow(1+CHILD_RETURN,1/12)-1;return {years:y,pmt:jround(goal*rm/(Math.pow(1+rm,m)-1)),payYear:BASE_YEAR+y}}
-  const u=TF.child(1000,'m',y),pmt=jround(goal/u.base*1000),r=TF.child(pmt,'m',y);
-  return {years:y,pmt,payYear:BASE_YEAR+y,guar:jround(r.guar),base:jround(r.base),opt:jround(r.opt),paid:jround(r.paid)}}
-if(typeof module!=='undefined'){module.exports={calculate,childCalc,childOptions};}
-</script>
-<script>
-if(typeof document!=='undefined'){(function(){
-const tg=window.Telegram&&Telegram.WebApp; if(tg){try{tg.ready();tg.expand()}catch(e){}}
-const $=id=>document.getElementById(id);
-// view — екран пенсії (форма/результат), cview — екран дитячої програми; у дані для бота йде лише view (поле calc)
-const S={tab:'p',view:'form',cview:'form',sex:'f',work:'emp',past:2,pastSet:false,cpay:21,cgoal:1000000};
-try{if(new URLSearchParams(location.search).get('tab')==='child')S.tab='c'}catch(e){}
-// відповіді фінансової анкети з бота (pa — вік, pn — на руки, pw — тип роботи, pr — вік пенсії, pwant — бажана пенсія,
-// ca — вік дитини); людина може змінити повзунки
-const PF=(()=>{try{const q=new URLSearchParams(location.search);return{pa:+q.get('pa')||0,pn:+q.get('pn')||0,pw:q.get('pw')||'',pr:+q.get('pr')||0,pwant:+q.get('pwant')||0,ca:q.get('ca')===null||q.get('ca')===''?-1:+q.get('ca')}}catch(e){return{}}})();
-if(['emp','fop','none'].includes(PF.pw))S.work=PF.pw;
-function chips(id,key,num){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
-  [...$(id).children].forEach(x=>x.classList.toggle('on',x===b));const v=b.dataset.v;S[key]=num&&v!=='own'?Number(v):v;if(key==='past')S.pastSet=true;upd()})}
-if(PF.pa>=18&&PF.pa<=65){$('age').value=PF.pa;$('stazh').value=Math.max(0,Math.min(45,PF.pa-22))}  // стаж не питали: приблизно з 22 років
-if(PF.pn>=5000)$('net').value=Math.min(150000,PF.pn);
-if(PF.pr>=40&&PF.pr<=70&&PF.pr>+$('age').value)$('ret').value=PF.pr;
-if(PF.pwant>=5000&&PF.pwant<=100000)$('want').value=PF.pwant;
-if(Number.isInteger(PF.ca)&&PF.ca>=0&&PF.ca<=17)$('cage').value=PF.ca;
-if(PF.pw)[...$('work').children].forEach(x=>x.classList.toggle('on',x.dataset.v===S.work));
-// стан форми й екрана в межах сесії: navGo в «Накопичити» і назад не скидає розрахунок (15.11.2026)
-const SS_KEY='pension_state', SS_IDS=['age','ret','stazh','net','want','cage','cgoal-own'];
-function saveState(){try{const o={S:{},v:{}};['tab','view','cview','sex','work','past','pastSet','cpay','cgoal'].forEach(k=>o.S[k]=S[k]);
-  SS_IDS.forEach(id=>o.v[id]=$(id).value);sessionStorage.setItem(SS_KEY,JSON.stringify(o))}catch(e){}}
-(function(){try{const o=JSON.parse(sessionStorage.getItem(SS_KEY)||'null');if(!o)return;
-  const q=new URLSearchParams(location.search);Object.assign(S,o.S);if(q.get('tab')==='child')S.tab='c';
-  SS_IDS.forEach(id=>{if(o.v[id]!=null&&o.v[id]!=='')$(id).value=o.v[id]});
-  [['sex','sex'],['work','work'],['past','past'],['cgoal','cgoal']].forEach(([id,k])=>[...$(id).children].forEach(x=>x.classList.toggle('on',String(x.dataset.v)===String(S[k]))));
-}catch(e){}})();
-chips('sex','sex');chips('work','work');chips('past','past',true);chips('cgoal','cgoal',true);
-$('cpay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.cpay=Number(b.dataset.v);upd()});
-['age','ret','stazh','net','want','cage'].forEach(id=>$(id).addEventListener('input',upd));
-$('cgoal-own').addEventListener('input',upd);
-$('tab-p').onclick=()=>{S.tab='p';upd();scrollTo(0,0)};$('tab-c').onclick=()=>{S.tab='c';upd();scrollTo(0,0)};
-$('tab-n').onclick=()=>navGo('save.html');$('tab-s').onclick=()=>navGo('insure.html');
-// форма ↔ результат (окремо для пенсії й дитячої програми)
-function show(v){if(v==='res'&&window.trackOpen)trackOpen(S.tab==='c'?'res_child':'res_pension');const k=S.tab==='p'?'view':'cview';S[k]=v;S._enter=v==='res';upd();S._enter=false;scrollTo(0,0);if(v==='res')UI.enter($(S.tab==='p'?'p-out':'c-out'))}
-$('toResC').onclick=()=>show('res');
-// аналітика: людина вперше щось змінила у формі (повзунок, чип, поле)
-['p-form','c-form'].forEach(id=>{const f=$(id);if(!f)return;const h=()=>{if(window.trackOpen)trackOpen(id==='c-form'?'move_child':'move_pension')};
-  f.addEventListener('input',h);f.addEventListener('click',e=>{if(e.target.closest('button'))h()})});
-// жива цифра в панелі теж веде до результату (у дитячій — коли вказано суму)
-$('dockSum').onclick=()=>{if(S.tab==='p'||childGoal())show('res')};
-// «Змінити» і «Порахувати детально →» у блоці-містку: save.html з тією ж сумою, строком, віком і статтю
-document.querySelector('.wrap').addEventListener('click',e=>{
-  if(e.target.closest('[data-back]')){show('form');return}
-  const b=e.target.closest('[data-amt]');if(b)navGo('save.html',null,{amt:b.dataset.amt,yrs:b.dataset.yrs,pa:b.dataset.age,sx:b.dataset.sx})});
-const num=n=>jround(n).toLocaleString('uk-UA').replace(/\u00a0|\u202f/g,' ');
-const yw=n=>n%10===1&&n%100!==11?'рік':n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?'роки':'років';
-const sumrow=t=>`<div class="sumrow"><span>${t}</span><button type="button" class="linkbtn" data-back>${UI.icon('edit',18)}Змінити</button></div>`;
-// Місток до рішення: що дасть сума «відкладати ≈ X грн/міс» у програмі накопичення (модель tariff.js, межі як у save.html)
-// результат пенсії коротший (15.11.2026): блок програми згорнуто, на першому екрані лише пенсія, розрив і «відкладайте»
-function bridgeFold(i,r){const b=bridge(i,r);return b?`<details class="how fold"><summary>Що дасть ця сума в програмі накопичення</summary>${b}</details>`:''}
-function bridge(i,r){
-  if(!TF||!r.pmt||r.pmt<=0)return '';
-  const left=i.ret-i.age, n=Math.min(Math.max(10,Math.min(50,75-i.age)),Math.max(10,left));
-  const amt=Math.min(20000,Math.max(500,Math.round(r.pmt/100)*100));
-  const t=TF.adult(amt,'m',i.age,i.sex,n), k=x=>money(Math.round(x/1000)*1000);
-  const notes=[];
-  if(r.pmt>20000)notes.push('Калькулятор рахує до 20 000 грн/міс, більшу суму підберемо на консультації.');
-  else if(r.pmt<500)notes.push('Найменший внесок у програмі: 500 грн/міс.');
-  if(n>left)notes.push('Найкоротший строк програми: 10 років.');
-  if(n<left)notes.push('Програма триває щонайдовше до 75 років, тому строк '+n+' р.');
-  if(t.base<t.paid)notes.push('На короткому строку в старшому віці прогноз може бути меншим за внески.');
-  const ann=TF.annuity?TF.annuity(t.base,i.age+n,i.sex):null;
-  // 4 759 → 4 800: внесок у програмі кратний 100 грн, тому показуємо обидві суми й пояснюємо округлення
-  const rounded=r.pmt>=500&&r.pmt<=20000&&amt!==r.pmt?` (${money(r.pmt)}, округлено до сотень)`:'';
-  return `<div class="card bridge" id="bridge"><div class="card-h"><h2>Якщо відкладати цю суму в програмі накопичення</h2>
-    <p class="note">${money(amt)}/міс${rounded} · ${n} ${yw(n)} · накопичувальне страхування життя</p></div>
-    <dl class="rows"><div><dt>Відкладете</dt><dd>${money(t.paid)}</dd></div><div><dt>Інвестиційний дохід<small>прогноз, не гарантований</small></dt><dd class="${t.base<t.paid?'am':'gd'}">${t.base<t.paid?'−':'+'} ≈ ${k(Math.abs(t.base-t.paid))}</dd></div><div><dt>Разом</dt><dd class="gd">≈ ${k(t.base)}</dd></div>${ann?`<div><dt>Або щомісяця довічно<small>з ${i.age+n} років</small></dt><dd class="gd">≈ ${money(Math.round(ann/100)*100)}</dd></div>`:''}</dl>
-    <p class="note">Якщо з вами щось станеться, сім'я отримає ≈ ${k(t.cover)}.${notes.length?' '+notes.join(' '):''}</p>
-    <p class="note">Суми програми вказано в майбутніх гривнях, без поправки на інфляцію, тому напряму з потрібним капіталом (у сьогоднішніх цінах) їх не порівнюйте. Як закрити різницю, покаже консультант.</p>
-    <button type="button" class="btn ghost" data-amt="${amt}" data-yrs="${n}" data-age="${i.age}" data-sx="${i.sex}">Порахувати детально${UI.icon('chev',18)}</button></div>`;
-}
-const v=id=>Number($(id).value);
-function fill(el){const p=(el.value-el.min)/(el.max-el.min)*100;el.style.setProperty('--p',p+'%')}
-function pensionInput(){
-  const age=v('age'), ret=Math.max(v('ret'),age+1);
-  const net=S.work==='emp'?v('net'):null;
-  const salary=S.work==='emp'?net*NET_TO_GROSS:S.work==='fop'?MIN_WAGE:0;
-  const future=S.work==='none'?0:Math.max(0,ret-age);
-  const pastNet=PAST[S.past], pastK=pastNet===null?0.8:pastNet*NET_TO_GROSS/AVG_NOW;
-  return {sex:S.sex,age,ret,stazh:v('stazh'),future,pastK,salary,want:v('want'),net,work:S.work,pastIdx:S.past};
-}
-function childGoal(){if(S.cgoal==='own'){const x=Number($('cgoal-own').value);return x>=10000?x:0}return S.cgoal}
-function renderPension(){
-  const i=pensionInput(), r=calculate(i.sex,i.age,i.ret,i.stazh,i.future,i.pastK,i.salary,i.want);
-  const hero0=`<div class="hero">${UI.deco()}${UI.mark(15)}`;
-  let h='', bigTo=0;
-  if(r.early){
-    // ранній вихід: головна цифра — скільки відкладати; далі — скільки років жити на власні гроші
-    bigTo=r.pmt;
-    h+=hero0+`<p class="hero-k">Щоб перестати працювати у ${i.ret}, відкладайте</p>
-      <p class="hero-v"><span class="pre">≈</span><span id="p-big">${num(r.pmt)}</span><small>грн на місяць</small></p>`;
-    if(r.stateAge){
-      const tot=(r.stateAge-i.ret)+20, w1=Math.round((r.stateAge-i.ret)/tot*100);
-      h+=`<p class="hero-s">Державна пенсія не раніше 60. З вашим стажем (${r.total} р.) її призначать з <b>${r.stateAge}</b>. <b class="am">${r.bridge} ${yw(r.bridge)}</b> доведеться жити на власні гроші.</p>
-        <div class="tl"><div style="flex-grow:${w1}"><i class="own"></i><span><b>${i.ret}–${r.stateAge}</b><br>тільки свої</span></div><div style="flex-grow:${100-w1}"><i></i><span><b>з ${r.stateAge}</b><br>держава ${money(r.pension)} + свої</span></div></div></div>`;
-    }else{
-      h+=`<p class="hero-s">Якщо перестати працювати у ${i.ret}, <b class="am">стажу (${r.total} р.) поки не вистачає на державну пенсію</b> (потрібно від ${r.need} р.). Жити доведеться тільки на власні накопичення.</p></div>`;
-    }
-    h+=sumrow(`<b>${i.sex==='f'?'Жінка':'Чоловік'}, ${i.age} р.</b>, на пенсію у ${i.ret}`);
-    h+=`<div class="card"><dl class="rows"><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div>${r.stateAge?`<div><dt>До ${r.stateAge}: щомісяця</dt><dd>${money(i.want)}</dd></div><div><dt>Після ${r.stateAge}: доплата до пенсії</dt><dd>${money(r.gap)}</dd></div>`:''}</dl></div>`;
-    h+=bridgeFold(i,r);
-  }else{
-    // у вік виходу стажу не вистачає, але пенсію призначать пізніше (63/65): показуємо її, а не «0 грн»
-    const alt=!r.eligible&&r.altAge?calculate(i.sex,i.age,r.altAge,i.stazh,i.future,i.pastK,i.salary,i.want):null;
-    const shown=alt?alt.pension:r.pension;
-    const share=r.eligible?Math.min(100,Math.round(r.pension/i.want*100)):0;
-    bigTo=shown;
-    h+=hero0+`<p class="hero-k">Пенсія від держави ${alt?'з '+r.altAge:'у '+i.ret} років</p>
-      <p class="hero-v"><span id="p-big">${num(shown)}</span><small>грн/міс</small></p>`;
-    const gapShown=alt?Math.max(0,i.want-alt.pension):r.gap;  // після призначення пенсії з 63/65
-    const lack=gapShown>0?`До бажаних ${money(i.want)} не вистачатиме <b class="am">${money(gapShown)}</b> щомісяця${alt?' і після '+r.altAge:''}.`:'';
-    if(r.eligible)h+=`<p class="hero-s">${r.ratio?(i.work==='fop'?`Це близько ${r.ratio}% мінімальної зарплати, з якої ви платите ЄСВ. `:`Це близько ${r.ratio}% вашої зарплати. `):''}${lack||`За розрахунком державна пенсія <b class="gd">покриває бажаний дохід</b> ${money(i.want)}/міс.`}</p>`;
-    else h+=`<p class="hero-s"><b class="am">У ${i.ret} права на пенсію ще не буде:</b> потрібно ${r.need} р. стажу, буде ${r.total}.${alt?` Тому державну пенсію призначать з ${r.altAge} років.`:' Державної пенсії за віком не буде.'} ${lack}</p>`;
-    const shareShown=alt?Math.min(100,Math.round(alt.pension/i.want*100)):share;
-    if(gapShown>0)h+=`<div class="split"><div class="split-b">${shareShown>0?`<i style="width:${shareShown}%"></i>`:''}<s></s></div>
-      <div class="split-l"><span><b>${num(shown)}</b>дасть держава</span><span><b>${num(gapShown)}</b>не вистачає</span></div></div>`;
-    if(r.eligible)h+=`<p class="hero-x ok">${UI.icon('check',18,2.4)}<span>Право на пенсію є: стаж ${r.total} р.</span></p>`;
-    h+=`</div>`;
-    h+=sumrow(`<b>${i.sex==='f'?'Жінка':'Чоловік'}, ${i.age} р.</b>, на пенсію у ${i.ret}`);
-    // внесок понад 20 000 грн/міс або понад половину доходу: цифру не показуємо, пропонуємо реальні варіанти (15.11.2026)
-    const unreal=r.gap>0&&r.pmt>0&&(r.pmt>20000||(i.net&&r.pmt>i.net*0.5));
-    const left=i.ret-i.age;
-    if(r.gap>0&&unreal)h+=`<div class="card"><p class="k">Щоб мати ${money(i.want)}/міс на пенсії</p>
-      <p class="big"><span>за ${left} ${yw(left)} таку суму не зібрати</span></p>
-      <p class="note">Але є реальні варіанти: накопичення на 10 років для себе або капітал для дітей чи онуків. Консультант покаже цифри саме для вас.</p></div>`;
-    else if(r.gap>0)h+=`<div class="card"><p class="k">Щоб мати ${money(i.want)}/міс, відкладайте</p>
-      <p class="big"><span>≈ ${num(r.pmt)}</span><small>грн на місяць</small></p>
-      <dl class="rows"><div><dt>До пенсії лишилось</dt><dd>${left} р.</dd></div><div><dt>Потрібен капітал у ${i.ret}</dt><dd>${mln(r.capital)}</dd></div></dl></div>`;
-    if(r.gap>0&&!unreal)h+=bridgeFold(i,r);
-  }
-  const tip=t=>`<div class="card"><div class="info"><span class="ib">${UI.icon('info',22)}</span><div><p>${t}</p></div></div></div>`;
-  if(i.work==='fop')h+=tip('Як ФОП з мінімальним ЄСВ ви отримаєте пенсію, близьку до мінімальної, навіть з великим доходом.');
-  if(i.work==='none')h+=tip('Неофіційна робота не додає ні стажу, ні пенсії: ці роки не зараховуються до стажу.');
-  h+=UI.steps('Підберемо програму під ваш бюджет');
-  // поділитися: у тексті лише державна пенсія (якщо вона є); власних накопичень і доходу не розкриваємо
-  const sp=r.pension>0&&i.age<45;  // з 45+ без власної цифри: пенсіонер шле дітям, «моя пенсія вийде» звучить дивно
-  h+=UI.shareCard('pension',{title:'А скільки вийде у ваших близьких?',note:'Надішліть їм калькулятор. Це хвилина і безкоштовно.',b:['Надіслати близьким'],
-    t:sp?[`Моя державна пенсія вийде ≈ ${money(r.pension)} на місяць 😬 Цікаво, скільки в тебе. Тут рахує за хвилину.`]
-        :['Тут за хвилину видно, якою буде державна пенсія і скільки не вистачить до бажаного доходу. Глянь, цікаво, що вийде в тебе.'],
-    mini:(sp?`У повідомленні буде лише ваша державна пенсія: ${money(r.pension)}.`:'Ваших цифр у повідомленні не буде.')+' Текст можна змінити перед надсиланням.'});
-  h+=UI.fine('<b>Розрахунок орієнтовний.</b> Оцінка за формулою ПФУ в цінах 2026 року, не рішення Пенсійного фонду. Інвестиційний дохід не гарантований.');
-  $('p-out').innerHTML=h;
-  if(S._enter)UI.count($('p-big'),bigTo,num,bigTo*0.7);
-}
-function renderChild(){
-  const goal=childGoal();
-  if(!goal){$('c-out').innerHTML='';return}
-  const a=v('cage'), r=childCalc(a,S.cpay,goal), k=x=>money(Math.round(x/1000)*1000);
-  const got=r.guar?Math.round(r.base/1000)*1000:goal;
-  let h=`<div class="hero">${UI.deco()}${UI.mark(15)}<p class="hero-k">У ${S.cpay} ${yw(S.cpay)} (${r.payYear} рік) дитина отримає</p>
-    <p class="hero-v gd"><span class="pre">≈</span><span id="c-big">${num(got)}</span><small>грн</small></p>
-    ${r.guar?`<p class="hero-s">Прогноз, інвестиційний дохід не гарантований.</p>`:''}</div>`;
-  h+=sumrow(`<b>Дитині ${a} ${yw(a)}</b>, ціль ${money(goal)} у ${S.cpay}`);
-  h+=`<div class="card"><p class="k">Для цього відкладайте</p><p class="big"><span>≈ ${num(r.pmt)}</span><small>грн на місяць</small></p><dl class="rows"><div><dt>Програма</dt><dd>${r.years} ${yw(r.years)}</dd></div>${r.guar?`<div><dt>Внесете</dt><dd>${money(r.paid)}</dd></div>
-    <div><dt>Інвестиційний дохід<small>прогноз, не гарантований</small></dt><dd class="gd">+ ≈ ${k(Math.max(0,r.base-r.paid))}</dd></div>
-    <div><dt>Разом</dt><dd class="gd">≈ ${k(r.base)}</dd></div>`:''}</dl></div>`;
-  h+=`<div class="card"><div class="info"><span class="ib">${UI.icon('shield',22)}</span><div><p>Можна додати опцію: якщо з батьками щось станеться, страхова продовжить внески, і <b>дитина все одно отримає суму</b>.</p><p>Внески можна щороку індексувати від інфляції. Точні умови пояснить консультант</p></div></div></div>`;
-  h+=UI.steps('Підберемо внесок і строк під вашу дитину');
-  h+=UI.shareCard('child',{title:'Хто ще дбає про майбутнє дитини?',note:'Надішліть їм калькулятор. Це хвилина і безкоштовно.',b:['Надіслати близьким'],
-    t:['Глянь, скільки треба відкладати, щоб у дитини був свій капітал на старт у доросле життя. Рахує за хвилину.'],
-    mini:'Ваших сум у повідомленні не буде. Текст можна змінити перед надсиланням.'});
-  h+=UI.fine('<b>Розрахунок орієнтовний.</b> Інвестиційний дохід не гарантований, точні умови залежать від програми і страхової компанії.');
-  $('c-out').innerHTML=h;
-  if(S._enter)UI.count($('c-big'),got,num,got*0.7);
-}
-function setMain(kind){const m=$('main');if(m._k===kind)return;m._k=kind;m.classList.toggle('cta',kind==='cta');
-  m.innerHTML=kind==='cta'?UI.cta():'Показати повний розрахунок'}
-function pastFromNet(n){return n<10000?0:n<20000?1:n<30000?2:n<45000?3:n<65000?4:5}
-function upd(){
-  if(!S.pastSet&&S.work==='emp'){S.past=pastFromNet(v('net'));[...$('past').children].forEach(x=>x.classList.toggle('on',+x.dataset.v===S.past))}
-  const age=v('age'); $('ret').min=Math.max(40,age+1); if(v('ret')<=age)$('ret').value=age+1;
-  ['age','ret','stazh','net','want','cage'].forEach(id=>fill($(id)));
-  const ca=v('cage'); $('cage-u').textContent=ca===1?'рік':ca>=2&&ca<=4?'роки':'років';
-  if(window.UI)UI.syncNums();
-  $('net-f').hidden=S.work!=='emp';
-  $('tab-p').classList.toggle('on',S.tab==='p'); $('tab-c').classList.toggle('on',S.tab==='c');
-  if (window.trackOpen) trackOpen(S.tab==='c'?'child':'pension');
-  // дитяча форма: вік виплати, сума
-  const opts=childOptions(ca);
-  if(!opts.includes(S.cpay))S.cpay=opts[0];
-  $('cpay').innerHTML=opts.map(x=>`<button type="button" data-v="${x}" class="${x===S.cpay?'on':''}">${x}</button>`).join('');
-  $('cgoal-own').hidden=S.cgoal!=='own';
-  const g=childGoal(); $('cgoal-v').textContent=g?money(g):''; $('cgoal-h').hidden=!!g;
-  if(!g)S.cview='form';
-  const view=S.tab==='p'?S.view:S.cview;
-  $('p-form').hidden=!(S.tab==='p'&&S.view==='form'); $('p-res').hidden=!(S.tab==='p'&&S.view==='res');
-  $('c-form').hidden=!(S.tab==='c'&&S.cview==='form'); $('c-res').hidden=!(S.tab==='c'&&S.cview==='res');
-  saveState();
-  if(S.tab==='p'&&S.view==='res')renderPension();
-  if(S.tab==='c'&&S.cview==='res')renderChild();
-  UI.setView(view,()=>show('form'));
-  $('main').hidden=view==='form';  // у формі — лише велика «Показати розрахунок» (body.no-sum, ui.css), цифра тільки на результаті
-  const sec=$('second');
-  // нижня панель. Форма: жива цифра + темна «Показати розрахунок». Результат: запис (корал) + «у чат», без дубля суми
-  if(S.tab==='p'){
-    const i=pensionInput(), r=calculate(i.sex,i.age,i.ret,i.stazh,i.future,i.pastK,i.salary,i.want);
-    $('toResC').hidden=false;
-    $('toResC').querySelector('.lg').textContent='Показати мою пенсію';$('toResC').querySelector('.sm').textContent='Моя пенсія';
-    if(S.view==='form'){setMain('show');sec.hidden=true;
-      // цифру на формі не показуємо: людина бачить її лише на екрані результату (разом з «не вистачить» і записом)
-      $('dockK').textContent='Ваша пенсія';
-      $('dockV').textContent='≈ ••• грн/міс'}
-    else{setMain('cta');sec.hidden=false;
-      $('dockK').textContent=r.pmt>0?'Відкладати до '+i.ret+' р.':'Пенсія від держави';
-      $('dockV').textContent='≈ '+money(r.pmt>0?r.pmt:r.pension)+'/міс'}
-  }else{setMain('cta');sec.hidden=!g;$('toResC').hidden=!g;
-    $('toResC').querySelector('.lg').textContent='Показати розрахунок';$('toResC').querySelector('.sm').textContent='Розрахунок';
-    $('dockK').textContent='Внесок для дитини';
-    $('dockV').textContent=!g?'вкажіть суму':S.cview==='form'?'≈ ••• грн/міс':'≈ '+money(childCalc(ca,S.cpay,g).pmt)+'/міс'}
-}
-function payload(action){
-  const i=pensionInput(), d={a:action,p:{sex:i.sex,age:i.age,ret:i.ret,stazh:i.stazh,work:i.work,net:i.net,past:i.pastIdx,want:i.want,calc:S.view==='res'?1:0}};
-  if(S.tab==='c'&&childGoal())d.c={age:v('cage'),pay:S.cpay,goal:childGoal()};
-  return JSON.stringify(d);
-}
-function send(action){
-  const data=payload(action);
-  window.toBot(data,'').then(ok=>{if(!ok)alert('Відкрийте калькулятор через Telegram-бота, щоб надіслати дані.')});
-}
-$('main').onclick=()=>{
-  if(S.tab==='p'&&S.view==='form'){show('res');return}
-  send(S.tab==='c'?'child':'lead');
-};
-$('second').onclick=()=>send('bd');
-UI.onShare(()=>{if((S.tab==='p'?S.view:S.cview)==='res')upd()});  // «Поділитися» ввімкнено: домалювати блок на відкритому результаті
-upd();
-})();}
-</script>
+<h2>Як рахується пенсія в Україні</h2>
+<p>Пенсію за віком рахують за формулою із Закону «Про загальнообов'язкове державне пенсійне страхування» (№ 1058-IV):</p>
+<p class="note"><b>Пенсія = середня зарплата × коефіцієнт заробітку × коефіцієнт стажу</b></p>
+<ul class="dots">
+  <li><b>Середня зарплата для обчислення пенсії.</b> У 2026 році для нових пенсій це 17 482,87 грн (середнє за 2023–2025 роки).</li>
+  <li><b>Коефіцієнт заробітку.</b> У скільки разів ваша офіційна зарплата була більшою чи меншою за середню по країні за весь стаж. Заробляли рівно середню, коефіцієнт 1.</li>
+  <li><b>Коефіцієнт стажу.</b> 1% за кожен рік: 35 років стажу дають 0,35.</li>
+</ul>
+<p>Приклад: 35 років стажу і зарплата на рівні середньої дають 17 482,87 × 1 × 0,35 ≈ 6 119 грн. Тобто навіть з повним стажем держава замінює приблизно третину зарплати, а з меншим стажем ще менше.</p>
+
+<h2>Скільки стажу потрібно для пенсії</h2>
+<div class="tblw"><table>
+<thead><tr><th>Рік виходу</th><th>У 60 років</th><th>У 63 роки</th><th>У 65 років</th></tr></thead>
+<tbody><tr><td>2026</td><td>33 роки</td><td>23 роки</td><td>15 років</td></tr>
+<tr><td>2027</td><td>34 роки</td><td>24 роки</td><td>15 років</td></tr>
+<tr><td>2028 і далі</td><td>35 років</td><td>25 років</td><td>15 років</td></tr></tbody>
+</table></div>
+<p style="margin-top:12px"><a href="/stazh-dlya-pensii/">Докладно про стаж: що рахується, як перевірити і що робити, якщо не вистачає</a></p>
+
+<h2>Чому пенсії не вистачить і що з цим робити</h2>
+<p>Працюючих в Україні вже майже стільки ж, скільки пенсіонерів, тому солідарна система платить небагато, і частка пенсії від зарплати падає. У розвинених країнах держава теж дає лише частину, а решту люди відкладають самі: у США державна пенсія замінює приблизно половину зарплати, а разом з власними накопиченнями виходить майже вся.</p>
+<p>Калькулятор вище показує, скільки бракуватиме до бажаної суми і скільки треба відкладати щомісяця, щоб цю різницю закрити. Чим раніше почати, тим менший щомісячний внесок.</p>
+
+<h2>Часті питання</h2>
+<details><summary>Чи точний цей калькулятор?</summary><p>Це орієнтовний розрахунок за формулою ПФУ в цінах 2026 року. Точну суму призначає Пенсійний фонд за вашими реальними даними про стаж і зарплату з персоніфікованого обліку.</p></details>
+<details><summary>Яка мінімальна пенсія у 2026 році?</summary><p>Для людини з повним стажем (30 років для жінок, 35 для чоловіків) мінімальна пенсія за віком 2 595 грн, з 65 років вища. Якщо стажу менше повного, мінімум зменшується пропорційно.</p></details>
+<details><summary>Чи рахується стаж ФОП?</summary><p>Так, якщо щомісяця сплачено хоча б мінімальний ЄСВ (у 2026 році 1 902,34 грн). Але з мінімального внеску пенсія виходить близькою до мінімальної. <a href="/pensiya-fop/">Пенсія ФОП: розрахунок і приклади</a></p></details>
+<details><summary>Як дізнатися свій точний стаж?</summary><p>В електронному кабінеті Пенсійного фонду (portal.pfu.gov.ua) через електронний підпис (КЕП) або BankID. Там видно ваш стаж і зарплату за даними персоніфікованого обліку.</p></details>
+<details><summary>Скільки треба відкладати, щоб мати 20 000 грн на пенсії?</summary><p>Залежить від віку, стажу і зарплати. Введіть «20000» у полі «Хочу мати на пенсії», і калькулятор покаже суму на місяць саме для вас.</p></details>
+</main>
+
+<footer>
+  <nav><a href="/">Пенсійний калькулятор</a><a href="/stazh-dlya-pensii/">Стаж для пенсії 2026–2028</a><a href="/pensiya-fop/">Пенсія ФОП</a><a data-bot="footer" href="https://t.me/tviy_finplan_bot?start=site">Telegram-бот</a><a href="https://t.me/tviy_finplan">Telegram-канал</a></nav>
+  <p>Розрахунок за Законом України № 1058-IV, показники ПФУ на 2026 рік. Розрахунок орієнтовний і не є рішенням Пенсійного фонду.</p>
+  <p>© 2026 Твій фінансовий план</p>
+</footer>
+</div>
+<script src="/site.js?v=1"></script>
 </body>
 </html>
