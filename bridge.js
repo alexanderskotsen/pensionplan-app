@@ -78,10 +78,10 @@ window.toBot = async function (data, start) {
         '#gateLock .gn{color:var(--fg,#1B1620);font-weight:600}html.gate-locked,html.gate-locked body{overflow:hidden}';
       document.head.appendChild(st);
       box = document.createElement('div'); box.id = 'gateLock'; box.setAttribute('role', 'dialog');
-      box.innerHTML = '<div class="gl"><h1>Калькулятори доступні підписникам каналу «Твій фінансовий план»</h1>' +
-        '<p>Підпишіться, і калькулятор відкриється одразу.</p>' +
+      box.innerHTML = '<div class="gl"><h1>Калькулятори відкриваються для підписників</h1>' +
+        '<p>Підпишіться на канал «Твій\u00a0фінансовий\u00a0план», і\u00a0калькулятор відкриється одразу.</p>' +
         '<button type="button" class="g1" id="gateSub">Підписатися</button>' +
-        '<button type="button" class="g2" id="gateChk">Я підписався</button><p class="gn" id="gateNote" hidden></p></div>';
+        '<button type="button" class="g2" id="gateChk">Перевірити підписку</button><p class="gn" id="gateNote" hidden></p></div>';
       document.body.appendChild(box);
       document.documentElement.classList.add('gate-locked');
       box.querySelector('#gateSub').onclick = () => {
