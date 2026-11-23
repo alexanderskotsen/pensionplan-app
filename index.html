@@ -2,11 +2,11 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<script>/* Mini App пенсії переїхала в pension.html (23.11.2026). Усе, що відкривається з Telegram (#tgWebApp…) або зі старими
-   параметрами бота (tu, ts, tab, pa…), одразу йде туди. Звичайний відвідувач і Google бачать лендінг. */
-(function(){var h=location.hash,q=location.search.replace(/^\?/,'');
-var keys=q?q.split('&').map(function(x){return x.split('=')[0]}).filter(function(k){return k&&!/^(utm_|fbclid|gclid|ttclid|yclid)/.test(k)}):[];
-if(h.indexOf('tgWebApp')>=0||keys.length)location.replace('/pension.html'+location.search+h);})();</script>
+<script>/* Mini App пенсії переїхала в pension.html (23.11.2026). Усе з Telegram (#tgWebApp…) або з параметрами бота
+   (білий список нижче) одразу йде туди. Шлях відносний: працює і на tviyfinplan.com.ua, і на GitHub Pages (/pensionplan-app/). */
+(function(){var h=location.hash,q=location.search.replace(/^\?/,''),K=/^(tu|ts|tab|api|bot|v|pa|pn|pw|pr|pwant|ca|amt|yrs|sx|af)$/;
+var hit=q&&q.split('&').some(function(x){return K.test(decodeURIComponent(x.split('=')[0]))});
+if(h.indexOf('tgWebApp')>=0||hit)location.replace('pension.html'+location.search+h);})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Пенсійний калькулятор 2026: розрахувати пенсію онлайн | Твій фінансовий план</title>
 <meta name="description" content="Безкоштовний пенсійний калькулятор: за хвилину порахуйте свою майбутню пенсію від держави за формулою ПФУ, скільки стажу потрібно і скільки відкладати самому. Без реєстрації.">
@@ -15,11 +15,14 @@ if(h.indexOf('tgWebApp')>=0||keys.length)location.replace('/pension.html'+locati
 <meta property="og:title" content="Пенсійний калькулятор 2026: яка буде ваша пенсія">
 <meta property="og:description" content="За хвилину порахуйте пенсію від держави і скільки відкладати самому. Без реєстрації.">
 <meta property="og:url" content="https://tviyfinplan.com.ua/">
-<meta property="og:image" content="https://tviyfinplan.com.ua/og.png">
+<meta property="og:image" content="https://tviyfinplan.com.ua/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:locale" content="uk_UA">
-<link rel="icon" href="/logo.svg" type="image/svg+xml">
-<link rel="preload" href="/fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/site.css?v=1">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="site.css?v=2">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[
 {"@type":"WebApplication","name":"Пенсійний калькулятор «Твій фінансовий план»","url":"https://tviyfinplan.com.ua/","applicationCategory":"FinanceApplication","operatingSystem":"Any","inLanguage":"uk","offers":{"@type":"Offer","price":"0","priceCurrency":"UAH"}},
 {"@type":"FAQPage","mainEntity":[
@@ -32,7 +35,7 @@ if(h.indexOf('tgWebApp')>=0||keys.length)location.replace('/pension.html'+locati
 <body data-page="home">
 <div class="w">
 <header class="top">
-  <a class="logo" href="/"><img src="/logo.svg" alt="" width="36" height="36">Твій фінансовий план</a>
+  <a class="logo" href="/"><img src="logo.svg" alt="" width="36" height="36">Твій фінансовий план</a>
   <a class="tg" data-bot="top" href="https://t.me/tviy_finplan_bot?start=site">Telegram</a>
 </header>
 
@@ -51,12 +54,15 @@ if(h.indexOf('tgWebApp')>=0||keys.length)location.replace('/pension.html'+locati
   <div class="row"><span class="lbl">Як працюєте зараз</span>
     <div class="chips" data-k="work"><button type="button" data-v="emp" class="on">Офіційно</button><button type="button" data-v="fop">ФОП</button><button type="button" data-v="none">Неофіційно</button></div></div>
   <div class="row" id="netrow"><label for="net">Зарплата на руки, грн/міс</label><input id="net" type="number" inputmode="numeric" min="0" step="500" value="20000"></div>
+  <div class="row" id="pastrow" hidden><span class="lbl">До ФОП ви здебільшого</span>
+    <div class="chips" data-k="past"><button type="button" data-v="fop" class="on">Теж були ФОП</button><button type="button" data-v="emp">Працювали офіційно</button></div></div>
   <div class="grid2">
     <div class="row"><span class="lbl">На пенсію у</span>
       <div class="chips" data-k="ret"><button type="button" data-v="60" class="on">60</button><button type="button" data-v="63">63</button><button type="button" data-v="65">65</button></div></div>
     <div class="row"><label for="want">Хочу мати на пенсії, грн/міс</label><input id="want" type="number" inputmode="numeric" min="1000" step="1000" value="15000"></div>
   </div>
   <button class="btn ink" type="submit">Порахувати мою пенсію</button>
+  <p id="err" class="err" role="alert" hidden></p>
   <div id="res" class="res" hidden aria-live="polite"></div>
 </form>
 
@@ -77,16 +83,16 @@ if(h.indexOf('tgWebApp')>=0||keys.length)location.replace('/pension.html'+locati
 <tr><td>2027</td><td>34 роки</td><td>24 роки</td><td>15 років</td></tr>
 <tr><td>2028 і далі</td><td>35 років</td><td>25 років</td><td>15 років</td></tr></tbody>
 </table></div>
-<p style="margin-top:12px"><a href="/stazh-dlya-pensii/">Докладно про стаж: що рахується, як перевірити і що робити, якщо не вистачає</a></p>
+<p style="margin-top:12px"><a href="stazh-dlya-pensii/">Докладно про стаж: що рахується, як перевірити і що робити, якщо не вистачає</a></p>
 
 <h2>Чому пенсії не вистачить і що з цим робити</h2>
-<p>Працюючих в Україні вже майже стільки ж, скільки пенсіонерів, тому солідарна система платить небагато, і частка пенсії від зарплати падає. У розвинених країнах держава теж дає лише частину, а решту люди відкладають самі: у США державна пенсія замінює приблизно половину зарплати, а разом з власними накопиченнями виходить майже вся.</p>
+<p>Працюючих в Україні вже майже стільки ж, скільки пенсіонерів, тому солідарна система платить небагато, і частка пенсії від зарплати падає. У розвинених країнах держава теж дає лише частину, а решту люди відкладають самі: у США державна пенсія замінює близько 40% зарплати, а решту люди добирають власними накопиченнями.</p>
 <p>Калькулятор вище показує, скільки бракуватиме до бажаної суми і скільки треба відкладати щомісяця, щоб цю різницю закрити. Чим раніше почати, тим менший щомісячний внесок.</p>
 
 <h2>Часті питання</h2>
 <details><summary>Чи точний цей калькулятор?</summary><p>Це орієнтовний розрахунок за формулою ПФУ в цінах 2026 року. Точну суму призначає Пенсійний фонд за вашими реальними даними про стаж і зарплату з персоніфікованого обліку.</p></details>
 <details><summary>Яка мінімальна пенсія у 2026 році?</summary><p>Для людини з повним стажем (30 років для жінок, 35 для чоловіків) мінімальна пенсія за віком 2 595 грн, з 65 років вища. Якщо стажу менше повного, мінімум зменшується пропорційно.</p></details>
-<details><summary>Чи рахується стаж ФОП?</summary><p>Так, якщо щомісяця сплачено хоча б мінімальний ЄСВ (у 2026 році 1 902,34 грн). Але з мінімального внеску пенсія виходить близькою до мінімальної. <a href="/pensiya-fop/">Пенсія ФОП: розрахунок і приклади</a></p></details>
+<details><summary>Чи рахується стаж ФОП?</summary><p>Так, якщо щомісяця сплачено хоча б мінімальний ЄСВ (у 2026 році 1 902,34 грн). Але з мінімального внеску пенсія виходить близькою до мінімальної. <a href="pensiya-fop/">Пенсія ФОП: розрахунок і приклади</a></p></details>
 <details><summary>Як дізнатися свій точний стаж?</summary><p>В електронному кабінеті Пенсійного фонду (portal.pfu.gov.ua) через електронний підпис (КЕП) або BankID. Там видно ваш стаж і зарплату за даними персоніфікованого обліку.</p></details>
 <details><summary>Скільки треба відкладати, щоб мати 20 000 грн на пенсії?</summary><p>Залежить від віку, стажу і зарплати. Введіть «20000» у полі «Хочу мати на пенсії», і калькулятор покаже суму на місяць саме для вас.</p></details>
 </main>
@@ -97,6 +103,6 @@ if(h.indexOf('tgWebApp')>=0||keys.length)location.replace('/pension.html'+locati
   <p>© 2026 Твій фінансовий план</p>
 </footer>
 </div>
-<script src="/site.js?v=1"></script>
+<script src="site.js?v=2"></script>
 </body>
 </html>

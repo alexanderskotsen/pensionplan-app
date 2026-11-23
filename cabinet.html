@@ -176,7 +176,7 @@ dt{color:var(--mut)}dd{margin:0;text-align:right;font-weight:600;overflow-wrap:a
 <script>
 const tg = window.Telegram && window.Telegram.WebApp;
 const P = new URLSearchParams(location.search);
-const API = (P.get('api') || '').replace(/\/$/, '');
+const API = (u => { u = (u || '').replace(/\/$/, ''); return /^https:\/\/([a-z0-9-]+\.)*(tviyfinplan\.com\.ua|57\.129\.193\.181\.sslip\.io)$/.test(u) ? u : ''; })(P.get('api'));
 const INIT = (tg && tg.initData) || '';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

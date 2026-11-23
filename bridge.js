@@ -1,3 +1,5 @@
+/* Адреса сервера бота лише з дозволених доменів: чужий ?api= не отримає initData (рецензія 23.11.2026). */
+window.safeApi = function (u) { u = (u || '').replace(/\/$/, ''); return /^https:\/\/([a-z0-9-]+\.)*(tviyfinplan\.com\.ua|57\.129\.193\.181\.sslip\.io)$/.test(u) ? u : 'https://app.tviyfinplan.com.ua'; };
 // Надсилання розрахунку в бота з будь-якої сторінки Mini App.
 // • Відкрито кнопкою внизу чату: initData порожній, працює лише Telegram sendData.
 // • Відкрито з меню / посилання / інлайн-кнопки: є initData — шлемо на сервер бота (/api/webapp_data).
@@ -6,7 +8,7 @@ window.toBot = async function (data, start) {
   const tg = window.Telegram && window.Telegram.WebApp;
   const inTg = !!(tg && tg.platform && tg.platform !== 'unknown');
   const q = new URLSearchParams(location.search);
-  const api = (q.get('api') || 'https://app.tviyfinplan.com.ua').replace(/\/$/, '');
+  const api = window.safeApi(q.get('api'));
   const bot = q.get('bot') || 'tviy_finplan_bot';
   if (inTg && !tg.initData) {
     try { tg.sendData(data); return true; } catch (e) {}
@@ -34,7 +36,7 @@ window.toBot = async function (data, start) {
     try {
       const tg = window.Telegram && window.Telegram.WebApp;
       const q = new URLSearchParams(location.search);
-      const api = (q.get('api') || 'https://app.tviyfinplan.com.ua').replace(/\/$/, '');
+      const api = window.safeApi(q.get('api'));
       const init = tg && tg.initData;
       if (!init && !q.get('tu')) return;
       const headers = { 'Content-Type': 'text/plain' };

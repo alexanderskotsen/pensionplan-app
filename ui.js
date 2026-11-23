@@ -106,7 +106,7 @@
   // fu_<tg_id>_<kind>_a (хто прийде, закріпиться за тим самим консультантом). Вимикач — settings.share у боті (/api/share):
   // поки відповіді немає або вимкнено, блоку немає. Сторінка слухає UI.onShare(fn), щоб перемалювати результат.
   const SQ = new URLSearchParams(location.search);
-  const SAPI = (SQ.get('api') || 'https://app.tviyfinplan.com.ua').replace(/\/$/, '');
+  const SAPI = window.safeApi ? window.safeApi(SQ.get('api')) : 'https://app.tviyfinplan.com.ua';
   const shareTexts = {}, shareCbs = [];
   UI.shareOn = false;
   UI.onShare = fn => { shareCbs.push(fn); if (UI.shareOn) fn(); };
