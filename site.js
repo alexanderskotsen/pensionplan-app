@@ -92,7 +92,9 @@ function calc(scroll){
     h+=`<div class="card save"><p class="lbl">Щоб мати ${num(want)} грн/міс, відкладайте</p><p class="big">≈ ${num(pmt)} <small>грн на місяць</small></p><p class="hint">До пенсії ${left} ${yw(left)}, потрібен капітал ≈ ${num(r.capital)} грн.</p></div>`;
   if(S.work==='fop')h+=`<p class="note">ФОП з мінімальним ЄСВ отримає пенсію, близьку до мінімальної, навіть з великим доходом. <a href="pensiya-fop/">Чому так і що з цим робити</a></p>`;
   if(S.work==='none')h+=`<p class="note">Неофіційна робота не додає ні стажу, ні пенсії.</p>`;
-  h+=`<div class="cta-box"><a class="btn cta" href="${botLink('res')}">Отримати повний план у Telegram</a><p class="hint" style="text-align:center;margin:0">Безкоштовно: скільки відкладати, з якого віку і що це дасть</p></div>`;
+  // дані розрахунку в посилання на бота (≤64 символи): f35s10e20r60w15pf → бот відкриє калькулятор з цими даними й результатом
+  const code=S.sex+A+'s'+Math.round(stazh)+{emp:'e',fop:'f',none:'n'}[S.work]+(S.work==='emp'?Math.min(999,Math.round(net/1000)):0)+'r'+ret+'w'+Math.min(999,Math.round(want/1000))+(S.work==='fop'?'p'+(S.past==='fop'?'f':'e'):'');
+  h+=`<div class="cta-box"><a class="btn cta" href="${botLink('res')}_${code}">Отримати план у Telegram</a><p class="hint" style="text-align:center;margin:0">Безкоштовно: скільки відкладати, з якого віку і що це дасть</p></div>`;
   h+=`<p class="fine">Розрахунок орієнтовний: формула ПФУ в цінах 2026 року, не рішення Пенсійного фонду. Інвестиційний дохід не гарантований.</p>`;
   $('res').innerHTML=h;$('res').hidden=false;
   if(scroll)$('res').scrollIntoView({behavior:'smooth',block:'start'});
