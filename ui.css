@@ -272,6 +272,10 @@ details.how.fold .card p{padding:0}
 .dock-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;background:none;color:var(--fg);font-size:16px;font-weight:700;min-height:var(--tap);margin:0 0 -6px;padding:0 8px;border-radius:12px}
 .dock-link:active{background:var(--soft)}
 /* форма: жива сума + «Розрахунок»; результат: без дубля суми, з «Надіслати розрахунок у чат» */
+/* «Що з цим робити: 3 кроки» (воронка v2): друга кнопка під записом, помітна, але не коралова; лише на результаті */
+.dock-post{display:none;margin-top:6px;min-height:46px;font-size:16px;font-weight:700;background:var(--soft);color:var(--fg);border:1.5px solid var(--ctl);gap:4px}
+html.has-post body[data-view="res"] .dock-post{display:flex}
+html.has-post body[data-view="res"] .dock-link{min-height:40px;margin-top:2px}
 body[data-view="res"] .dock-top{display:none}
 body[data-view="form"] .dock-link,body[data-view="form"] .dock .btn.cta{display:none}
 /* калькулятори без цифри на формі (пенсія, дитина, накопичення; 15.11.2026): лише велика «Показати розрахунок» */

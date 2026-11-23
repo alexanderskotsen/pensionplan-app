@@ -8,10 +8,10 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=12">
-<script src="bridge.js?v=6"></script>
+<link rel="stylesheet" href="ui.css?v=13">
+<script src="bridge.js?v=7"></script>
 <script src="tariff.js?v=3"></script>
-<script src="ui.js?v=10"></script>
+<script src="ui.js?v=11"></script>
 <style>
 /* «Швидше чи легше?» — та сама ціль з іншим строком; рядок натискається */
 .alt{display:grid}
@@ -111,6 +111,7 @@
     <button type="button" class="dock-go" id="toRes" data-tores><span class="lg">Показати розрахунок</span><span class="sm">Розрахунок</span><i data-ic="chev" data-px="18"></i></button>
   </div>
   <button type="button" class="btn cta" id="cta" data-cta></button>
+  <button type="button" class="btn dock-post" id="post" data-post="save">Що з цим робити: 3 кроки<i data-ic="chev" data-px="18"></i></button>
   <button type="button" class="dock-link" id="cta2"><i data-ic="plane" data-px="18"></i>Зберегти розрахунок у боті</button>
 </div></div>
 
@@ -271,8 +272,13 @@
     if (S.view === 'res') chart(r);
     if (window.UI) UI.syncNums();
   }
+  // цифри екрана результату для бота (воронка v2): ті самі, що бачить людина (суму округлено, як на екрані)
+  function trackRes(){
+    if (!window.trackOpen || !S._r) return;
+    trackOpen('res_save', { cur:S.cur, freq:S.freq, mode:S.mode, pay:S._pay, term:S.term, total:rnd(S._r.proj), paid:Math.round(S._r.paid), goal:S.goal, age:S.age, sex:S.sex });
+  }
   function show(v){
-    if (v === 'res' && window.trackOpen) trackOpen('res_save');
+    if (v === 'res') trackRes();
     S.view = v; S._enter = v === 'res';
     UI.setView(v, () => show('form'));
     render(); S._enter = false; scrollTo(0, 0);
@@ -294,7 +300,7 @@
   document.addEventListener('input', moved);
   document.addEventListener('click', e => { const b = e.target.closest('button'); if (b && !b.closest('.dock')) moved(); });
   $('back').onclick = () => show('form');
-  $('alt').onclick = e => { const b = e.target.closest('button[data-t]'); if (b) { S.term = +b.dataset.t; render(); } };
+  $('alt').onclick = e => { const b = e.target.closest('button[data-t]'); if (b) { S.term = +b.dataset.t; render(); if (S.view === 'res') trackRes(); } };
   window.addEventListener('resize', () => { if (S.view === 'res') { $('chart').classList.remove('draw'); chart(S._r); } });
   if (new URLSearchParams(location.search).get('tab') === 'goal') S.mode = 'goal';
   { const pa = +new URLSearchParams(location.search).get('pa'); if (pa >= 18 && pa <= 65) S.age = pa; }  // вік з анкети

@@ -145,7 +145,33 @@
     if (!inTg && navigator.share) { try { navigator.share({ text: text, url: link }).catch(() => {}); return; } catch (e) {} }
     try { if (!window.open(url, '_blank')) location.href = url; } catch (e) { location.href = url; }
   };
+  // ---------- «Що з цим робити: 3 кроки» (воронка v2) ----------
+  // Кнопка під «Записатися на консультацію» на екрані результату відкриває закріплений пост каналу.
+  // Адресу й вимикач дає бот (GET /api/post → {on, url}; settings.funnel_v2, settings.channel_post), кеш у sessionStorage.
+  // Поки відповіді немає або вимкнено, кнопки немає (html.has-post у ui.css). Подія post_<calc> у боті.
+  UI.postUrl = '';
+  const setPost = u => { UI.postUrl = /^https:\/\/t\.me\//.test(u || '') ? u : ''; document.documentElement.classList.toggle('has-post', !!UI.postUrl); };
+  try {
+    const c = sessionStorage.getItem('post_url');
+    if (c !== null) setPost(c);
+    else fetch(SAPI + '/api/post').then(r => r.json()).then(d => { const u = d && d.on && d.url ? d.url : '';
+      try { sessionStorage.setItem('post_url', u); } catch (e) {} setPost(u); }).catch(() => {});
+  } catch (e) {}
+  UI.post = function (kind) {
+    const url = UI.postUrl;
+    if (!url) return;
+    try {
+      const init = inTg && tg.initData, headers = { 'Content-Type': 'text/plain' };
+      if (init) headers['X-Init-Data'] = init;
+      if (init || SQ.get('tu')) fetch(SAPI + '/api/track', { method: 'POST', headers, keepalive: true,
+        body: JSON.stringify({ c: 'post_' + kind, tu: SQ.get('tu') || '', ts: SQ.get('ts') || '' }) }).catch(() => {});
+    } catch (e) {}
+    if (inTg) { try { tg.openTelegramLink(url); return; } catch (e) {} }
+    try { if (!window.open(url, '_blank')) location.href = url; } catch (e) { location.href = url; }
+  };
   document.addEventListener('click', e => {
+    const p = e.target.closest && e.target.closest('[data-post]');
+    if (p) { UI.post(p.dataset.post); return; }
     const b = e.target.closest && e.target.closest('[data-share]');
     if (b && shareTexts[b.dataset.share]) UI.share(b.dataset.share, shareTexts[b.dataset.share][+b.dataset.i || 0]);
   });

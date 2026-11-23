@@ -9,10 +9,10 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="ui.css?v=12">
-<script src="bridge.js?v=6"></script>
+<link rel="stylesheet" href="ui.css?v=13">
+<script src="bridge.js?v=7"></script>
 <script src="tariff.js?v=3"></script>
-<script src="ui.js?v=10"></script>
+<script src="ui.js?v=11"></script>
 </head>
 <body class="no-sum" data-view="form">
 <nav class="nav"><div class="nav-in"><button type="button" id="tab-n">Накопичити</button><button type="button" id="tab-p" class="on">Пенсія</button><button type="button" id="tab-c">Дитині</button><button type="button" id="tab-s">Захист</button><!-- Гра схована 14.11.2026 --></div></nav>
@@ -96,6 +96,7 @@
     <button type="button" class="dock-go" id="toResC" data-tores hidden><span class="lg">Показати розрахунок</span><span class="sm">Розрахунок</span><i data-ic="chev" data-px="18"></i></button>
   </div>
   <button type="button" class="btn" id="main">Показати повний розрахунок</button>
+  <button type="button" class="btn dock-post" id="post" data-post="pension">Що з цим робити: 3 кроки<i data-ic="chev" data-px="18"></i></button>
   <button type="button" class="dock-link" id="second" hidden><i data-ic="plane" data-px="18"></i>Зберегти розрахунок у боті</button>
 </div></div>
 
@@ -188,7 +189,17 @@ $('cgoal-own').addEventListener('input',upd);
 $('tab-p').onclick=()=>{S.tab='p';upd();scrollTo(0,0)};$('tab-c').onclick=()=>{S.tab='c';upd();scrollTo(0,0)};
 $('tab-n').onclick=()=>navGo('save.html');$('tab-s').onclick=()=>navGo('insure.html');
 // форма ↔ результат (окремо для пенсії й дитячої програми)
-function show(v){if(v==='res'&&window.trackOpen)trackOpen(S.tab==='c'?'res_child':'res_pension');const k=S.tab==='p'?'view':'cview';S[k]=v;S._enter=v==='res';upd();S._enter=false;scrollTo(0,0);if(v==='res')UI.enter($(S.tab==='p'?'p-out':'c-out'))}
+// цифри екрана результату для бота (воронка v2): ті самі, що бачить людина
+function resData(){
+  if(S.tab==='c'){const g=childGoal();if(!g)return null;const a=v('cage');return {age:a,pay:S.cpay,goal:g,pmt:childCalc(a,S.cpay,g).pmt}}
+  const i=pensionInput(), r=calculate(i.sex,i.age,i.ret,i.stazh,i.future,i.pastK,i.salary,i.want);
+  const d={sex:i.sex,age:i.age,ret:i.ret,stazh:i.stazh,work:i.work,net:i.net,want:i.want,pmt:r.pmt};
+  if(r.early){d.pension=r.pension;d.gap=r.gap;d.pa=r.stateAge||0}
+  else{const alt=!r.eligible&&r.altAge?calculate(i.sex,i.age,r.altAge,i.stazh,i.future,i.pastK,i.salary,i.want):null;
+    d.pension=alt?alt.pension:r.pension;d.gap=alt?Math.max(0,i.want-alt.pension):r.gap;d.pa=alt?r.altAge:r.eligible?i.ret:0}
+  return d;
+}
+function show(v){if(v==='res'&&window.trackOpen)trackOpen(S.tab==='c'?'res_child':'res_pension',resData());const k=S.tab==='p'?'view':'cview';S[k]=v;S._enter=v==='res';upd();S._enter=false;scrollTo(0,0);if(v==='res')UI.enter($(S.tab==='p'?'p-out':'c-out'))}
 $('toResC').onclick=()=>show('res');
 // аналітика: людина вперше щось змінила у формі (повзунок, чип, поле)
 ['p-form','c-form'].forEach(id=>{const f=$(id);if(!f)return;const h=()=>{if(window.trackOpen)trackOpen(id==='c-form'?'move_child':'move_pension')};
@@ -346,6 +357,7 @@ function upd(){
   if(S.tab==='p'&&S.view==='res')renderPension();
   if(S.tab==='c'&&S.cview==='res')renderChild();
   UI.setView(view,()=>show('form'));
+  $('post').dataset.post=S.tab==='c'?'child':'pension';
   $('main').hidden=view==='form';  // у формі — лише велика «Показати розрахунок» (body.no-sum, ui.css), цифра тільки на результаті
   const sec=$('second');
   // нижня панель. Форма: жива цифра + темна «Показати розрахунок». Результат: запис (корал) + «у чат», без дубля суми

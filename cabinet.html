@@ -434,6 +434,34 @@ async function renderFunnel() {
   if (d.sources.length) h += `<div class="card"><h3><span>Звідки приходять</span></h3><table class="tbl"><tr><th>Джерело</th><th>Люди</th><th>Записи</th><th>Поліси</th></tr>${d.sources.map(s => `<tr><td>${esc(s.name)}</td><td>${num(s.users)}</td><td><b>${num(s.leads)}</b></td><td>${num(s.policies)}</td></tr>`).join('')}</table></div>`;
   if (d.agents && d.agents.length) h += `<div class="card"><h3><span>Консультанти</span></h3>${d.agents.map(a => `<div class="arow"><div><b>${esc(a.name)}</b>${a.idle ? ` <span class="tag late">без дії ${a.idle}</span>` : ''}</div>
       <div class="mini">${num(a.users)} ${pl(a.users, 'людина', 'людини', 'людей')} · <b>${num(a.leads)}</b> ${pl(a.leads, 'запис', 'записи', 'записів')}${a.resp === null ? '' : ' · відповідь ' + dur(a.resp)}${a.dial === null ? '' : ' · додзвон ' + a.dial + '%'} · консультацій ${a.consults} · полісів ${num(a.policies)}</div></div>`).join('')}</div>`;
+  // Нова воронка (23.11.2026): канал, результат, що зробили після результату; порівняння «до / після» перемикання
+  const f2 = d.funnel2;
+  if (f2) {
+    const p = f2.period, c = f2.cmp, pc = (a, b) => b ? ` <span class="mini">${pct(a, b)}</span>` : '';
+    const row = (n, v) => `<div class="row"><span>${n}</span><span><b class="v">${v}</b></span></div>`;
+    h += `<div class="card"><h3><span>Нова воронка</span><span>${f2.on ? 'увімкнено' : 'вимкнено'}</span></h3>` +
+      row('Канал: підписались → вийшли → лишились', `${num(p.ch_join)} → ${num(p.ch_left)} → ${num(p.ch_stay)}`) +
+      row('Дійшли до результату', `${num(p.res)} з ${num(p.came)}` + pc(p.res, p.came)) +
+      row('Отримали повідомлення після результату', num(p.after)) +
+      row('Відкрили пост «Що з цим робити»', num(p.post)) +
+      row('Почали портрет з повідомлення', num(p.portrait)) +
+      row('Натиснули консультацію з повідомлення', num(p.cons)) +
+      row('Повторний візит: надіслано', num(p.ret)) +
+      row('Прийшли з кнопок постів каналу', num(p.ch_back)) +
+      (p.locked ? row('Вийшли з каналу → повернулись', `${num(p.back)} з ${num(p.locked)}`) : '') +
+      `<div class="mini" style="margin-top:6px">Старий прогрів: ${f2.nurture_v1 ? 'увімкнено' : 'вимкнено'}. Пост рахуємо за натисканнями в калькуляторі; кнопка під повідомленням у чаті відкриває канал одразу, її натискань не видно.</div>`;
+    if (c) {
+      const pr = x => x.came ? Math.round(x.res / x.came * 100) + '%' : '·';
+      const cr = (n, a, b) => `<tr><td>${n}</td><td>${a}</td><td><b>${b}</b></td></tr>`;
+      h += `<h3 style="margin-top:12px"><span>До і після перемикання</span></h3><table class="tbl"><tr><th>${String(c.days).replace('.', ',')} дн.</th><th>До</th><th>Після</th></tr>` +
+        cr('Прийшли', num(c.before.came), num(c.after.came)) + cr('Дійшли до результату', pr(c.before), pr(c.after)) +
+        cr('Записались', num(c.before.leads), num(c.after.leads)) +
+        cr('Пішли (блок, відписка)', num(c.before.lost), num(c.after.lost)) +
+        cr('Канал: лишились', num(c.before.ch_stay), num(c.after.ch_stay)) + `</table>
+        <div class="mini" style="margin-top:6px">Однакові проміжки до і після ${new Date(c.from * 1000).toLocaleDateString('uk-UA')}. «Пішли» рахуємо серед тих, хто прийшов у цей проміжок.</div>`;
+    }
+    h += `</div>`;
+  }
   if (d.miniapp.length) h += `<div class="card"><h3><span>Калькулятори</span></h3>${d.miniapp.map(m => `<div class="row"><span>${esc(m.name)}</span><span><b class="v">${num(m.opened)}${m.moved!=null?' → '+num(m.moved)+' → '+num(m.result):''} → ${num(m.done)} → ${num(m.leads)}</b></span></div>`).join('')}
     <div class="mini" style="margin-top:6px">Відкрили → (змінили дані → побачили результат) → натиснули «записатися» або «у чат» → записались. Кроки в дужках рахуються з 15.11. Відкрили хоч щось: ${d.miniapp_any.opened}, з них нічого не дорахували: ${d.miniapp_any.nothing}.</div></div>`;
   h += `<div class="card"><h3><span>Прогрів</span></h3><div class="row"><span>Зараз отримують листи</span><span><b class="v">${d.nurture.now}</b></span></div>
